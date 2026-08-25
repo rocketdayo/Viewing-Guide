@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { ClassProject, CongestionLevel } from '../types';
+import { fetchLiveGasCongestionSmart } from './gasClientFetcher';
 
 export interface GasParsedItem {
   classCode: string; // e.g. "1A", "2K"
@@ -45,40 +46,10 @@ export function matchClassCodeToProject(classCode: string, project: ClassProject
 }
 
 /**
- * Fetch latest live congestion data from the backend API /api/congestion-live
+ * Fetch latest live congestion data (using backend API or direct browser client fallback)
  */
 export async function fetchLiveGasCongestion(gasUrl?: string): Promise<GasSyncResult> {
-  try {
-    const apiUrl = gasUrl 
-      ? `/api/congestion-live?url=${encodeURIComponent(gasUrl)}`
-      : '/api/congestion-live';
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
-
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      signal: controller.signal,
-    });
-    
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const json: GasSyncResult = await response.json();
-    return json;
-  } catch (err: any) {
-    console.warn('Live congestion fetch failed:', err);
-    return {
-      success: false,
-      error: err.name === 'AbortError' ? 'タイムアウト（15秒経過）' : (err.message || 'データ取得に失敗しました'),
-    };
-  }
+  return fetchLiveGasCongestionSmart(gasUrl);
 }
 
 /**

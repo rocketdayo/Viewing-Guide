@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Announcement } from '../types';
+import { fetchLiveAnnouncementsSmart } from './gasClientFetcher';
 
 export interface AnnouncementSyncResult {
   success: boolean;
@@ -8,35 +9,7 @@ export interface AnnouncementSyncResult {
 }
 
 export async function fetchLiveAnnouncements(gasUrl?: string): Promise<AnnouncementSyncResult> {
-  try {
-    const apiUrl = gasUrl 
-      ? `/api/announcements-live?url=${encodeURIComponent(gasUrl)}`
-      : '/api/announcements-live';
-      
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
-
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' },
-      signal: controller.signal,
-    });
-    
-    clearTimeout(timeoutId);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-    
-    const json: AnnouncementSyncResult = await response.json();
-    return json;
-  } catch (err: any) {
-    console.warn('Backend announcement fetch failed:', err);
-    return {
-      success: false,
-      error: err.name === 'AbortError' ? 'Fetch timeout' : (err.message || 'Failed to fetch live announcements data'),
-    };
-  }
+  return fetchLiveAnnouncementsSmart(gasUrl);
 }
 
 export function useAnnouncementSync(
