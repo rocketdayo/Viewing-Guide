@@ -1,4 +1,5 @@
 import React from 'react';
+import logoImg from '../assets/logo.png';
 
 interface LogoBadgeProps {
   className?: string;
@@ -8,7 +9,7 @@ interface LogoBadgeProps {
 export const LogoBadge: React.FC<LogoBadgeProps> = ({ className = "w-10 h-10", size }) => {
   return (
     <img 
-      src="/logo.png" 
+      src={logoImg} 
       alt="SG Festival Logo" 
       className={`${className} object-contain`} 
       style={size ? { width: size, height: size } : undefined}
@@ -16,3 +17,4 @@ export const LogoBadge: React.FC<LogoBadgeProps> = ({ className = "w-10 h-10", s
     />
   );
 };
+
