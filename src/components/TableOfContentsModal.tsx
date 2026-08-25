@@ -8,7 +8,8 @@ import {
   MapPin, 
   Shield, 
   ChevronRight,
-  BookOpen
+  BookOpen,
+  GraduationCap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AppDataState } from '../types';
@@ -110,7 +111,7 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
                   </span>
                   <ChevronRight className="w-4 h-4 text-sky-400 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <p className="text-xs text-slate-600">Day1/Day2 チャペル・体育館・中庭の公演時間</p>
+                <p className="text-xs text-slate-600">各ステージの公演タイムテーブル（制作中）</p>
               </div>
 
               <div 
@@ -143,16 +144,36 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
 
               <div 
                 onClick={() => handleJump('map')}
-                className="p-4 rounded-xs border border-amber-100 bg-amber-50/50 hover:bg-amber-100/60 transition-all cursor-pointer group sm:col-span-2"
+                className="p-4 rounded-xs border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer group"
               >
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="flex items-center space-x-2 text-amber-900 font-bold text-sm">
-                    <MapPin className="w-4 h-4 text-amber-600" />
+                  <span className="flex items-center space-x-2 text-slate-800 font-bold text-sm">
+                    <MapPin className="w-4 h-4 text-rose-500" />
                     <span>校内マップ・フロア案内</span>
                   </span>
-                  <ChevronRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
                 </div>
                 <p className="text-xs text-slate-600">本館・新館・特別棟・チャペル・体育館の場所確認</p>
+              </div>
+
+              <div 
+                onClick={() => {
+                  onClose();
+                  onNavigate('home');
+                  setTimeout(() => {
+                    document.getElementById('alumni-section')?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+                className="p-4 rounded-xs border border-amber-300 bg-amber-50/70 hover:bg-amber-100 transition-all cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="flex items-center space-x-2 text-amber-950 font-bold text-sm">
+                    <GraduationCap className="w-4 h-4 text-amber-700" />
+                    <span>清教学園同窓会 特別企画</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-amber-600 group-hover:translate-x-1 transition-transform" />
+                </div>
+                <p className="text-xs text-amber-900/80">公式チラシ掲載：『未来の仕事図鑑』＆『先輩グルメ』</p>
               </div>
             </div>
 
@@ -165,8 +186,9 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
               <div className="space-y-3">
                 {['1年', '2年'].map((grade) => {
                   const gradeProjects = appData?.projects?.filter((p) => p.grade === grade) || [];
+                  if (gradeProjects.length === 0) return null;
                   return (
-                    <div key={grade} className="bg-slate-50 rounded-xs p-3.5 border border-slate-200/70">
+                    <div key={grade} className="rounded-xs p-3.5 border bg-slate-50 border-slate-200/70">
                       <div className="text-xs font-bold text-slate-700 mb-2 flex items-center justify-between">
                         <span>高校 {grade}</span>
                         <span className="text-[11px] text-slate-500 font-normal">{gradeProjects.length} 企画</span>
@@ -176,10 +198,10 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
                           <button
                             key={proj.id}
                             onClick={() => handleProjectClick(proj.id)}
-                            className="px-2.5 py-1.5 rounded-xs bg-white border border-slate-200 text-xs font-medium text-slate-700 hover:border-emerald-500 hover:text-emerald-600 transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs"
+                            className="px-2.5 py-1.5 rounded-xs border text-xs font-medium transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs bg-white border-slate-200 text-slate-700 hover:border-emerald-500 hover:text-emerald-600"
                           >
                             <span className="font-bold text-emerald-900">{proj.classNumber}</span>
-                            <span className="text-slate-500 max-w-[120px] truncate">{proj.title}</span>
+                            <span className="text-slate-600 max-w-[140px] truncate">{proj.title}</span>
                           </button>
                         ))}
                       </div>

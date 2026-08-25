@@ -15,10 +15,12 @@ import {
   Radio,
   ExternalLink,
   Phone,
-  ArrowRight
+  ArrowRight,
+  GraduationCap
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { AppDataState, ClassProject } from '../types';
+import { AlumniSection } from './AlumniSection';
 
 interface HomeViewProps {
   appData: AppDataState;
@@ -209,7 +211,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               },
               {
                 title: 'タイムスケジュール',
-                desc: 'ステージ発表やタイムテーブルのスケジュール確認（制作中）',
+                desc: '各ステージ・イベントの公演タイムテーブル（制作中）',
                 icon: Calendar,
                 action: () => onNavigate('schedule'),
                 tag: '制作中',
@@ -256,6 +258,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
+      {/* 2.5 清教学園同窓会（清教会）特別企画 特設セクション (PDF 1P: 未来の仕事図鑑 / PDF 2P: 先輩グルメ) */}
+      <AlumniSection />
+
       {/* 3. ごあいさつセクション (Institutional Greetings Tabs - Text Only) */}
       <section className="py-14 bg-[#FAFBFD] border-b border-slate-200 transition-opacity duration-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -290,17 +295,30 @@ export const HomeView: React.FC<HomeViewProps> = ({
               key={activeGreeting.id}
               className="bg-white p-6 sm:p-10 border border-slate-300 shadow-2xs space-y-6"
             >
-              <div className="border-b border-slate-200 pb-4">
-                <div className="text-xs font-mono text-emerald-800 font-bold">{activeGreeting.role}</div>
-                <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mt-1">
-                  {activeGreeting.title}
-                </h3>
-                <div className="text-sm font-bold text-slate-700 mt-1">{activeGreeting.name}</div>
+              <div className="border-b border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <div className="text-xs font-mono text-emerald-800 font-bold">{activeGreeting.role}</div>
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mt-1">
+                    {activeGreeting.themeTitle || (activeGreeting as any).title || `${activeGreeting.role}からのごあいさつ`}
+                  </h3>
+                  <div className="text-sm font-bold text-slate-700 mt-1">{activeGreeting.name}</div>
+                </div>
+                {activeGreeting.message.includes('確認中') && (
+                  <span className="self-start sm:self-auto px-3 py-1 bg-amber-50 text-amber-900 border border-amber-300 text-xs font-bold rounded-xs">
+                    内容確認中
+                  </span>
+                )}
               </div>
 
               <div className="space-y-4 text-sm sm:text-base text-slate-700 leading-relaxed font-sans whitespace-pre-line">
                 {activeGreeting.message}
               </div>
+
+              {activeGreeting.profileNote && (
+                <div className="pt-3 border-t border-slate-100 text-xs text-slate-500 font-mono">
+                  {activeGreeting.profileNote}
+                </div>
+              )}
             </motion.div>
           )}
         </div>

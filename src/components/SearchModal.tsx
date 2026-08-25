@@ -46,7 +46,10 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         p.catchphrase.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q) ||
         p.location.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q)
+        p.description.toLowerCase().includes(q) ||
+        (p.organizer && p.organizer.toLowerCase().includes(q)) ||
+        (p.menuItems && p.menuItems.some((m) => m.toLowerCase().includes(q))) ||
+        (p.fullDetails && p.fullDetails.toLowerCase().includes(q))
     );
 
     const matchedSchedules = (appData?.schedules || []).filter(

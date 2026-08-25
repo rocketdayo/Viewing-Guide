@@ -26,23 +26,39 @@ export const INITIAL_APP_DATA: AppDataState = {
       profileNote: '清教学園中・高等学校 校長'
     },
     {
+      id: 'greet-chairman',
+      role: '理事長',
+      name: '井上 良作',
+      themeTitle: '理事長からのごあいさつ',
+      message: 'ごあいさつ内容は現在確認中です。公開まで今しばらくお待ちください。',
+      profileNote: '学校法人清教学園 理事長'
+    },
+    {
       id: 'greet-council-president',
       role: '生徒会長',
-      name: '河内 結衣 (高3)',
-      themeTitle: '全員が主役。この瞬間にしか咲かない最高の笑顔を',
-      message: `皆さん、こんにちは！生徒会長の河内です！\n\n今年の文化祭は、生徒全員が主体となって「今までにない新しい清教の魅力」を表現することに全力で挑戦しました。放課後の校舎には連日、大道具を組み立てる音や劇のセリフ合わせ、バンドの演奏、ダンスの練習など、熱気に満ちた声が響き渡っていました。\n\n私たち高校3年生はクラス企画の出展はありませんが、生徒会執行部や実行委員会、各クラブ・有志ステージ、そして全体の安全な誘導・運営を通じて、後輩たちの挑戦を全力で支えています！\n\nこのオンライン鑑賞ガイドでは、各企画の詳細やスケジュールはもちろん、リアルタイムの混雑状況もチェックできます！ぜひご活用ください！`,
-      profileNote: '第75期 生徒会執行部 会長 (高3)'
+      name: '森本 豊 (高2)',
+      themeTitle: '生徒会長からのごあいさつ',
+      message: 'ごあいさつ内容は現在確認中です。公開まで今しばらくお待ちください。',
+      profileNote: '生徒会執行部 会長 (高2)'
     },
     {
       id: 'greet-committee-chair',
       role: '文化祭実行委員長',
-      name: '橘 航平 (高3)',
-      themeTitle: '一人ひとりの熱意が一つに。記憶に残る最高の2日間を',
-      message: `文化祭実行委員長の橘です。\n\n今年度の文化祭を開催するにあたり、企画段階から感染対策や安全管理、スムーズな誘導計画、そしてこのオンラインガイドの開発まで、全校生徒・教職員の皆様と綿密な準備を重ねてまいりました。\n\n今年の目玉は、高1（A〜J組）と高2（A〜K組）の全21クラスが創り上げた迫力ある教室アトラクションや脱出ゲーム、お化け屋敷、カフェ、そしてチャペルや体育館での多彩なステージです。さらに混雑を避けて快適に楽しんでいただけるよう、各ブースの待機時間をリアルタイムで配信しています。\n\n困ったことがあれば、校内の水色の腕章をつけた実行委員にお気軽にお声がけください。皆様にとって笑顔と感動に満ちた一日になりますように！`,
-      profileNote: '2026年度 文化祭実行委員会 委員長 (高3)'
+      name: '堀井 奏汰 (高2) / 上西 莉央 (高2)',
+      themeTitle: '文化祭実行委員長からのごあいさつ',
+      message: 'ごあいさつ内容は現在確認中です。公開まで今しばらくお待ちください。',
+      profileNote: '文化祭実行委員会 委員長 (高2)'
     }
   ],
   announcements: [
+    {
+      id: 'ann-alumni-special',
+      timestamp: '2026/09/19 09:30',
+      category: '一般案内',
+      title: '【同窓会特別企画】『未来の仕事図鑑』＆『先輩グルメを食べつくせ！』開催のご案内',
+      content: '清教学園同窓会主催の特別企画を9月19日(土)に開催！高3教室での進路相談「未来の仕事図鑑」と、キャンパス前・国際交流室前での「先輩グルメ」をぜひお楽しみください。',
+      isPinned: true
+    },
     {
       id: 'ann-guide-launch',
       timestamp: '2026/09/19 09:15',
@@ -51,123 +67,7 @@ export const INITIAL_APP_DATA: AppDataState = {
       content: '各クラスの待ち時間をリアルタイム表示。混雑状況タブから各教室の最新状況をいつでもご確認いただけます。',
     }
   ],
-  schedules: [
-    {
-      id: 'sch-1',
-      day: 'Day1',
-      startTime: '09:00',
-      endTime: '09:30',
-      title: 'オープニングセレモニー & 開会宣言',
-      performer: '生徒会執行部・実行委員会・軽音部',
-      venue: 'チャペル大講堂',
-      category: 'セレモニー',
-      description: '文化祭の幕開けを告げるファンファーレと実行委員長挨拶、オープニング特別ムービー上映！',
-      isImportant: true
-    },
-    {
-      id: 'sch-2',
-      day: 'Day1',
-      startTime: '09:45',
-      endTime: '10:45',
-      title: '吹奏楽部 スペシャルオータムコンサート',
-      performer: '清教学園高等学校 吹奏楽部',
-      venue: 'チャペル大講堂',
-      category: 'ステージ',
-      description: '全日本コンクール演奏曲から人気J-POPメドレー、映画音楽まで大迫力のサウンドをお届けします。',
-      isImportant: true
-    },
-    {
-      id: 'sch-3',
-      day: 'Day1',
-      startTime: '11:00',
-      endTime: '12:00',
-      title: 'ダンス部 Autumn Showcase 2026',
-      performer: 'ダンス部',
-      venue: '体育館アリーナ',
-      category: 'ステージ',
-      description: 'HipHop、Lock、Jazzなど多彩なジャンルで魅せるエネルギッシュなダンスパフォーマンス！',
-      isImportant: true
-    },
-    {
-      id: 'sch-4',
-      day: 'Day1',
-      startTime: '12:15',
-      endTime: '13:15',
-      title: '有志バンドLIVE セッション PART 1',
-      performer: '高校生有志バンド 3組',
-      venue: '中庭特設ウッドステージ',
-      category: 'ライブ',
-      description: '青空の下で響く爽快なロックサウンド！観客と一体になる熱狂の野外ステージ。'
-    },
-    {
-      id: 'sch-5',
-      day: 'Day1',
-      startTime: '13:30',
-      endTime: '14:30',
-      title: '演劇部 秋季特別公演「星巡りの切符」',
-      performer: '演劇部',
-      venue: '特別棟3F 視聴覚ホール',
-      category: 'ステージ',
-      description: '生徒書き下ろしの青春SFファンタジー。笑いあり涙ありの本格演劇舞台をお見逃しなく。'
-    },
-    {
-      id: 'sch-6',
-      day: 'Day1',
-      startTime: '14:45',
-      endTime: '15:15',
-      title: 'Day 1 デイリーハイライト & 優秀企画速報',
-      performer: '生徒会放送局',
-      venue: '校内全館放送 & チャペル',
-      category: 'セレモニー',
-      description: '1日目の見どころ振り返りと翌日の注目企画アナウンス。'
-    },
-    {
-      id: 'sch-7',
-      day: 'Day2',
-      startTime: '09:15',
-      endTime: '10:15',
-      title: '合唱部 & ハンドベルクワイア 朝の祈りと調べ',
-      performer: '合唱部・ハンドベル部',
-      venue: 'チャペル大講堂',
-      category: 'ステージ',
-      description: '厳かなチャペルに響き渡る透き通った歌声と美しいハンドベルのハーモニー。',
-      isImportant: true
-    },
-    {
-      id: 'sch-8',
-      day: 'Day2',
-      startTime: '10:30',
-      endTime: '12:00',
-      title: '清教男声・女声パフォーマンス王座決定戦',
-      performer: '各学年選抜有志チーム',
-      venue: '体育館アリーナ',
-      category: 'コンテスト',
-      description: '各学年の精鋭たちが個性豊かなパフォーマンスで競い合う名物エンタメバトル！'
-    },
-    {
-      id: 'sch-9',
-      day: 'Day2',
-      startTime: '12:30',
-      endTime: '13:45',
-      title: '軽音楽部 ファイナルフェス',
-      performer: '軽音楽部 4バンド',
-      venue: '中庭特設ウッドステージ',
-      category: 'ライブ',
-      description: '熱いビートとシャウト！最高潮の盛り上がりを見せる中庭ライブステージ。'
-    },
-    {
-      id: 'sch-10',
-      day: 'Day2',
-      startTime: '14:00',
-      endTime: '15:15',
-      title: 'グランドフィナーレ & クロージングセレモニー',
-      performer: '全校生徒・実行委員会',
-      venue: '体育館アリーナ & 第1グラウンド',
-      category: 'セレモニー',
-      description: '文化祭グランプリ表彰式、全校合唱、感動のエンディングムービー上映！',
-      isImportant: true
-    }
-  ],
+  schedules: [],
   projects: [
     // ==========================================
     // 高校1年 (A組〜J組: 全10クラス)

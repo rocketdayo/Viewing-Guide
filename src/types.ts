@@ -2,18 +2,22 @@ export type CongestionLevel = 'smooth' | 'moderate' | 'crowded' | 'ticket' | 'cl
 
 export interface ClassProject {
   id: string;
-  grade: '1年' | '2年' | '3年' | 'クラブ・有志';
-  classNumber: string; // e.g. '1年A組', '2年C組', '吹奏楽部'
+  grade: '1年' | '2年' | '3年' | 'クラブ・有志' | '同窓会・特別企画';
+  classNumber: string; // e.g. '1年A組', '2年C組', '吹奏楽部', '同窓会'
   title: string;
   catchphrase: string;
-  category: '演劇・劇' | 'アトラクション・体験' | '展示・研究' | 'カフェ・飲食' | '縁日・ゲーム' | 'ステージ・音楽';
+  category: '演劇・劇' | 'アトラクション・体験' | '展示・研究' | 'カフェ・飲食' | '縁日・ゲーム' | 'ステージ・音楽' | '特別企画・進路';
   location: string;
-  building: '本館' | '新館' | '特別棟' | 'チャペル' | '体育館' | '中庭・屋外' | 'カフェテリア';
-  floor: string; // '1F', '2F', '3F', '4F' etc.
+  building: '本館' | '新館' | '特別棟' | 'チャペル' | '体育館' | '中庭・屋外' | 'カフェテリア' | 'キャンパス前・屋外';
+  floor: string; // '1F', '2F', '3F', '4F', '屋外' etc.
   description: string;
   fullDetails: string;
   highlights: string[];
   imageUrl?: string;
+  organizer?: string; // e.g. '清教学園同窓会（清教会）'
+  targetAudience?: string; // e.g. '高校生・中学生・一般来場者・保護者'
+  timeSlot?: string; // e.g. '9月19日(土) ①10:00〜12:00 ②12:30〜14:30'
+  menuItems?: string[]; // e.g. グルメメニュー一覧
   congestion: {
     level: CongestionLevel;
     waitTimeMinutes: number; // e.g. 5, 20, 45

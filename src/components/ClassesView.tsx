@@ -359,7 +359,7 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <span className="text-xs font-bold text-slate-500">
-            該当企画: {filteredProjects.length} 件 / 全 21 企画
+            該当企画: {filteredProjects.length} 件 / 全 {projects.length} 企画
           </span>
         </div>
 
@@ -404,7 +404,7 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
                     <div className="space-y-3">
                       {/* Top Bar: Grade/Class & Bookmark */}
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-wrap items-center gap-1.5">
                           <span className="bg-emerald-50 text-emerald-900 text-xs font-bold px-2.5 py-1 rounded-xs border border-emerald-100">
                             {proj.classNumber}
                           </span>

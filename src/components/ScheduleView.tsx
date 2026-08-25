@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import { ScheduleEvent } from '../types';
 
 interface ScheduleViewProps {
-  schedules: ScheduleEvent[];
+  schedules?: ScheduleEvent[];
 }
 
 export const ScheduleView: React.FC<ScheduleViewProps> = () => {
@@ -26,7 +26,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = () => {
             </h1>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            チャペル大講堂、体育館、中庭特設ステージでの公演・LIVE・セレモニーの全日程
+            チャペル大講堂、体育館、中庭特設ステージ等の公演タイムテーブル
           </p>
         </div>
       </motion.div>
@@ -44,21 +44,21 @@ export const ScheduleView: React.FC<ScheduleViewProps> = () => {
 
         <div className="space-y-3 max-w-xl mx-auto">
           <span className="inline-block px-3 py-1 bg-amber-100 text-amber-900 text-xs font-bold uppercase tracking-widest rounded-xs">
-            只今、プログラム作成中
+            只今、タイムテーブル作成中
           </span>
           <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
             タイムスケジュールは現在制作中です
           </h2>
           <p className="text-sm text-slate-600 leading-relaxed pt-1">
-            ステージ発表・イベントの最新タイムテーブルは現在調整を行っております。<br className="hidden sm:inline" />
-            詳細なプログラム確定まで今しばらくお待ちください。
+            各ステージ（チャペル・体育館・中庭など）の公演タイムテーブルおよび出演順の調整を行っております。<br className="hidden sm:inline" />
+            完成次第、本画面にて公開いたします。
           </p>
         </div>
 
         <div className="pt-4 border-t border-slate-100 max-w-md mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-slate-500">
           <div className="flex items-center space-x-1.5">
-            <Clock className="w-4 h-4 text-emerald-700" />
-            <span>最新発表は本サイトで順次更新</span>
+            <Clock className="w-4 h-4 text-sky-700" />
+            <span>タイムテーブルを近日更新予定</span>
           </div>
           <div className="flex items-center space-x-1.5">
             <Sparkles className="w-4 h-4 text-amber-600" />
