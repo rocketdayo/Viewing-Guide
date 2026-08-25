@@ -83,9 +83,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
               {/* Event Info Box (Institutional style) */}
               <div className="bg-white p-5 border border-slate-300/90 shadow-2xs space-y-2.5">
-                <div className="flex items-center justify-between text-xs font-mono border-b border-slate-100 pb-2">
+                <div className="flex flex-wrap items-center justify-between text-xs font-mono border-b border-slate-100 pb-2 gap-2">
                   <span className="text-emerald-800 font-bold uppercase tracking-wider">フェスティバル・インフォメーション</span>
-                  <span className="text-slate-500">入場自由・一般公開</span>
+                  <span className="text-amber-800 bg-amber-50 px-2.5 py-0.5 border border-amber-200 font-sans font-semibold text-[11px]">対象：本校生徒・保護者・招待者のみ</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-700 pt-1">
                   <div className="flex items-center space-x-2">
@@ -94,7 +94,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   </div>
                   <div className="flex items-center space-x-2">
                     <MapPin className="w-4 h-4 text-emerald-700 shrink-0" />
-                    <span><strong className="text-slate-900">会場：</strong>清教学園 本館・新館・体育館</span>
+                    <span><strong className="text-slate-900">会場：</strong>清教学園</span>
                   </div>
                 </div>
               </div>
@@ -209,17 +209,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
               },
               {
                 title: 'タイムスケジュール',
-                desc: 'ステージ発表やタイムテーブルのスケジュール確認',
+                desc: 'ステージ発表やタイムテーブルのスケジュール確認（制作中）',
                 icon: Calendar,
                 action: () => onNavigate('schedule'),
-                tag: '時間割',
+                tag: '制作中',
               },
               {
                 title: '校内マップ・施設案内',
-                desc: '本館・新館・体育館・チャペルのフロアマップ',
+                desc: '清教学園校内の配置図・フロアマップ（制作中）',
                 icon: MapPin,
                 action: () => onNavigate('map'),
-                tag: 'フロア図',
+                tag: '制作中',
               },
             ].map((item, idx) => {
               const Icon = item.icon;

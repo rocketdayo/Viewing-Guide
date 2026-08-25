@@ -42,10 +42,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const navItems = [
     { id: 'home', label: 'ホーム', icon: Home },
-    { id: 'schedule', label: 'タイムテーブル', icon: Calendar },
+    { id: 'schedule', label: 'タイムテーブル', icon: Calendar, isDraft: true },
     { id: 'classes', label: 'クラス企画', icon: Layers },
     { id: 'congestion', label: '混雑状況', icon: Activity },
-    { id: 'map', label: '校内マップ', icon: MapPin },
+    { id: 'map', label: '校内マップ', icon: MapPin, isDraft: true },
     ...(isAdminLoggedIn ? [{ id: 'admin', label: '管理パネル', icon: Shield, isAdmin: true }] : []),
   ];
 
@@ -123,6 +123,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <Icon className={`w-4 h-4 ${isActive ? 'scale-110' : ''}`} />
                   <span>{item.label}</span>
+                  {item.isDraft && (
+                    <span className="text-[9px] bg-amber-100 text-amber-800 font-semibold px-1 py-0.2 rounded-xs ml-0.5">制作中</span>
+                  )}
                   {isActive && (
                     <motion.div
                       layoutId="navbarIndicator"
@@ -202,6 +205,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                     >
                       <Icon className="w-4 h-4 shrink-0" />
                       <span className="text-xs font-bold">{item.label}</span>
+                      {item.isDraft && (
+                        <span className="text-[9px] bg-amber-100 text-amber-800 font-semibold px-1 py-0.2 rounded-xs ml-auto">制作中</span>
+                      )}
                     </button>
                   );
                 })}
