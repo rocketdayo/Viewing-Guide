@@ -1,0 +1,660 @@
+import { AppDataState } from '../types';
+
+export const INITIAL_GAS_URL = "https://docs.google.com/spreadsheets/d/154F3vcdcOSyMc55VbY9qPCey4JtL7mW1pCOWBrDVuZc/edit?gid=0#gid=0";
+export const INITIAL_ANNOUNCEMENT_URL = "https://docs.google.com/spreadsheets/d/1Ajv5ErGHjhIz740IaB-IqhywYkV66dREwOdk7G3EiEg/edit?gid=0#gid=0";
+export const ANNOUNCEMENT_PORTAL_URL = "https://script.google.com/a/macros/stu.seikyo.ed.jp/s/AKfycbwsTDpMSe6Kdr1RoQ8TVByVtVVqAZG5q3mSvPmMxhH_SRUx8wZSwJdaKD8qwwphmAgaEg/exec";
+
+export const INITIAL_APP_DATA: AppDataState = {
+  festivalTitle: "2026 清教学園 中高合同文化祭 SG fes",
+  festivalTheme: "清教エナジー！～1度しかない学園生活を楽しもう～",
+  dates: "2026年9月19日(土)・9月20日(日)",
+  gasCongestionUrl: INITIAL_GAS_URL,
+  gasAnnouncementUrl: INITIAL_ANNOUNCEMENT_URL,
+  greetings: [
+    {
+      id: 'greet-principal',
+      role: '学校長',
+      name: '森野 章二',
+      themeTitle: 'ご来校の皆さまへ',
+      message: `ご来校の皆さま、本日は清教学園中・高等学校の中高合同文化祭SG fesにお越しくださり、心から感謝申し上げます。中高合同文化祭は、6月に実施された中高合同体育大会と並び、中高総勢1700名を超える生徒たちが合同で実施する学園の一大イベントです。
+　今年度のテーマは、「**清教エナジー！～1度しかない学園生活を楽しもう～**」です。生徒たちからの提案によるものですが、日頃からエネルギーが高く元気いっぱいの清教の生徒が、この時期にしか楽しめない学園生活を目一杯エンジョイしようという気持ちが溢れています。体育大会同様、この文化祭も生徒たちの自主性を重んじる取り組みのため、色々な面で稚拙さや不十分な点が目立つ部分もあるかもしれませんが、温かい目で見守ってくださり、生徒たちと共に楽しんでいただければ幸いです。
+　PTA役員をはじめとする保護者の皆さま、清教学園同窓会「清教会」の皆さま、卒業生の皆さま、清教学園に関心を持ってくださっている皆さま、そして本日お越しくださったすべての皆さまに感謝をいたします。
+この日が皆さまにとって喜びの溢れる素晴らしい一日となりますように。
+
+清教学園中・高等学校
+校長　森野章二`,
+      profileNote: '清教学園中・高等学校 校長'
+    },
+    {
+      id: 'greet-council-president',
+      role: '生徒会長',
+      name: '河内 結衣 (高3)',
+      themeTitle: '全員が主役。この瞬間にしか咲かない最高の笑顔を',
+      message: `皆さん、こんにちは！生徒会長の河内です！\n\n今年の文化祭は、生徒全員が主体となって「今までにない新しい清教の魅力」を表現することに全力で挑戦しました。放課後の校舎には連日、大道具を組み立てる音や劇のセリフ合わせ、バンドの演奏、ダンスの練習など、熱気に満ちた声が響き渡っていました。\n\n私たち高校3年生はクラス企画の出展はありませんが、生徒会執行部や実行委員会、各クラブ・有志ステージ、そして全体の安全な誘導・運営を通じて、後輩たちの挑戦を全力で支えています！\n\nこのオンライン鑑賞ガイドでは、各企画の詳細やスケジュールはもちろん、リアルタイムの混雑状況もチェックできます！ぜひご活用ください！`,
+      profileNote: '第75期 生徒会執行部 会長 (高3)'
+    },
+    {
+      id: 'greet-committee-chair',
+      role: '文化祭実行委員長',
+      name: '橘 航平 (高3)',
+      themeTitle: '一人ひとりの熱意が一つに。記憶に残る最高の2日間を',
+      message: `文化祭実行委員長の橘です。\n\n今年度の文化祭を開催するにあたり、企画段階から感染対策や安全管理、スムーズな誘導計画、そしてこのオンラインガイドの開発まで、全校生徒・教職員の皆様と綿密な準備を重ねてまいりました。\n\n今年の目玉は、高1（A〜J組）と高2（A〜K組）の全21クラスが創り上げた迫力ある教室アトラクションや脱出ゲーム、お化け屋敷、カフェ、そしてチャペルや体育館での多彩なステージです。さらに混雑を避けて快適に楽しんでいただけるよう、各ブースの待機時間をリアルタイムで配信しています。\n\n困ったことがあれば、校内の水色の腕章をつけた実行委員にお気軽にお声がけください。皆様にとって笑顔と感動に満ちた一日になりますように！`,
+      profileNote: '2026年度 文化祭実行委員会 委員長 (高3)'
+    }
+  ],
+  announcements: [
+    {
+      id: 'ann-guide-launch',
+      timestamp: '2026/09/19 09:15',
+      category: '一般案内',
+      title: 'オンライン鑑賞ガイド公開！リアルタイム混雑モニターも稼働中です',
+      content: '各クラスの待ち時間をリアルタイム表示。混雑状況タブから各教室の最新状況をいつでもご確認いただけます。',
+    }
+  ],
+  schedules: [
+    {
+      id: 'sch-1',
+      day: 'Day1',
+      startTime: '09:00',
+      endTime: '09:30',
+      title: 'オープニングセレモニー & 開会宣言',
+      performer: '生徒会執行部・実行委員会・軽音部',
+      venue: 'チャペル大講堂',
+      category: 'セレモニー',
+      description: '文化祭の幕開けを告げるファンファーレと実行委員長挨拶、オープニング特別ムービー上映！',
+      isImportant: true
+    },
+    {
+      id: 'sch-2',
+      day: 'Day1',
+      startTime: '09:45',
+      endTime: '10:45',
+      title: '吹奏楽部 スペシャルオータムコンサート',
+      performer: '清教学園高等学校 吹奏楽部',
+      venue: 'チャペル大講堂',
+      category: 'ステージ',
+      description: '全日本コンクール演奏曲から人気J-POPメドレー、映画音楽まで大迫力のサウンドをお届けします。',
+      isImportant: true
+    },
+    {
+      id: 'sch-3',
+      day: 'Day1',
+      startTime: '11:00',
+      endTime: '12:00',
+      title: 'ダンス部 Autumn Showcase 2026',
+      performer: 'ダンス部',
+      venue: '体育館アリーナ',
+      category: 'ステージ',
+      description: 'HipHop、Lock、Jazzなど多彩なジャンルで魅せるエネルギッシュなダンスパフォーマンス！',
+      isImportant: true
+    },
+    {
+      id: 'sch-4',
+      day: 'Day1',
+      startTime: '12:15',
+      endTime: '13:15',
+      title: '有志バンドLIVE セッション PART 1',
+      performer: '高校生有志バンド 3組',
+      venue: '中庭特設ウッドステージ',
+      category: 'ライブ',
+      description: '青空の下で響く爽快なロックサウンド！観客と一体になる熱狂の野外ステージ。'
+    },
+    {
+      id: 'sch-5',
+      day: 'Day1',
+      startTime: '13:30',
+      endTime: '14:30',
+      title: '演劇部 秋季特別公演「星巡りの切符」',
+      performer: '演劇部',
+      venue: '特別棟3F 視聴覚ホール',
+      category: 'ステージ',
+      description: '生徒書き下ろしの青春SFファンタジー。笑いあり涙ありの本格演劇舞台をお見逃しなく。'
+    },
+    {
+      id: 'sch-6',
+      day: 'Day1',
+      startTime: '14:45',
+      endTime: '15:15',
+      title: 'Day 1 デイリーハイライト & 優秀企画速報',
+      performer: '生徒会放送局',
+      venue: '校内全館放送 & チャペル',
+      category: 'セレモニー',
+      description: '1日目の見どころ振り返りと翌日の注目企画アナウンス。'
+    },
+    {
+      id: 'sch-7',
+      day: 'Day2',
+      startTime: '09:15',
+      endTime: '10:15',
+      title: '合唱部 & ハンドベルクワイア 朝の祈りと調べ',
+      performer: '合唱部・ハンドベル部',
+      venue: 'チャペル大講堂',
+      category: 'ステージ',
+      description: '厳かなチャペルに響き渡る透き通った歌声と美しいハンドベルのハーモニー。',
+      isImportant: true
+    },
+    {
+      id: 'sch-8',
+      day: 'Day2',
+      startTime: '10:30',
+      endTime: '12:00',
+      title: '清教男声・女声パフォーマンス王座決定戦',
+      performer: '各学年選抜有志チーム',
+      venue: '体育館アリーナ',
+      category: 'コンテスト',
+      description: '各学年の精鋭たちが個性豊かなパフォーマンスで競い合う名物エンタメバトル！'
+    },
+    {
+      id: 'sch-9',
+      day: 'Day2',
+      startTime: '12:30',
+      endTime: '13:45',
+      title: '軽音楽部 ファイナルフェス',
+      performer: '軽音楽部 4バンド',
+      venue: '中庭特設ウッドステージ',
+      category: 'ライブ',
+      description: '熱いビートとシャウト！最高潮の盛り上がりを見せる中庭ライブステージ。'
+    },
+    {
+      id: 'sch-10',
+      day: 'Day2',
+      startTime: '14:00',
+      endTime: '15:15',
+      title: 'グランドフィナーレ & クロージングセレモニー',
+      performer: '全校生徒・実行委員会',
+      venue: '体育館アリーナ & 第1グラウンド',
+      category: 'セレモニー',
+      description: '文化祭グランプリ表彰式、全校合唱、感動のエンディングムービー上映！',
+      isImportant: true
+    }
+  ],
+  projects: [
+    // ==========================================
+    // 高校1年 (A組〜J組: 全10クラス)
+    // ==========================================
+    {
+      id: 'p-1a',
+      grade: '1年',
+      classNumber: '1年A組',
+      title: '人形教室',
+      catchphrase: '人形に呪われた教室を救うお化け屋敷',
+      category: 'アトラクション・体験',
+      location: '本館 2F 1-A教室',
+      building: '本館',
+      floor: '2F',
+      description: '人形に呪われた教室を救うお化け屋敷。薄暗い教室に蠢く人形たちの怨念を鎮め、無事に脱出できるか？',
+      fullDetails: '教室全体を呪われた廃校の教室に改装。不気味に並ぶ人形たち、ひとりでに鳴るチャイムや動く机のギミックなど、背筋が凍る恐怖演出が満載。呪いを解く手がかりを見つけて無事生還を目指してください。',
+      highlights: ['リアルな呪いの人形ギミック', '臨場感あふれるホラー音響演出', 'ミッションクリア型のお化け屋敷'],
+      congestion: {
+        level: 'smooth',
+        waitTimeMinutes: 10,
+        ticketRequired: false,
+        lastUpdated: '11:40',
+        statusNote: 'スムーズにご案内可能です'
+      },
+      rules: ['暗室のため足元にご注意ください', 'キャスト・人形への接触は禁止です']
+    },
+    {
+      id: 'p-1b',
+      grade: '1年',
+      classNumber: '1年B組',
+      title: '1-B出口',
+      catchphrase: '空港搭乗口で異変を探せ！搭乗ゲート5への脱出を目指す間違い探しゲーム！',
+      category: 'アトラクション・体験',
+      location: '本館 2F 1-B教室',
+      building: '本館',
+      floor: '2F',
+      description: '舞台は空港の搭乗口に向かう途中。前にすすんで行き、道中で間違いがあるかを探す。そして、道中に間違いがあったかどうかを待機ルームでスタッフに伝える。それがあっていたなら搭乗口の番号が一つ増える。間違っていたなら数字が0に戻る。搭乗ゲート5 に辿り着いたチームから脱出する。',
+      fullDetails: '大人気ループホラーゲームのシステムを空港の搭乗口に見立ててリアル再現！道中の僅かな異変や間違いを見逃さず、正しい報告を重ねて搭乗ゲート5へ到達せよ！観察力と記憶力が試される新感覚の脱出アトラクションです。',
+      highlights: ['空港搭乗口を再現したリアルな通路', '細部に仕掛けられた絶妙な間違いギミック', 'チーム協力で挑むループ脱出体験'],
+      congestion: {
+        level: 'ticket',
+        waitTimeMinutes: 15,
+        ticketRequired: true,
+        ticketDistributionTime: 'オンラインにて整理券受付中',
+        lastUpdated: '11:42',
+        statusNote: 'オンライン整理券を発行してご参加ください'
+      },
+      rules: ['1グループ2〜4名様推奨', '制限時間内に間違いを報告してください'],
+      onlineTicketUrl: '',
+      onlineTicketNote: 'オンライン整理券発行対応クラスです。整理券を発行の上、指定時間にお越しください。'
+    },
+    {
+      id: 'p-1c',
+      grade: '1年',
+      classNumber: '1年C組',
+      title: 'パニックZoo 〜謎を解いて檻から脱出せよ〜',
+      catchphrase: '動物園で大パニック発生!? 散りばめられた謎を解き明かし檻から脱出せよ！',
+      category: 'アトラクション・体験',
+      location: '本館 2F 1-C教室',
+      building: '本館',
+      floor: '2F',
+      description: '謎を解いて動物園から脱出する体験型アトラクション。檻に閉じ込められたあなたを待つ数々の試練をクリアしよう！',
+      fullDetails: '突如制御不能になった動物園の檻の中に閉じ込められた来場者たち。動物たちの鳴き声や足跡、飼育日誌に隠された暗号を解き明かし、緊急ロックを解除して檻から脱出を目指します！',
+      highlights: ['本格的な動物園セットと檻の装飾', '頭脳を使う多彩な謎解きギミック', '脱出成功でオリジナル認定スタンプ'],
+      congestion: {
+        level: 'crowded',
+        waitTimeMinutes: 35,
+        ticketRequired: false,
+        lastUpdated: '11:45',
+        statusNote: '人気のため35分待ち'
+      },
+      rules: ['所要時間：約10分', 'ヒントカードも用意しています']
+    },
+    {
+      id: 'p-1d',
+      grade: '1年',
+      classNumber: '1年D組',
+      title: '釣りスピアクアリウム',
+      catchphrase: '教室が巨大な海の世界に！手作り魚釣り＆水中探索アトラクション！',
+      category: '縁日・ゲーム',
+      location: '本館 2F 1-D教室',
+      building: '本館',
+      floor: '2F',
+      description: '教室をアクアリウムに見立てた体験型釣り＆水中探索アトラクション。海の生き物を釣り上げて豪華景品を狙おう！',
+      fullDetails: '教室全体をブルーの照明と水槽風装飾で覆い、幻想的な深海アクアリウムを構築！自作の竿と仕掛けを使って、泳ぐ様々な魚やレアな深海魚を釣り上げるゲームです。大物を釣り上げた方には特製景品をプレゼント！',
+      highlights: ['幻想的なアクアリウム空間演出', '手作り魚釣りゲーム（レア魚多数）', 'お子様から大人まで楽しめる景品'],
+      congestion: {
+        level: 'ticket',
+        waitTimeMinutes: 10,
+        ticketRequired: true,
+        ticketDistributionTime: 'オンラインにて整理券受付中',
+        lastUpdated: '11:35',
+        statusNote: 'オンライン整理券発行対応中'
+      },
+      rules: ['釣り竿は周りの人にぶつからないようご注意ください'],
+      onlineTicketUrl: '',
+      onlineTicketNote: 'オンライン整理券発行対応クラスです。整理券をお持ちの方を優先してご案内いたします。'
+    },
+    {
+      id: 'p-1e',
+      grade: '1年',
+      classNumber: '1年E組',
+      title: '福山パラダイス',
+      catchphrase: '輪投げ・恋御籤・射的・ヨーヨー釣り！最高の縁日パラダイスへようこそ！',
+      category: '縁日・ゲーム',
+      location: '本館 2F 1-E教室',
+      building: '本館',
+      floor: '2F',
+      description: '輪投げや恋御籤や射的やヨーヨー釣りなどをして縁日を再現する。',
+      fullDetails: '賑やかなお祭り空間が広がる「福山パラダイス」！定番の射的や輪投げ、色とりどりのヨーヨー釣り、そして大注目の特製「恋御籤（こいみくじ）」まで、ワクワクする縁日アトラクションをぎゅっと詰め込みました！',
+      highlights: ['盛りだくさんの縁日ブース（射的・輪投げ・ヨーヨー）', '当たると噂の特製「恋御籤」', 'お祭り気分を盛り上げる装飾とBGM'],
+      congestion: {
+        level: 'smooth',
+        waitTimeMinutes: 10,
+        ticketRequired: false,
+        lastUpdated: '11:30',
+        statusNote: '各ブースすぐにご参加いただけます'
+      },
+      rules: ['景品がなくなり次第終了となる場合がございます']
+    },
+    {
+      id: 'p-1f',
+      grade: '1年',
+      classNumber: '1年F組',
+      title: 'WADARASHI',
+      catchphrase: '動く的を狙い撃ち！ボールを蹴ってターゲットを倒し駄菓子をゲット！',
+      category: '縁日・ゲーム',
+      location: '本館 3F 1-F教室',
+      building: '本館',
+      floor: '3F',
+      description: '来場者はボールを蹴って動く的を倒す。倒したものや、倒した個数により点数が変動する。それに応じて駄菓子を提供する。',
+      fullDetails: '足元のボールを思い切りキック！レール上を不規則に動く的やターゲットを狙い撃つ爽快キックターゲット。倒した的の種類や合計スコアに応じて、懐かしの駄菓子をプレゼントします！サッカー経験者も初心者も大熱狂！',
+      highlights: ['動く的を倒す爽快キックゲーム', 'スコアに応じた駄菓子プレゼント', '安全ネットと衝撃吸収マット完備'],
+      congestion: {
+        level: 'moderate',
+        waitTimeMinutes: 15,
+        ticketRequired: false,
+        lastUpdated: '11:43',
+        statusNote: '順番にご案内中（約15分待ち）'
+      },
+      rules: ['靴を履いたままご参加いただけます', 'スタッフの合図でキックしてください']
+    },
+    {
+      id: 'p-1g',
+      grade: '1年',
+      classNumber: '1年G組',
+      title: 'ワクワクG組カフェテリア',
+      catchphrase: 'ワクワクがいっぱい！ほっと一息つける憩いのカフェテリア空間',
+      category: 'カフェ・飲食',
+      location: '本館 3F 1-G教室',
+      building: '本館',
+      floor: '3F',
+      description: '心躍るカフェテリア空間でおいしいドリンクや軽食を楽しめる憩いのカフェ。文化祭歩きの休憩にぴったり！',
+      fullDetails: 'おしゃれに装飾された居心地の良いカフェ空間。冷たいジュースやお茶、スイーツ感覚で楽しめるドリンクをご提供。フォトブースも併設しており、友達やご家族と記念撮影も楽しめます。',
+      highlights: ['ゆったり座れる休憩テーブル席', '冷たいドリンク＆おもてなし', 'おしゃれな写真撮影スポット'],
+      congestion: {
+        level: 'smooth',
+        waitTimeMinutes: 10,
+        ticketRequired: false,
+        lastUpdated: '11:47',
+        statusNote: 'お席に空きがございます'
+      },
+      rules: ['混雑時は30分制とさせていただきます']
+    },
+    {
+      id: 'p-1h',
+      grade: '1年',
+      classNumber: '1年H組',
+      title: '人間カーリング',
+      catchphrase: '乗って押して高得点エリアを狙え！白熱の人間カーリング対決！',
+      category: 'アトラクション・体験',
+      location: '本館 3F 1-H教室',
+      building: '本館',
+      floor: '3F',
+      description: '人間カーリング。キャスター付きの台車orキャスター付き椅子に人を乗せて押す。床に点数のラインを示し、合計得点によって景品が変わる。',
+      fullDetails: '自分がストーンになって特設リンクを滑走！ペアを組んで台車に乗り、パートナーが絶妙な力加減でプッシュ。床に描かれた同心円のサークル中心（高得点エリア）にピタリと止められるか!? スリルと笑いが絶えない人気アトラクションです。',
+      highlights: ['キャスター台車に乗る大迫力の滑走感', 'ペアでの息の合ったチームプレイ', '合計得点で豪華景品ゲット'],
+      congestion: {
+        level: 'moderate',
+        waitTimeMinutes: 20,
+        ticketRequired: false,
+        lastUpdated: '11:32',
+        statusNote: '挑戦者多数につき約20分待ち'
+      },
+      rules: ['ヘルメット・プロテクター着用', 'コース外への飛び出し防止クッション完備']
+    },
+    {
+      id: 'p-1i',
+      grade: '1年',
+      classNumber: '1年I組',
+      title: '角には気を付けろこの先自己責任',
+      catchphrase: '曲がり角の先に潜む恐怖…この先自己責任で進む戦慄のお化け屋敷！',
+      category: 'アトラクション・体験',
+      location: '本館 3F 1-I教室',
+      building: '本館',
+      floor: '3F',
+      description: 'お化け屋敷。来場者に恐怖と驚き、そして楽しさを体験してもらい、思い出に残る文化祭の企画を提供する。',
+      fullDetails: '暗闇の迷路に張り巡らされた数々の死角。角を曲がるたびに何かが待ち受ける…！生徒たちの迫真の演出と特殊メイク、不気味な音響で心拍数MAXの恐怖と驚きをお届けします。勇気を出して一歩を踏み出してください。',
+      highlights: ['死角を巧みに使った驚愕ギミック', 'こだわり抜いた暗闇迷路レイアウト', '思い出に残る絶叫体験'],
+      congestion: {
+        level: 'crowded',
+        waitTimeMinutes: 40,
+        ticketRequired: false,
+        lastUpdated: '11:45',
+        statusNote: '現在大盛況（約40分待ち）'
+      },
+      rules: ['暗闇の中を走らないでください', '心臓の弱い方はご注意ください']
+    },
+    {
+      id: 'p-1j',
+      grade: '1年',
+      classNumber: '1年J組',
+      title: 'かき氷始めました',
+      catchphrase: 'ひんやり美味しい定番フレーバー！いちご＆ブルーハワイのかき氷で涼もう！',
+      category: 'カフェ・飲食',
+      location: '本館 3F 1-J教室',
+      building: '本館',
+      floor: '3F',
+      description: '客にかき氷を提供する　かき氷（いちご）かき氷（ブルーハワイ）',
+      fullDetails: '暑い文化祭にぴったりの冷た〜いかき氷！定番人気の「いちご」と爽やかな「ブルーハワイ」の2大フレーバーをご用意。ふわふわの氷にたっぷりシロップをかけてご提供します。一息ついてリフレッシュしていってください！',
+      highlights: ['ふわふわ食感の特製かき氷', '定番人気「いちご」「ブルーハワイ」', '涼しく休憩できるイートインスペース'],
+      congestion: {
+        level: 'smooth',
+        waitTimeMinutes: 5,
+        ticketRequired: false,
+        lastUpdated: '11:38',
+        statusNote: 'すぐにご注文・お受け取りいただけます'
+      },
+      rules: ['ゴミは分別して専用ゴミ箱へ捨ててください']
+    },
+
+    // ==========================================
+    // 高校2年 (A組〜K組: 全11クラス)
+    // ==========================================
+    {
+      id: 'p-2a',
+      grade: '2年',
+      classNumber: '2年A組',
+      title: '今日から動物デビュー。',
+      catchphrase: 'みんなも今日から動物の仲間入り!? 癒やしと笑顔の体験型どうぶつパーク！',
+      category: '展示・研究',
+      location: '新館 3F 2-A教室',
+      building: '新館',
+      floor: '3F',
+      description: '可愛い動物たちの世界に入り込む体験型アトラクション＆フォトスポット。動物になりきって楽しもう！',
+      fullDetails: '教室全体をサバンナや森の動物園風に装飾！動物のカチューシャや小道具を身に着けて撮影できる映えフォトスポットや、動物クイズ・ミニゲームなど、子どもから大人まで笑顔になれるアトラクションです。',
+      highlights: ['可愛い動物なりきりフォトスポット', '手作り動物ジオラマ＆装飾', '参加型どうぶつミニゲーム'],
+      congestion: {
+        level: 'ticket',
+        waitTimeMinutes: 10,
+        ticketRequired: true,
+        ticketDistributionTime: 'オンラインにて整理券受付中',
+        lastUpdated: '11:45',
+        statusNote: 'オンライン整理券発行対応中'
+      },
+      rules: ['撮影時は順番をお守りください'],
+      onlineTicketUrl: '',
+      onlineTicketNote: 'オンライン整理券発行対応クラスです。整理券を取得のうえお越しください。'
+    },
+    {
+      id: 'p-2b',
+      grade: '2年',
+      classNumber: '2年B組',
+      title: 'サスケットモンスター',
+      catchphrase: 'ポケモンセンター（2B）で依頼を受け、指定のモンスターを捕まえて景品ゲット！',
+      category: 'アトラクション・体験',
+      location: '新館 3F 2-B教室',
+      building: '新館',
+      floor: '3F',
+      description: 'ポケモンセンター（2B）に立ち寄り依頼されたポケモンを捕まえよう！捕まえられたポケモンに応じて景品をゲット！',
+      fullDetails: '2年B組に開設された特設ポケモンセンター！依頼ボードからミッションを受注し、フィールド内に隠れたターゲットのモンスターを探して捕獲せよ！捕まえたポケモンのレア度や数に応じて豪華景品をプレゼント！',
+      highlights: ['特設ポケモンセンターの本格世界観', '探索型モンスター捕獲ミッション', '豪華景品が当たるガチャ＆引き換え'],
+      congestion: {
+        level: 'crowded',
+        waitTimeMinutes: 30,
+        ticketRequired: false,
+        lastUpdated: '11:48',
+        statusNote: '現在30分待ちです'
+      },
+      rules: ['1グループ最大4名様', 'フィールド内は走らず探索してください']
+    },
+    {
+      id: 'p-2c',
+      grade: '2年',
+      classNumber: '2年C組',
+      title: 'SGクエスト 2-C',
+      catchphrase: '勇者となってダンジョンを攻略せよ！立ちはだかる謎と試練に挑む体験型RPG！',
+      category: 'アトラクション・体験',
+      location: '新館 3F 2-C教室',
+      building: '新館',
+      floor: '3F',
+      description: '勇者となって教室内のダンジョンを冒険し、立ちはだかる試練やクエストをクリアして進む体験型RPGアドベンチャー。',
+      fullDetails: '教室内に組まれた巨大な迷宮ダンジョン。剣や盾を手に取り、モンスターとの遭遇や宝箱の暗号解除、ボスの弱点を探る試練に挑戦！仲間と協力して伝説の勇者を目指そう！',
+      highlights: ['RPGの世界観を完全再現したダンジョン', '手作り武器＆防具の装備体験', 'ボス戦ギミックと謎解き試練'],
+      congestion: {
+        level: 'crowded',
+        waitTimeMinutes: 35,
+        ticketRequired: false,
+        lastUpdated: '11:40',
+        statusNote: 'パーティー編成順にご案内中'
+      },
+      rules: ['武器は振り回さず指示に従ってご使用ください']
+    },
+    {
+      id: 'p-2d',
+      grade: '2年',
+      classNumber: '2年D組',
+      title: 'モジャオサバイバル',
+      catchphrase: '危険が待ち受けるサバイバルゾーン！数々の罠をくぐり抜けて生き残れ！',
+      category: 'アトラクション・体験',
+      location: '新館 3F 2-D教室',
+      building: '新館',
+      floor: '3F',
+      description: '障害物や危険なギミックが仕掛けられたサバイバルエリアを進み、制限時間内にミッションを達成して生還を目指すアクション体験型アトラクション。',
+      fullDetails: 'ジャングルや荒野をイメージした障害物コース。忍び寄る罠やトラップをかいくぐり、指定されたアイテムを回収して脱出せよ！ハラハラドキドキのアクションサバイバルを楽しめます。',
+      highlights: ['スリル満点の障害物サバイバルコース', 'タイムアタック計測システム', '生還者へのサバイバー認定証'],
+      congestion: {
+        level: 'ticket',
+        waitTimeMinutes: 15,
+        ticketRequired: true,
+        ticketDistributionTime: 'オンラインにて整理券受付中',
+        lastUpdated: '11:38',
+        statusNote: 'オンライン整理券発行対応中'
+      },
+      rules: ['動きやすい服装・靴でご参加ください'],
+      onlineTicketUrl: '',
+      onlineTicketNote: 'オンライン整理券発行対応クラスです。整理券をお持ちの方を優先してご案内いたします。'
+    },
+    {
+      id: 'p-2e',
+      grade: '2年',
+      classNumber: '2年E組',
+      title: '静かにして下さい。',
+      catchphrase: '声を上げたら何かが起きる…音を立てずに進む恐怖のデシベル測定サバイバル！',
+      category: 'アトラクション・体験',
+      location: '新館 4F 2-E教室',
+      building: '新館',
+      floor: '4F',
+      description: 'デシベル測定器で一定以上の音が測定された場合に、より驚かす。また、記録された音をもとに、ランキングを作成し、掲載する。',
+      fullDetails: '静寂が支配する暗闇の教室。高精度デシベルメーターが常にあなたの呼吸音や悲鳴を監視中！一定デシベルを超えた瞬間、仕掛けられた恐怖ギミックが一斉に発動！測定された絶叫デシベル値はリアルタイムランキングボードに掲載されます。',
+      highlights: ['電子デシベル測定器連動の恐怖ギミック', '絶叫音量リアルタイムランキング掲示', '息を潜めて進む極限の緊張感'],
+      congestion: {
+        level: 'ticket',
+        waitTimeMinutes: 20,
+        ticketRequired: true,
+        ticketDistributionTime: 'オンラインにて整理券受付中',
+        lastUpdated: '11:46',
+        statusNote: 'オンライン整理券を発行してご参加ください'
+      },
+      rules: ['大声を出さずに耐えられるか挑戦してください'],
+      onlineTicketUrl: '',
+      onlineTicketNote: 'オンライン整理券発行対応クラスです。指定の時間枠の整理券を取得してください。'
+    },
+    {
+      id: 'p-2f',
+      grade: '2年',
+      classNumber: '2年F組',
+      title: 'まさしの見極め道場',
+      catchphrase: '本物を見破れるか!? 五感と直感を研ぎ澄ます究極の見極めチャレンジ！',
+      category: '縁日・ゲーム',
+      location: '新館 4F 2-F教室',
+      building: '新館',
+      floor: '4F',
+      description: '様々な感覚や観察力を使って本物や違いを見極める、白熱のチャレンジ体験道場。',
+      fullDetails: '一流芸能人気分を味わえる「格付け見極め道場」！手触りだけで物を当てる箱の中身当て、重さの微妙な違い、音の聞き分けなど、多彩なテストに挑戦。見事全問正解して「一流」の称号を勝ち取ろう！',
+      highlights: ['五感をフル活用する格付けチェック問題', '正解数に応じた格付けランク認定証', '友達同士で白熱の勝負'],
+      congestion: {
+        level: 'smooth',
+        waitTimeMinutes: 10,
+        ticketRequired: false,
+        lastUpdated: '11:49',
+        statusNote: '道場すぐに入門いただけます'
+      },
+      rules: ['カンニング防止のため個別ブースで回答します']
+    },
+    {
+      id: 'p-2g',
+      grade: '2年',
+      classNumber: '2年G組',
+      title: 'バレずに宿題チャレンジ',
+      catchphrase: '見つかったら即終了!? 見張りの目を盗んで宿題を完成させるハラハラ体験！',
+      category: 'アトラクション・体験',
+      location: '新館 4F 2-G教室',
+      building: '新館',
+      floor: '4F',
+      description: '先生や見張り役の目を盗みながら制限時間内に宿題を終わらせるスリル満点のかくれんぼ・ミッションゲーム。',
+      fullDetails: '教室の机に座り、巡回する先生や見張りの隙を突いてペンを走らせろ！視線を感じたらサッと隠れる！息詰まるステルスアクションゲームをリアル体験。無事バレずに宿題をすべて終わらせることができるか!?',
+      highlights: ['リアルだるまさんがころんだ風ステルスゲーム', '巡回キャストの臨場感あふれる見張り', 'クリアタイムを競うランキング'],
+      congestion: {
+        level: 'moderate',
+        waitTimeMinutes: 15,
+        ticketRequired: false,
+        lastUpdated: '11:41',
+        statusNote: '順番にご案内中（約15分待ち）'
+      },
+      rules: ['見張りに見られたら即アウトとなります']
+    },
+    {
+      id: 'p-2h',
+      grade: '2年',
+      classNumber: '2年H組',
+      title: '巨大人生ゲーム',
+      catchphrase: '自分がコマになって進む！教室全体に広がる巨大な人生すごろく！',
+      category: '縁日・ゲーム',
+      location: '新館 4F 2-H教室',
+      building: '新館',
+      floor: '4F',
+      description: '教室の床全体が巨大なルーレット＆すごろく盤に！自分がコマになって波乱万丈の人生を進む参加型ボードゲーム。',
+      fullDetails: '教室いっぱいに描かれたマス目を巨大ルーレットを回して進む！就職、結婚、お宝獲得、まさかのハプニングなど、波乱万丈のイベントが目白押し。最終的にお金を一番多く稼いだ人が勝者！',
+      highlights: ['教室一面の巨大マス目マップ', '手作りの特大回転ルーレット', '盛り上がるオリジナルイベントマス'],
+      congestion: {
+        level: 'moderate',
+        waitTimeMinutes: 20,
+        ticketRequired: false,
+        lastUpdated: '11:44',
+        statusNote: '各回ゲーム進行中（約20分待ち）'
+      },
+      rules: ['1ゲーム約15分', '1回最大6名様同時プレイ']
+    },
+    {
+      id: 'p-2i',
+      grade: '2年',
+      classNumber: '2年I組',
+      title: 'ケバブやさん',
+      catchphrase: '焼きたてジューシー！特製スパイスとお肉が香ばしい絶品ケバブサンド！',
+      category: 'カフェ・飲食',
+      location: '新館 4F 2-I教室',
+      building: '新館',
+      floor: '4F',
+      description: 'おいしいケバブサンドを食べてもらう。香ばしいお肉と特製ソースが絶品！',
+      fullDetails: '香ばしいスパイスの香りが食欲をそそる本格ケバブブース！じっくり焼き上げたジューシーなお肉とシャキシャキのキャベツをピタパンに挟み、特製オーロラソースやスパイシーソースをかけてご提供します！',
+      highlights: ['ジューシーなお肉たっぷりケバブサンド', '選べる特製ソース（マイルド／スパイシー）', 'テイクアウト＆イートイン対応'],
+      congestion: {
+        level: 'moderate',
+        waitTimeMinutes: 15,
+        ticketRequired: false,
+        lastUpdated: '11:47',
+        statusNote: '焼き上がり順にお渡し中（約15分待ち）'
+      },
+      rules: ['アレルギー原材料（小麦・鶏肉等）をご確認ください']
+    },
+    {
+      id: 'p-2j',
+      grade: '2年',
+      classNumber: '2年J組',
+      title: 'ミステリー～密室殺人の謎を解け～',
+      catchphrase: '現場に残された手掛かりを集め、完全密室のトリックを暴け！本格推理ゲーム',
+      category: 'アトラクション・体験',
+      location: '新館 2F 2-J教室',
+      building: '新館',
+      floor: '2F',
+      description: '密室で起きた不可解な事件の現場を調査し、散りばめられた証拠と証言から犯人を暴く本格推理・謎解きアトラクション。',
+      fullDetails: '本格的な密室殺人事件の現場を完全再現！探偵となった来場者は、容疑者たちの証言や現場に残された凶器・遺留品を照らし合わせ、密室トリックの謎を解明せよ。真犯人を暴いた名探偵には特製認定証を授与！',
+      highlights: ['本格的な事件現場ジオラマ＆証拠品', '緻密に練られた密室トリック推理', 'チームで挑む名探偵捜査体験'],
+      congestion: {
+        level: 'ticket',
+        waitTimeMinutes: 15,
+        ticketRequired: true,
+        ticketDistributionTime: 'オンラインにて整理券受付中',
+        lastUpdated: '11:42',
+        statusNote: 'オンライン整理券発行対応中'
+      },
+      rules: ['現場の証拠品は丁寧に扱ってください'],
+      onlineTicketUrl: '',
+      onlineTicketNote: 'オンライン整理券発行対応クラスです。整理券を取得の上、捜査班の集合時間にお越しください。'
+    },
+    {
+      id: 'p-2k',
+      grade: '2年',
+      classNumber: '2年K組',
+      title: '今日、迷子になりました。惑星朝日編',
+      catchphrase: '未知の惑星「朝日」に不時着!? 宇宙を舞台にした壮大な謎解き脱出ミッション！',
+      category: 'アトラクション・体験',
+      location: '新館 2F 2-K教室',
+      building: '新館',
+      floor: '2F',
+      description: '宇宙を舞台にして謎解きをし、脱出する体験型脱出アドベンチャー。',
+      fullDetails: '宇宙探査船が謎の惑星「朝日」に不時着して迷子に！未知の宇宙ステーションを探索しながら、故障した航法システムの修復コードや惑星の謎を解き明かし、母船へ帰還せよ！壮大なSF空間演出と濃密な謎解きを楽しめます。',
+      highlights: ['宇宙ステーション＆未知の惑星セット', '手応え抜群の本格SF謎解きギミック', '脱出成功時の感動演出'],
+      congestion: {
+        level: 'crowded',
+        waitTimeMinutes: 35,
+        ticketRequired: false,
+        lastUpdated: '11:46',
+        statusNote: '脱出ミッション挑戦中（約35分待ち）'
+      },
+      rules: ['制限時間：12分', '1グループ最大4名様']
+    }
+  ]
+};
