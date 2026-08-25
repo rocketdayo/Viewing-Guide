@@ -68,13 +68,23 @@ export function saveAppData(data: AppDataState): void {
   try {
     const sanitized = sanitizeAppData(data);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
-    // Also sync to server for cross-user online persistence
+    
+    // Skip backend server sync if running on static hosts like GitHub Pages
+    const isStaticHost = typeof window !== 'undefined' && (
+      window.location.hostname.includes('github.io') ||
+      window.location.protocol === 'file:'
+    );
+    if (isStaticHost) {
+      return;
+    }
+
+    // Also sync to server for cross-user online persistence if backend exists
     fetch('/api/app-data', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(sanitized),
-    }).catch(err => {
-      console.warn('Background server sync failed:', err);
+    }).catch(() => {
+      // Quietly ignore if backend is unavailable
     });
   } catch (e) {
     console.error('Failed to save app data:', e);
@@ -82,14 +92,30 @@ export function saveAppData(data: AppDataState): void {
 }
 
 export async function fetchServerAppData(): Promise<AppDataState | null> {
+  // Skip on static hosts like GitHub Pages
+  const isStaticHost = typeof window !== 'undefined' && (
+    window.location.hostname.includes('github.io') ||
+    window.location.protocol === 'file:'
+  );
+  if (isStaticHost) {
+    return null;
+  }
+
   try {
     const res = await fetch('/api/app-data');
+    if (!res.ok) {
+      return null;
+    }
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      return null;
+    }
     const json = await res.json();
-    if (json.success && json.data) {
+    if (json && json.success && json.data) {
       return sanitizeAppData(json.data);
     }
-  } catch (e) {
-    console.warn('Failed to fetch server app data:', e);
+  } catch {
+    // Quietly ignore backend fetch errors
   }
   return null;
 }

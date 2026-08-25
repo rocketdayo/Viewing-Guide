@@ -7,6 +7,17 @@ export const DEFAULT_CONGESTION_URL =
 export const DEFAULT_ANNOUNCEMENT_URL =
   "https://docs.google.com/spreadsheets/d/1Ajv5ErGHjhIz740IaB-IqhywYkV66dREwOdk7G3EiEg/edit?gid=0#gid=0";
 
+export function getGoogleSpreadsheetGvizUrl(targetUrl: string): string {
+  const fetchUrl = targetUrl.trim();
+  const match = fetchUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  if (match && match[1] !== "e") {
+    const gidMatch = fetchUrl.match(/[#&?]gid=([0-9]+)/);
+    const gid = gidMatch ? gidMatch[1] : "0";
+    return `https://docs.google.com/spreadsheets/d/${match[1]}/gviz/tq?tqx=out:csv&gid=${gid}`;
+  }
+  return getGoogleSpreadsheetCsvUrl(targetUrl);
+}
+
 /**
  * Convert Google Spreadsheet view/edit/pub URLs to a direct CSV export URL
  */
@@ -181,15 +192,35 @@ export function parseAnnouncementCsvOrJson(rawText: string): Announcement[] {
 }
 
 /**
- * Fetch raw text with direct fetch and fallback to CORS proxies
+ * Fetch raw text with direct fetch (gviz/export) and fallback to CORS proxies
  */
 export async function fetchRawTextDirect(targetUrl: string): Promise<string> {
+  const gvizUrl = getGoogleSpreadsheetGvizUrl(targetUrl);
   const csvUrl = getGoogleSpreadsheetCsvUrl(targetUrl);
 
-  // Attempt 1: Direct fetch
+  // Attempt 1: Direct gviz fetch
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    const response = await fetch(gvizUrl, {
+      method: 'GET',
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    if (response.ok) {
+      const text = await response.text();
+      if (text && !text.trim().startsWith("<!DOCTYPE")) {
+        return text;
+      }
+    }
+  } catch {
+    // Direct gviz failed, try other methods
+  }
+
+  // Attempt 2: Direct CSV export fetch
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
     const response = await fetch(csvUrl, {
       method: 'GET',
       signal: controller.signal,
@@ -201,15 +232,15 @@ export async function fetchRawTextDirect(targetUrl: string): Promise<string> {
         return text;
       }
     }
-  } catch (err) {
-    console.warn("Direct fetch failed, trying CORS proxy fallback...", err);
+  } catch {
+    // Direct CSV export failed, try proxy
   }
 
-  // Attempt 2: CORS Proxy via allorigins
+  // Attempt 3: CORS Proxy via allorigins
   try {
     const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(csvUrl)}`;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
     const response = await fetch(proxyUrl, { signal: controller.signal });
     clearTimeout(timeoutId);
     if (response.ok) {
@@ -218,15 +249,15 @@ export async function fetchRawTextDirect(targetUrl: string): Promise<string> {
         return text;
       }
     }
-  } catch (err) {
-    console.warn("CORS proxy allorigins failed:", err);
+  } catch {
+    // allorigins failed
   }
 
-  // Attempt 3: CORS Proxy via corsproxy.io
+  // Attempt 4: CORS Proxy via corsproxy.io
   try {
     const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(csvUrl)}`;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
     const response = await fetch(proxyUrl, { signal: controller.signal });
     clearTimeout(timeoutId);
     if (response.ok) {
@@ -235,8 +266,8 @@ export async function fetchRawTextDirect(targetUrl: string): Promise<string> {
         return text;
       }
     }
-  } catch (err) {
-    console.warn("CORS proxy corsproxy failed:", err);
+  } catch {
+    // corsproxy failed
   }
 
   throw new Error("スプレッドシート・GASからの直接取得に失敗しました");
@@ -248,31 +279,38 @@ export async function fetchRawTextDirect(targetUrl: string): Promise<string> {
 export async function fetchLiveGasCongestionSmart(gasUrl?: string): Promise<GasSyncResult> {
   const targetUrl = gasUrl || DEFAULT_CONGESTION_URL;
 
-  // First, try Express backend /api/congestion-live if available
-  try {
-    const apiUrl = `/api/congestion-live?url=${encodeURIComponent(targetUrl)}`;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
+  const isStaticHost = typeof window !== 'undefined' && (
+    window.location.hostname.includes('github.io') ||
+    window.location.protocol === 'file:'
+  );
 
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' },
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
+  // First, try Express backend /api/congestion-live if available and NOT on static host
+  if (!isStaticHost) {
+    try {
+      const apiUrl = `/api/congestion-live?url=${encodeURIComponent(targetUrl)}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-    const contentType = response.headers.get('content-type') || '';
-    if (response.ok && contentType.includes('application/json')) {
-      const json: GasSyncResult = await response.json();
-      if (json.success && json.data) {
-        return json;
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      const contentType = response.headers.get('content-type') || '';
+      if (response.ok && contentType.includes('application/json')) {
+        const json: GasSyncResult = await response.json();
+        if (json.success && json.data) {
+          return json;
+        }
       }
+    } catch {
+      // Backend API unavailable or failed
     }
-  } catch {
-    // Backend API unavailable or failed (e.g. GitHub Pages static host)
   }
 
-  // Fallback: Direct client browser fetch
+  // Fallback / Static host: Direct client browser fetch
   try {
     const rawText = await fetchRawTextDirect(targetUrl);
     const data = parseGasCongestionCsv(rawText);
@@ -283,7 +321,7 @@ export async function fetchLiveGasCongestionSmart(gasUrl?: string): Promise<GasS
       data,
     };
   } catch (err: any) {
-    console.error("Smart congestion fetch failed:", err);
+    console.warn("Direct congestion fetch fallback:", err.message);
     return {
       success: false,
       error: err.message || "データ取得に失敗しました",
@@ -297,31 +335,38 @@ export async function fetchLiveGasCongestionSmart(gasUrl?: string): Promise<GasS
 export async function fetchLiveAnnouncementsSmart(gasUrl?: string): Promise<AnnouncementSyncResult> {
   const targetUrl = gasUrl || DEFAULT_ANNOUNCEMENT_URL;
 
-  // First, try Express backend /api/announcements-live if available
-  try {
-    const apiUrl = `/api/announcements-live?url=${encodeURIComponent(targetUrl)}`;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
+  const isStaticHost = typeof window !== 'undefined' && (
+    window.location.hostname.includes('github.io') ||
+    window.location.protocol === 'file:'
+  );
 
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' },
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
+  // First, try Express backend /api/announcements-live if available and NOT on static host
+  if (!isStaticHost) {
+    try {
+      const apiUrl = `/api/announcements-live?url=${encodeURIComponent(targetUrl)}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-    const contentType = response.headers.get('content-type') || '';
-    if (response.ok && contentType.includes('application/json')) {
-      const json: AnnouncementSyncResult = await response.json();
-      if (json.success && json.data !== undefined) {
-        return json;
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      const contentType = response.headers.get('content-type') || '';
+      if (response.ok && contentType.includes('application/json')) {
+        const json: AnnouncementSyncResult = await response.json();
+        if (json.success && json.data !== undefined) {
+          return json;
+        }
       }
+    } catch {
+      // Backend API unavailable or failed
     }
-  } catch {
-    // Backend API unavailable or failed (e.g. GitHub Pages static host)
   }
 
-  // Fallback: Direct client browser fetch
+  // Fallback / Static host: Direct client browser fetch
   try {
     const rawText = await fetchRawTextDirect(targetUrl);
     const announcements = parseAnnouncementCsvOrJson(rawText);
@@ -330,7 +375,7 @@ export async function fetchLiveAnnouncementsSmart(gasUrl?: string): Promise<Anno
       data: announcements,
     };
   } catch (err: any) {
-    console.error("Smart announcement fetch failed:", err);
+    console.warn("Direct announcement fetch fallback:", err.message);
     return {
       success: false,
       error: err.message || "お知らせデータの取得に失敗しました",
