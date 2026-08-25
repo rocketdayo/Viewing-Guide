@@ -17,6 +17,9 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import careerGuideImg from '../assets/alumni/career_guide.png';
+import gourmetImg from '../assets/alumni/gourmet.png';
+import classReunionPdf from '../assets/alumni/classreunion.pdf';
 
 interface AlumniSectionProps {
   onOpenClassDetail?: (projectId: string) => void;
@@ -25,6 +28,8 @@ interface AlumniSectionProps {
 export const AlumniSection: React.FC<AlumniSectionProps> = () => {
   const [activeTab, setActiveTab] = useState<'both' | 'career' | 'gourmet'>('both');
   const [modalPage, setModalPage] = useState<1 | 2 | null>(null);
+
+  const pdfUrl = classReunionPdf || `${import.meta.env.BASE_URL}alumni/classreunion.pdf`;
 
   const careerData = {
     pageNumber: 1,
@@ -37,7 +42,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
     location: '本館 高3E・F・G教室',
     organizer: '清教学園同窓会（清教会）',
     target: '高校生・中学生・保護者・一般来場者',
-    imageSrc: '/alumni/career_guide.png',
+    imageSrc: careerGuideImg || `${import.meta.env.BASE_URL}alumni/career_guide.png`,
     features: [
       '第一線で活躍する清教OB・OGが多数来校',
       '大学生活・学問・職業のリアルを個別ブースでじっくり相談',
@@ -56,7 +61,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
     location: '清教キャンパス前 ＆ 国際交流室前',
     organizer: '清教学園同窓会（清教会）',
     target: '高校生・一般来場者・保護者・在校生',
-    imageSrc: '/alumni/gourmet.png',
+    imageSrc: gourmetImg || `${import.meta.env.BASE_URL}alumni/gourmet.png`,
     menuItems: [
       'ウインナー',
       'ワッフル',
@@ -99,7 +104,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
           {/* Action Tools */}
           <div className="flex flex-wrap items-center gap-2 pt-2 md:pt-0">
             <a
-              href="/alumni/classreunion.pdf"
+              href={pdfUrl}
               download="清教学園同窓会_特別企画案内.pdf"
               className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-amber-950 border border-amber-300 text-xs font-bold rounded-xs shadow-2xs transition-colors cursor-pointer"
             >
@@ -107,7 +112,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
               <span>PDFを保存（全2ページ）</span>
             </a>
             <a
-              href="/alumni/classreunion.pdf"
+              href={pdfUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xs shadow-2xs transition-colors cursor-pointer"
@@ -415,7 +420,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
                 </button>
 
                 <a
-                  href="/alumni/classreunion.pdf"
+                  href={pdfUrl}
                   download="清教学園同窓会_特別企画案内.pdf"
                   className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xs transition-colors"
                   title="PDFダウンロード"
@@ -461,7 +466,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
 
               <div className="flex items-center space-x-3">
                 <a
-                  href="/alumni/classreunion.pdf"
+                  href={pdfUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-amber-400 hover:underline flex items-center gap-1 font-bold"
