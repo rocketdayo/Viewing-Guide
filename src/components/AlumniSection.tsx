@@ -17,9 +17,11 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import careerGuideImg from '../assets/alumni/career_guide.png';
-import gourmetImg from '../assets/alumni/gourmet.png';
-import classReunionPdf from '../assets/alumni/classreunion.pdf';
+import {
+  CAREER_GUIDE_BASE64,
+  GOURMET_BASE64,
+  CLASS_REUNION_PDF_BASE64,
+} from '../assets/alumniData';
 
 interface AlumniSectionProps {
   onOpenClassDetail?: (projectId: string) => void;
@@ -29,7 +31,26 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
   const [activeTab, setActiveTab] = useState<'both' | 'career' | 'gourmet'>('both');
   const [modalPage, setModalPage] = useState<1 | 2 | null>(null);
 
-  const pdfUrl = classReunionPdf || `${import.meta.env.BASE_URL}alumni/classreunion.pdf`;
+  // Use embedded Base64 Data URI for 100% offline & GitHub-safe reliability
+  const pdfUrl = CLASS_REUNION_PDF_BASE64;
+
+  const handleOpenPdf = (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      // Convert base64 Data URI to Blob for clean new tab preview
+      const byteCharacters = atob(CLASS_REUNION_PDF_BASE64.split(',')[1]);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+    } catch (err) {
+      window.open(CLASS_REUNION_PDF_BASE64, '_blank');
+    }
+  };
 
   const careerData = {
     pageNumber: 1,
@@ -42,7 +63,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
     location: '本館 高3E・F・G教室',
     organizer: '清教学園同窓会（清教会）',
     target: '高校生・中学生・保護者・一般来場者',
-    imageSrc: careerGuideImg || `${import.meta.env.BASE_URL}alumni/career_guide.png`,
+    imageSrc: CAREER_GUIDE_BASE64,
     features: [
       '第一線で活躍する清教OB・OGが多数来校',
       '大学生活・学問・職業のリアルを個別ブースでじっくり相談',
@@ -61,7 +82,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
     location: '清教キャンパス前 ＆ 国際交流室前',
     organizer: '清教学園同窓会（清教会）',
     target: '高校生・一般来場者・保護者・在校生',
-    imageSrc: gourmetImg || `${import.meta.env.BASE_URL}alumni/gourmet.png`,
+    imageSrc: GOURMET_BASE64,
     menuItems: [
       'ウインナー',
       'ワッフル',
@@ -111,15 +132,13 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
               <Download className="w-4 h-4 text-amber-800" />
               <span>PDFを保存（全2ページ）</span>
             </a>
-            <a
-              href={pdfUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={handleOpenPdf}
               className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xs shadow-2xs transition-colors cursor-pointer"
             >
               <ExternalLink className="w-4 h-4" />
               <span>別タブで開く</span>
-            </a>
+            </button>
           </div>
         </div>
 
@@ -465,15 +484,13 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
               </div>
 
               <div className="flex items-center space-x-3">
-                <a
-                  href={pdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-amber-400 hover:underline flex items-center gap-1 font-bold"
+                <button
+                  onClick={handleOpenPdf}
+                  className="text-amber-400 hover:underline flex items-center gap-1 font-bold cursor-pointer"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   PDF原本を直接開く
-                </a>
+                </button>
                 <button
                   onClick={() => setModalPage(null)}
                   className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-white rounded-xs text-xs font-bold cursor-pointer"
