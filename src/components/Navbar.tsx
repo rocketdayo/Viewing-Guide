@@ -65,7 +65,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           id="pinned-announcement-bar"
-          onClick={() => handleNav('home')}
+          onClick={() => {
+            handleNav('home');
+            setTimeout(() => {
+              document.getElementById('announcements-section')?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+          }}
           className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 text-xs sm:text-sm font-medium flex items-center justify-between cursor-pointer transition-colors"
         >
           <div className="flex items-center space-x-2 max-w-5xl mx-auto overflow-hidden">
@@ -74,7 +79,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
             <span className="truncate">{pinnedAnnouncement.title}</span>
           </div>
-          <ChevronRight className="w-4 h-4 shrink-0 opacity-80" />
+          <div className="flex items-center space-x-1 shrink-0 text-xs font-bold text-amber-100">
+            <span>開く</span>
+            <ChevronRight className="w-4 h-4 opacity-80" />
+          </div>
         </motion.div>
       )}
 

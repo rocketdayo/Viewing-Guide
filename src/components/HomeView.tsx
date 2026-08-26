@@ -21,6 +21,8 @@ import {
 import { motion } from 'motion/react';
 import { AppDataState, ClassProject } from '../types';
 import { AlumniSection } from './AlumniSection';
+import { AnnouncementsSection } from './AnnouncementsSection';
+import { BloodDonationSection } from './BloodDonationSection';
 
 interface HomeViewProps {
   appData: AppDataState;
@@ -49,6 +51,35 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   const smoothCount = projects.filter((p) => p.congestion.level === 'smooth').length;
   const pinnedAnnouncement = appData?.announcements?.find((a) => a.isPinned);
+
+  const renderFormattedMessage = (text: string) => {
+    if (!text) return null;
+    const lines = text.split('\n');
+    return lines.map((line, lIdx) => {
+      if (!line.trim()) {
+        return <div key={lIdx} className="h-3" />;
+      }
+      const parts = line.split(/(\*\*.*?\*\*)/g);
+      return (
+        <p key={lIdx} className="leading-relaxed">
+          {parts.map((part, pIdx) => {
+            if (part.startsWith('**') && part.endsWith('**')) {
+              const boldText = part.slice(2, -2);
+              return (
+                <strong
+                  key={pIdx}
+                  className="font-bold text-slate-950 underline decoration-emerald-500 decoration-2 underline-offset-4"
+                >
+                  {boldText}
+                </strong>
+              );
+            }
+            return <span key={pIdx}>{part}</span>;
+          })}
+        </p>
+      );
+    });
+  };
 
   return (
     <div className="space-y-0 pb-20 bg-white text-slate-900 font-sans selection:bg-emerald-100 selection:text-emerald-900">
@@ -148,14 +179,22 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
                 {pinnedAnnouncement && (
                   <div 
-                    onClick={() => onNavigate('home')}
+                    onClick={() => {
+                      document.getElementById('announcements-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
                     className="p-4 bg-amber-50/80 border border-amber-200 cursor-pointer hover:bg-amber-100/70 transition-colors space-y-1.5"
                   >
                     <div className="flex items-center justify-between text-[10px] font-mono font-bold text-amber-800">
-                      <span>【重要なお知らせ】</span>
-                      <span>{pinnedAnnouncement.date}</span>
+                      <span className="flex items-center gap-1">
+                        <Radio className="w-3 h-3 text-amber-600 animate-pulse" />
+                        【重要なお知らせ】
+                      </span>
+                      <span>{pinnedAnnouncement.timestamp || (pinnedAnnouncement as any).date}</span>
                     </div>
                     <p className="text-xs text-amber-950 font-medium leading-relaxed">{pinnedAnnouncement.title}</p>
+                    <div className="text-[10px] text-amber-700 font-bold flex items-center justify-end">
+                      <span>お知らせ一覧を見る ↓</span>
+                    </div>
                   </div>
                 )}
 
@@ -258,11 +297,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
-      {/* 2.5 清教学園同窓会（清教会）特別企画 特設セクション (PDF 1P: 未来の仕事図鑑 / PDF 2P: 先輩グルメ) */}
-      <AlumniSection />
-
-      {/* 3. ごあいさつセクション (Institutional Greetings Tabs - Text Only) */}
-      <section className="py-14 bg-[#FAFBFD] border-b border-slate-200 transition-opacity duration-700">
+      {/* 2.3 ごあいさつセクション (Institutional Greetings Tabs - Text Only) */}
+      <section id="greetings-section" className="py-14 bg-[#FAFBFD] border-b border-slate-200 transition-opacity duration-700 scroll-mt-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-4">
             <div>
@@ -310,8 +346,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 )}
               </div>
 
-              <div className="space-y-4 text-sm sm:text-base text-slate-700 leading-relaxed font-sans whitespace-pre-line">
-                {activeGreeting.message}
+              <div className="space-y-3 text-sm sm:text-base text-slate-700 leading-relaxed font-sans">
+                {renderFormattedMessage(activeGreeting.message)}
               </div>
 
               {activeGreeting.profileNote && (
@@ -323,6 +359,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
           )}
         </div>
       </section>
+
+      {/* 2.4 お知らせ・緊急速報 配信サービス (Live Announcements Feed) */}
+      <AnnouncementsSection announcements={appData?.announcements || []} />
+
+      {/* 2.5 清教学園同窓会（清教会）特別企画 特設セクション (PDF 1P: 未来の仕事図鑑 / PDF 2P: 先輩グルメ) */}
+      <AlumniSection />
+
+      {/* 2.6 文化祭 献血（食堂前・オンライン整理券受付） */}
+      <BloodDonationSection />
 
       {/* 4. 注目のピックアップ企画 (Featured Projects Section with progressive fade-out styling) */}
       <section className="py-14 bg-white opacity-95 transition-opacity duration-1000">

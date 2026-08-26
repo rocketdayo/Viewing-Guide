@@ -9,7 +9,10 @@ import {
   Shield, 
   ChevronRight,
   BookOpen,
-  GraduationCap
+  GraduationCap,
+  Radio,
+  Megaphone,
+  Heart
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AppDataState } from '../types';
@@ -161,6 +164,26 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
                   onClose();
                   onNavigate('home');
                   setTimeout(() => {
+                    document.getElementById('announcements-section')?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+                className="p-4 rounded-xs border border-emerald-300 bg-emerald-50/70 hover:bg-emerald-100 transition-all cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="flex items-center space-x-2 text-emerald-950 font-bold text-sm">
+                    <Radio className="w-4 h-4 text-emerald-700 animate-pulse" />
+                    <span>お知らせ・緊急速報 配信サービス</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-emerald-600 group-hover:translate-x-1 transition-transform" />
+                </div>
+                <p className="text-xs text-emerald-900/80">本部からの最新アナウンス・プログラム変更の速報</p>
+              </div>
+
+              <div 
+                onClick={() => {
+                  onClose();
+                  onNavigate('home');
+                  setTimeout(() => {
                     document.getElementById('alumni-section')?.scrollIntoView({ behavior: 'smooth' });
                   }, 100);
                 }}
@@ -173,7 +196,27 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
                   </span>
                   <ChevronRight className="w-4 h-4 text-amber-600 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <p className="text-xs text-amber-900/80">公式チラシ掲載：『未来の仕事図鑑』＆『先輩グルメ』</p>
+                <p className="text-xs text-amber-900/80">特設案内：『未来の仕事図鑑』＆『先輩グルメ』</p>
+              </div>
+
+              <div 
+                onClick={() => {
+                  onClose();
+                  onNavigate('home');
+                  setTimeout(() => {
+                    document.getElementById('blood-donation-section')?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+                className="p-4 rounded-xs border border-rose-300 bg-rose-50/70 hover:bg-rose-100 transition-all cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="flex items-center space-x-2 text-rose-950 font-bold text-sm">
+                    <Heart className="w-4 h-4 text-rose-600 fill-rose-500" />
+                    <span>文化祭 献血（食堂前）</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-rose-600 group-hover:translate-x-1 transition-transform" />
+                </div>
+                <p className="text-xs text-rose-900/80">食堂前にて実施・オンライン整理券受付中</p>
               </div>
             </div>
 

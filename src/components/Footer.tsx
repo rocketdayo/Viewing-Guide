@@ -32,7 +32,7 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
               </div>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed max-w-md">
-              キリスト教精神に基づく「神を愛し、人を愛し、真理を愛する」教育のもと、生徒が創り上げる2日間の祭典。各クラスの熱演と展示、リアルタイム混雑モニターでお楽しみください。
+              中高総勢1,700名を超える生徒たちが合同で創り上げる学園の一大イベント。テーマ「清教エナジー！～1度しかない学園生活を楽しもう～」のもと、生徒たちの自主性とエネルギーがあふれる各企画・展示をどうぞお楽しみください。
             </p>
             <div className="text-xs text-slate-400 pt-1 space-y-1">
               <p className="flex items-center gap-1.5">

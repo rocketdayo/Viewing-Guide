@@ -68,10 +68,31 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         g.message.toLowerCase().includes(q)
     );
 
+    const specialEvents = [];
+    if ('献血 けんけつ 食堂前 整理券 blood 血液 16歳 医療 社会貢献'.toLowerCase().includes(q) || q.includes('献血') || q.includes('けんけつ') || q.includes('食堂')) {
+      specialEvents.push({
+        id: 'special-blood-donation',
+        title: '文化祭 献血（食堂前）',
+        desc: '食堂前にて実施・オンライン整理券受付中（16歳以上対象）',
+        tag: '社会貢献企画',
+        targetId: 'blood-donation-section'
+      });
+    }
+    if ('同窓会 清教会 未来の仕事図鑑 先輩グルメ 先輩 卒業生 フライヤー チラシ'.toLowerCase().includes(q) || q.includes('同窓会') || q.includes('清教') || q.includes('グルメ') || q.includes('仕事図鑑')) {
+      specialEvents.push({
+        id: 'special-alumni',
+        title: '清教学園同窓会 特別企画',
+        desc: '『未来の仕事図鑑』＆『先輩グルメを食べつくせ！』特設案内',
+        tag: '同窓会企画',
+        targetId: 'alumni-section'
+      });
+    }
+
     return {
       projects: matchedProjects,
       schedules: matchedSchedules,
       greetings: matchedGreetings,
+      specialEvents
     };
   }, [query, appData]);
 
@@ -80,7 +101,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   const totalResults =
     searchResults.projects.length +
     searchResults.schedules.length +
-    searchResults.greetings.length;
+    searchResults.greetings.length +
+    searchResults.specialEvents.length;
 
   return (
     <AnimatePresence>
@@ -161,6 +183,48 @@ export const SearchModal: React.FC<SearchModalProps> = ({
               </div>
             ) : (
               <div className="space-y-5">
+                {/* Special Events (Blood donation, Alumni) */}
+                {searchResults.specialEvents && searchResults.specialEvents.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold text-slate-400 uppercase">
+                      <span className="flex items-center gap-1">
+                        <Sparkles className="w-3.5 h-3.5 text-rose-600" /> 特設・特別企画 (
+                        {searchResults.specialEvents.length})
+                      </span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {searchResults.specialEvents.map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => {
+                            onNavigate('home');
+                            onClose();
+                            setTimeout(() => {
+                              document.getElementById(item.targetId)?.scrollIntoView({ behavior: 'smooth' });
+                            }, 100);
+                          }}
+                          className="p-3 rounded-xs bg-rose-50/40 hover:bg-rose-50 border border-rose-200/80 hover:border-rose-300 transition-all cursor-pointer flex items-center justify-between group"
+                        >
+                          <div className="space-y-0.5">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs font-bold text-rose-900 bg-rose-100/90 px-2 py-0.5 rounded-md">
+                                {item.tag}
+                              </span>
+                              <span className="text-sm font-bold text-slate-900 group-hover:text-rose-700 transition-colors">
+                                {item.title}
+                              </span>
+                            </div>
+                            <p className="text-xs text-slate-600">
+                              {item.desc}
+                            </p>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-rose-600 group-hover:translate-x-1 transition-all shrink-0 ml-2" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* 1. Classes / Projects results */}
                 {searchResults.projects.length > 0 && (
                   <div className="space-y-2">

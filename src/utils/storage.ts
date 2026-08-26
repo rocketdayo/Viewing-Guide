@@ -22,7 +22,10 @@ export function sanitizeAppData(parsed: any): AppDataState {
   let cleanAnnouncements = parsed.announcements;
   if (Array.isArray(cleanAnnouncements)) {
     cleanAnnouncements = cleanAnnouncements.filter((a: any) => 
-      !a.title?.includes("熱中症対策") && !a.title?.includes("静かにして下さい")
+      !a.title?.includes("熱中症対策") && 
+      !a.title?.includes("静かにして下さい") &&
+      !a.title?.includes("同窓会特別企画") &&
+      a.id !== 'ann-alumni-special'
     );
     INITIAL_APP_DATA.announcements.forEach((initA) => {
       if (!cleanAnnouncements.some((a: any) => a.id === initA.id)) {

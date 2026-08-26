@@ -113,12 +113,9 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
             </div>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
               同窓会企画
-              <span className="ml-3 text-sm sm:text-base font-sans font-medium text-amber-900 bg-amber-200/70 px-3 py-1 rounded-full border border-amber-300 align-middle">
-                公式PDFチラシ掲載
-              </span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 max-w-2xl leading-relaxed">
-              卒業生の先輩方による特別企画！「未来の仕事図鑑」（1ページ目）と「先輩グルメ」（2ページ目）の公式案内PDFをそれぞれ高画質で掲載しています。画像をタップすると全画面で拡大してご覧いただけます。
+              卒業生の先輩方による特別企画！「未来の仕事図鑑」と「先輩グルメ」の案内チラシを掲載しています。画像をタップすると全画面で拡大してご覧いただけます。
             </p>
           </div>
 
@@ -130,7 +127,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
               className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-amber-950 border border-amber-300 text-xs font-bold rounded-xs shadow-2xs transition-colors cursor-pointer"
             >
               <Download className="w-4 h-4 text-amber-800" />
-              <span>PDFを保存（全2ページ）</span>
+              <span>チラシPDFを保存</span>
             </a>
             <button
               onClick={handleOpenPdf}
@@ -200,7 +197,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
                     </div>
                     <div>
                       <span className="text-[11px] font-mono font-bold text-sky-800 tracking-wider">
-                        同窓会 企画 1（PDF 1ページ目）
+                        同窓会 企画 1
                       </span>
                       <h3 className="text-lg sm:text-xl font-bold text-slate-900">
                         {careerData.title}
@@ -231,7 +228,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
                 {/* PDF Page 1 Visual Flyer Card */}
                 <div className="space-y-2 pt-2">
                   <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span className="font-bold text-slate-700">📄 公式案内チラシ（PDF 1ページ目）</span>
+                    <span className="font-bold text-slate-700">案内チラシ</span>
                     <span className="text-sky-700 font-bold flex items-center gap-1">
                       <ZoomIn className="w-3.5 h-3.5" /> タップで拡大
                     </span>
@@ -302,7 +299,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
                     </div>
                     <div>
                       <span className="text-[11px] font-mono font-bold text-orange-800 tracking-wider">
-                        同窓会 企画 2（PDF 2ページ目）
+                        同窓会 企画 2
                       </span>
                       <h3 className="text-lg sm:text-xl font-bold text-slate-900">
                         {gourmetData.title}
@@ -333,7 +330,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
                 {/* PDF Page 2 Visual Flyer Card */}
                 <div className="space-y-2 pt-2">
                   <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span className="font-bold text-slate-700">📄 公式案内チラシ（PDF 2ページ目）</span>
+                    <span className="font-bold text-slate-700">案内チラシ</span>
                     <span className="text-orange-700 font-bold flex items-center gap-1">
                       <ZoomIn className="w-3.5 h-3.5" /> タップで拡大
                     </span>
@@ -412,7 +409,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
             >
               <div className="flex items-center space-x-3">
                 <span className="bg-amber-500 text-slate-950 text-xs font-bold px-2 py-0.5 rounded-xs">
-                  {modalPage === 1 ? 'PDF 1ページ目' : 'PDF 2ページ目'}
+                  {modalPage === 1 ? '企画 1' : '企画 2'}
                 </span>
                 <h3 className="text-xs sm:text-sm font-bold text-white truncate max-w-[200px] sm:max-w-md">
                   {modalPage === 1 ? careerData.title : gourmetData.title}
@@ -489,7 +486,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
                   className="text-amber-400 hover:underline flex items-center gap-1 font-bold cursor-pointer"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
-                  PDF原本を直接開く
+                  チラシPDFを開く
                 </button>
                 <button
                   onClick={() => setModalPage(null)}
