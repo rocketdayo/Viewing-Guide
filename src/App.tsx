@@ -26,14 +26,65 @@ import { fetchLiveGasCongestion, applyGasSyncToProjects } from './utils/congesti
 import { fetchLiveAnnouncements } from './utils/announcementSync';
 import { motion, AnimatePresence } from 'motion/react';
 
+// Helper to parse current URL into application route state
+interface RouteState {
+  page: string;
+  projectId: string | null;
+  anchor: string | null;
+}
+
+function parseCurrentUrl(): RouteState {
+  if (typeof window === 'undefined') {
+    return { page: 'home', projectId: null, anchor: null };
+  }
+
+  const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
+  const hash = window.location.hash ? window.location.hash.replace(/^#/, '') : null;
+  const searchParams = new URLSearchParams(window.location.search);
+  const paramProjectId = searchParams.get('project') || searchParams.get('id');
+
+  // Match /project/:id or /classes/:id (excluding reserved page names)
+  const projectMatch = pathname.match(/^\/(?:project|classes)\/([a-zA-Z0-9_-]+)$/);
+  const reservedPages = ['home', 'schedule', 'classes', 'congestion', 'bookmarks', 'timeline', 'map', 'admin'];
+  
+  if (projectMatch && !reservedPages.includes(projectMatch[1])) {
+    return {
+      page: 'classes',
+      projectId: projectMatch[1],
+      anchor: hash && hash !== 'toc' && hash !== 'search' ? hash : null,
+    };
+  }
+
+  let page = 'home';
+  if (pathname === '/schedule') page = 'schedule';
+  else if (pathname === '/classes') page = 'classes';
+  else if (pathname === '/congestion') page = 'congestion';
+  else if (pathname === '/bookmarks' || pathname === '/timeline') page = 'bookmarks';
+  else if (pathname === '/map') page = 'map';
+  else if (pathname === '/admin') page = 'admin';
+  else if (pathname === '/' || pathname === '/home') page = 'home';
+  else {
+    page = 'home';
+  }
+
+  return {
+    page,
+    projectId: paramProjectId || null,
+    anchor: hash && hash !== 'toc' && hash !== 'search' ? hash : null,
+  };
+}
+
 export default function App() {
   const [appData, setAppData] = useState<AppDataState>(() => loadAppData());
-  const [currentPage, setCurrentPage] = useState<string>('home');
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  
+  // Initialize navigation state directly from the browser URL
+  const initialRoute = parseCurrentUrl();
+  const [currentPage, setCurrentPage] = useState<string>(initialRoute.page);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(initialRoute.projectId);
   const [bookmarks, setBookmarks] = useState<string[]>(() => getBookmarks());
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
-  const [isTocOpen, setIsTocOpen] = useState<boolean>(false);
-  const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
+  const [isTocOpen, setIsTocOpen] = useState<boolean>(() => typeof window !== 'undefined' && window.location.hash === '#toc');
+  const [isSearchOpen, setIsSearchOpen] = useState<boolean>(() => typeof window !== 'undefined' && window.location.hash === '#search');
 
   // Synchronized state references to prevent re-creation loops
   const appDataRef = React.useRef(appData);
@@ -108,6 +159,142 @@ export default function App() {
     }
   }, []);
 
+  // Primary URL-aware navigation handler
+  const handleNavigate = useCallback((page: string, anchorOrProjectId?: string, replace: boolean = false) => {
+    if (page === 'classDetail' && anchorOrProjectId) {
+      handleSelectProject(anchorOrProjectId);
+      return;
+    }
+
+    let targetPath = page === 'home' ? '/home' : `/${page}`;
+    let targetAnchor = '';
+    let targetProjectId: string | null = null;
+
+    if (anchorOrProjectId) {
+      const isProject = appDataRef.current?.projects?.some((p) => p.id === anchorOrProjectId);
+      if (isProject) {
+        targetProjectId = anchorOrProjectId;
+        targetPath = `/project/${anchorOrProjectId}`;
+      } else {
+        targetAnchor = anchorOrProjectId;
+        targetPath = `${targetPath}#${anchorOrProjectId}`;
+      }
+    }
+
+    const currentFullPath = window.location.pathname + window.location.hash;
+    if (currentFullPath !== targetPath) {
+      const historyState = { page, projectId: targetProjectId, anchor: targetAnchor };
+      if (replace) {
+        window.history.replaceState(historyState, '', targetPath);
+      } else {
+        window.history.pushState(historyState, '', targetPath);
+      }
+    }
+
+    setCurrentPage(page);
+    setSelectedProjectId(targetProjectId);
+
+    if (!targetAnchor) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      setTimeout(() => {
+        const el = document.getElementById(targetAnchor);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, []);
+
+  const handleSelectProject = useCallback((id: string) => {
+    setSelectedProjectId(id);
+    const targetPath = `/project/${id}`;
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState({ page: currentPage, projectId: id }, '', targetPath);
+    }
+  }, [currentPage]);
+
+  const handleCloseProjectModal = useCallback(() => {
+    setSelectedProjectId(null);
+    const currentPath = window.location.pathname;
+    if (currentPath.startsWith('/project/') || currentPath.match(/^\/classes\/[a-zA-Z0-9_-]+$/)) {
+      const basePath = `/${currentPage === 'home' ? 'home' : currentPage}`;
+      window.history.pushState({ page: currentPage, projectId: null }, '', basePath);
+    }
+  }, [currentPage]);
+
+  const handleOpenSearch = useCallback(() => {
+    setIsSearchOpen(true);
+    if (window.location.hash !== '#search') {
+      window.history.pushState({ modal: 'search' }, '', window.location.pathname + '#search');
+    }
+  }, []);
+
+  const handleCloseSearch = useCallback(() => {
+    setIsSearchOpen(false);
+    if (window.location.hash === '#search') {
+      window.history.back();
+    }
+  }, []);
+
+  const handleOpenToc = useCallback(() => {
+    setIsTocOpen(true);
+    if (window.location.hash !== '#toc') {
+      window.history.pushState({ modal: 'toc' }, '', window.location.pathname + '#toc');
+    }
+  }, []);
+
+  const handleCloseToc = useCallback(() => {
+    setIsTocOpen(false);
+    if (window.location.hash === '#toc') {
+      window.history.back();
+    }
+  }, []);
+
+  // Sync browser back / forward navigation events
+  useEffect(() => {
+    const handlePopState = () => {
+      const route = parseCurrentUrl();
+      setCurrentPage(route.page);
+      setSelectedProjectId(route.projectId);
+
+      // Handle modals based on hash
+      const currentHash = window.location.hash;
+      setIsSearchOpen(currentHash === '#search');
+      setIsTocOpen(currentHash === '#toc');
+
+      if (route.anchor) {
+        setTimeout(() => {
+          const el = document.getElementById(route.anchor!);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    // Initial normalize if user opens root "/"
+    if (window.location.pathname === '/') {
+      window.history.replaceState({ page: 'home', projectId: null }, '', '/home');
+    }
+
+    // Scroll to initial anchor if present
+    if (initialRoute.anchor) {
+      setTimeout(() => {
+        const el = document.getElementById(initialRoute.anchor!);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 200);
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
   useEffect(() => {
     // Fetch latest app data from server on mount for online sync
     fetchServerAppData().then((serverData) => {
@@ -123,25 +310,6 @@ export default function App() {
     }, 20000);
     return () => clearInterval(timer);
   }, [syncNow]);
-
-  const handleNavigate = (page: string, anchorOrProjectId?: string) => {
-    if (page === 'classDetail' && anchorOrProjectId) {
-      setSelectedProjectId(anchorOrProjectId);
-      return;
-    }
-
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    if (anchorOrProjectId) {
-      setTimeout(() => {
-        const el = document.getElementById(anchorOrProjectId);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    }
-  };
 
   const handleDataUpdate = (newData: AppDataState) => {
     setAppData(newData);
@@ -170,11 +338,11 @@ export default function App() {
       <div>
         <Navbar 
           currentPage={currentPage} 
-          setCurrentPage={setCurrentPage} 
+          setCurrentPage={(page) => handleNavigate(page)} 
           appData={appData}
           isAdminLoggedIn={isAdminLoggedIn}
-          onOpenSearch={() => setIsSearchOpen(true)}
-          onOpenToc={() => setIsTocOpen(true)}
+          onOpenSearch={handleOpenSearch}
+          onOpenToc={handleOpenToc}
           bookmarksCount={bookmarks.length}
         />
         
@@ -191,8 +359,8 @@ export default function App() {
                 <HomeView 
                   appData={appData} 
                   onNavigate={handleNavigate}
-                  onSelectProject={(id) => setSelectedProjectId(id)}
-                  onOpenToc={() => setIsTocOpen(true)}
+                  onSelectProject={handleSelectProject}
+                  onOpenToc={handleOpenToc}
                   bookmarks={bookmarks}
                 />
               )}
@@ -206,7 +374,7 @@ export default function App() {
               {currentPage === 'classes' && (
                 <ClassesView 
                   projects={appData?.projects || []}
-                  onSelectProject={(id) => setSelectedProjectId(id)}
+                  onSelectProject={handleSelectProject}
                   bookmarks={bookmarks}
                   onToggleBookmark={handleToggleBookmark}
                   onNavigateToCongestion={() => handleNavigate('congestion')}
@@ -217,7 +385,7 @@ export default function App() {
                 <CongestionLiveView 
                   gasUrl={appData.gasCongestionUrl}
                   projects={appData?.projects || []}
-                  onSelectProject={(id) => setSelectedProjectId(id)}
+                  onSelectProject={handleSelectProject}
                   onSyncNow={syncNow}
                   isSyncing={isSyncing}
                   lastSyncTime={lastSyncTime ? lastSyncTime.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : null}
@@ -231,7 +399,7 @@ export default function App() {
                   allProjects={appData?.projects || []}
                   bookmarks={bookmarks}
                   onToggleBookmark={handleToggleBookmark}
-                  onSelectProject={(id) => setSelectedProjectId(id)}
+                  onSelectProject={handleSelectProject}
                   onNavigate={handleNavigate}
                 />
               )}
@@ -239,7 +407,7 @@ export default function App() {
               {currentPage === 'map' && (
                 <CampusMapView 
                   projects={appData?.projects || []}
-                  onSelectProject={(id) => setSelectedProjectId(id)}
+                  onSelectProject={handleSelectProject}
                 />
               )}
               
@@ -260,40 +428,40 @@ export default function App() {
       <Footer 
         appData={appData}
         onNavigate={handleNavigate}
-        onOpenToc={() => setIsTocOpen(true)} 
+        onOpenToc={handleOpenToc} 
       />
 
       {/* Mobile Sticky Bottom Navigation */}
       <BottomNav
         currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
+        setCurrentPage={(page) => handleNavigate(page)}
         bookmarksCount={bookmarks.length}
       />
 
       {/* Quick Search Modal */}
       <SearchModal
         isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
+        onClose={handleCloseSearch}
         appData={appData}
-        onSelectProject={(id) => setSelectedProjectId(id)}
+        onSelectProject={handleSelectProject}
         onNavigate={handleNavigate}
       />
 
       {/* Table of Contents Modal */}
       <TableOfContentsModal
         isOpen={isTocOpen}
-        onClose={() => setIsTocOpen(false)}
+        onClose={handleCloseToc}
         currentPage={currentPage}
         appData={appData}
         onNavigate={handleNavigate}
-        onSelectProject={(id) => setSelectedProjectId(id)}
+        onSelectProject={handleSelectProject}
       />
 
       {/* Class Detail Modal */}
       {selectedProject && (
         <ClassDetailModal
           project={selectedProject}
-          onClose={() => setSelectedProjectId(null)}
+          onClose={handleCloseProjectModal}
           isBookmarked={bookmarks.includes(selectedProject.id)}
           onToggleBookmark={handleToggleBookmark}
           onNavigateToCongestion={() => handleNavigate('congestion')}
