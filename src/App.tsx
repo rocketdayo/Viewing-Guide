@@ -26,6 +26,33 @@ import { fetchLiveGasCongestion, applyGasSyncToProjects } from './utils/congesti
 import { fetchLiveAnnouncements } from './utils/announcementSync';
 import { motion, AnimatePresence } from 'motion/react';
 
+// Helper to detect repository base path (e.g. '/Viewing-Guide')
+export function getAppBasePath(): string {
+  if (typeof window === 'undefined') return '';
+  const pathname = window.location.pathname;
+  if (pathname.startsWith('/Viewing-Guide')) {
+    return '/Viewing-Guide';
+  }
+  // Generic repository name detection (if hosted under GitHub pages subfolder)
+  const segments = pathname.split('/').filter(Boolean);
+  const reservedPages = ['home', 'schedule', 'classes', 'congestion', 'bookmarks', 'timeline', 'map', 'admin', 'project'];
+  if (segments.length > 0 && !reservedPages.includes(segments[0]) && !segments[0].includes('.')) {
+    return `/${segments[0]}`;
+  }
+  return '';
+}
+
+export function getRelativePath(): string {
+  if (typeof window === 'undefined') return '/home';
+  const basePath = getAppBasePath();
+  let pathname = window.location.pathname;
+  if (basePath && pathname.startsWith(basePath)) {
+    pathname = pathname.slice(basePath.length);
+  }
+  pathname = pathname.replace(/\/+$/, '') || '/';
+  return pathname;
+}
+
 // Helper to parse current URL into application route state
 interface RouteState {
   page: string;
@@ -38,13 +65,13 @@ function parseCurrentUrl(): RouteState {
     return { page: 'home', projectId: null, anchor: null };
   }
 
-  const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
+  const relPath = getRelativePath();
   const hash = window.location.hash ? window.location.hash.replace(/^#/, '') : null;
   const searchParams = new URLSearchParams(window.location.search);
   const paramProjectId = searchParams.get('project') || searchParams.get('id');
 
   // Match /project/:id or /classes/:id (excluding reserved page names)
-  const projectMatch = pathname.match(/^\/(?:project|classes)\/([a-zA-Z0-9_-]+)$/);
+  const projectMatch = relPath.match(/^\/(?:project|classes)\/([a-zA-Z0-9_-]+)$/);
   const reservedPages = ['home', 'schedule', 'classes', 'congestion', 'bookmarks', 'timeline', 'map', 'admin'];
   
   if (projectMatch && !reservedPages.includes(projectMatch[1])) {
@@ -56,13 +83,13 @@ function parseCurrentUrl(): RouteState {
   }
 
   let page = 'home';
-  if (pathname === '/schedule') page = 'schedule';
-  else if (pathname === '/classes') page = 'classes';
-  else if (pathname === '/congestion') page = 'congestion';
-  else if (pathname === '/bookmarks' || pathname === '/timeline') page = 'bookmarks';
-  else if (pathname === '/map') page = 'map';
-  else if (pathname === '/admin') page = 'admin';
-  else if (pathname === '/' || pathname === '/home') page = 'home';
+  if (relPath === '/schedule') page = 'schedule';
+  else if (relPath === '/classes') page = 'classes';
+  else if (relPath === '/congestion') page = 'congestion';
+  else if (relPath === '/bookmarks' || relPath === '/timeline') page = 'bookmarks';
+  else if (relPath === '/map') page = 'map';
+  else if (relPath === '/admin') page = 'admin';
+  else if (relPath === '/' || relPath === '/home') page = 'home';
   else {
     page = 'home';
   }
@@ -166,7 +193,8 @@ export default function App() {
       return;
     }
 
-    let targetPath = page === 'home' ? '/home' : `/${page}`;
+    const basePath = getAppBasePath();
+    let targetPath = page === 'home' ? `${basePath}/home` : `${basePath}/${page}`;
     let targetAnchor = '';
     let targetProjectId: string | null = null;
 
@@ -174,7 +202,7 @@ export default function App() {
       const isProject = appDataRef.current?.projects?.some((p) => p.id === anchorOrProjectId);
       if (isProject) {
         targetProjectId = anchorOrProjectId;
-        targetPath = `/project/${anchorOrProjectId}`;
+        targetPath = `${basePath}/project/${anchorOrProjectId}`;
       } else {
         targetAnchor = anchorOrProjectId;
         targetPath = `${targetPath}#${anchorOrProjectId}`;
@@ -208,7 +236,8 @@ export default function App() {
 
   const handleSelectProject = useCallback((id: string) => {
     setSelectedProjectId(id);
-    const targetPath = `/project/${id}`;
+    const basePath = getAppBasePath();
+    const targetPath = `${basePath}/project/${id}`;
     if (window.location.pathname !== targetPath) {
       window.history.pushState({ page: currentPage, projectId: id }, '', targetPath);
     }
@@ -216,10 +245,14 @@ export default function App() {
 
   const handleCloseProjectModal = useCallback(() => {
     setSelectedProjectId(null);
+    const basePath = getAppBasePath();
     const currentPath = window.location.pathname;
-    if (currentPath.startsWith('/project/') || currentPath.match(/^\/classes\/[a-zA-Z0-9_-]+$/)) {
-      const basePath = `/${currentPage === 'home' ? 'home' : currentPage}`;
-      window.history.pushState({ page: currentPage, projectId: null }, '', basePath);
+    const projectPrefix = `${basePath}/project/`;
+    const classesPrefix = `${basePath}/classes/`;
+    if (currentPath.startsWith(projectPrefix) || currentPath.startsWith(classesPrefix)) {
+      const normalizedPage = currentPage === 'home' ? 'home' : currentPage;
+      const pagePath = `${basePath}/${normalizedPage}`;
+      window.history.pushState({ page: currentPage, projectId: null }, '', pagePath);
     }
   }, [currentPage]);
 
@@ -275,9 +308,11 @@ export default function App() {
 
     window.addEventListener('popstate', handlePopState);
 
-    // Initial normalize if user opens root "/"
-    if (window.location.pathname === '/') {
-      window.history.replaceState({ page: 'home', projectId: null }, '', '/home');
+    // Initial normalize if user opens root "/" or repository root
+    const basePath = getAppBasePath();
+    const currentPath = window.location.pathname;
+    if (currentPath === '/' || currentPath === basePath || currentPath === `${basePath}/`) {
+      window.history.replaceState({ page: 'home', projectId: null }, '', `${basePath}/home`);
     }
 
     // Scroll to initial anchor if present

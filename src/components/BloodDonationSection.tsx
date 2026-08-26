@@ -54,7 +54,7 @@ export const BloodDonationSection: React.FC = () => {
 
           <div className="flex items-center gap-2.5 flex-wrap shrink-0">
             <a
-              href="/blooddonation.pdf"
+              href="./blooddonation.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-medium text-xs sm:text-sm rounded-xs shadow-2xs transition-colors cursor-pointer"
@@ -382,7 +382,7 @@ export const BloodDonationSection: React.FC = () => {
 
               <div className="flex items-center gap-2">
                 <a
-                  href="/blooddonation.pdf"
+                  href="./blooddonation.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-medium rounded-xs transition-colors flex items-center gap-1 cursor-pointer"
