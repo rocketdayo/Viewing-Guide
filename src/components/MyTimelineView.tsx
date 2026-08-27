@@ -1,8 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { ClassProject, CongestionLevel } from '../types';
-import { Bookmark, Clock, MapPin, Plus, Trash2, Edit3, Check, AlertCircle, ArrowRight, Calendar, Sparkles } from 'lucide-react';
+import { 
+  Bookmark, 
+  Clock, 
+  MapPin, 
+  Plus, 
+  Trash2, 
+  Edit3, 
+  Check, 
+  AlertCircle, 
+  ArrowRight, 
+  Calendar, 
+  Sparkles,
+  Share2,
+  Copy,
+  CheckCircle2,
+  QrCode,
+  Download,
+  ExternalLink,
+  MessageCircle,
+  FileText,
+  X
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { useI18n } from '../utils/i18n';
 
-interface CustomTimelineEvent {
+export interface CustomTimelineEvent {
   id: string;
   title: string;
   startTime: string;
@@ -11,7 +34,7 @@ interface CustomTimelineEvent {
   location: string;
 }
 
-interface ProjectScheduleMeta {
+export interface ProjectScheduleMeta {
   startTime: string;
   endTime: string;
   note: string;
@@ -24,10 +47,11 @@ interface MyTimelineViewProps {
   onToggleBookmark: (id: string) => void;
   onSelectProject: (id: string) => void;
   onNavigate: (page: string) => void;
+  onImportTimelineData?: (bookmarks: string[], customEvents: CustomTimelineEvent[], meta: Record<string, ProjectScheduleMeta>) => void;
 }
 
-const SCHEDULE_META_KEY = 'seikyo_fes_2026_project_schedules_v1';
-const CUSTOM_EVENTS_KEY = 'seikyo_fes_2026_custom_events_v1';
+export const SCHEDULE_META_KEY = 'seikyo_fes_2026_project_schedules_v1';
+export const CUSTOM_EVENTS_KEY = 'seikyo_fes_2026_custom_events_v1';
 
 export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
   bookmarkedProjects = [],
@@ -36,7 +60,10 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
   onToggleBookmark,
   onSelectProject,
   onNavigate,
+  onImportTimelineData,
 }) => {
+  const { language, t } = useI18n();
+
   // Project-specific schedule metadata (startTime, endTime, note)
   const [projectMeta, setProjectMeta] = useState<Record<string, ProjectScheduleMeta>>(() => {
     try {
@@ -75,6 +102,10 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
   const [editEnd, setEditEnd] = useState('10:30');
   const [editNote, setEditNote] = useState('');
 
+  // Share Modal & Toast State
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
   useEffect(() => {
     try {
       localStorage.setItem(SCHEDULE_META_KEY, JSON.stringify(projectMeta));
@@ -90,6 +121,13 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
       console.error('Failed to save custom events:', e);
     }
   }, [customEvents]);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
+  };
 
   const handleSaveProjectMeta = (projectId: string) => {
     setProjectMeta(prev => ({
@@ -168,23 +206,106 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
     }))
   ].sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
 
+  // Generate Compressed Shareable URL
+  const generateShareUrl = () => {
+    const payload = {
+      b: bookmarks,
+      c: customEvents.map(e => ({ t: e.title, s: e.startTime, e: e.endTime, l: e.location, n: e.note })),
+      m: projectMeta,
+    };
+    try {
+      const jsonStr = JSON.stringify(payload);
+      const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
+      const baseUrl = window.location.origin + window.location.pathname;
+      return `${baseUrl}?shared_timeline=${encoded}#bookmarks`;
+    } catch {
+      return window.location.href;
+    }
+  };
+
+  // Generate Formatted Text Summary for LINE / Chat
+  const generateFormattedTextSummary = () => {
+    let text = `✨【私の清教学園文化祭タイムスケジュール】✨\n\n`;
+    if (combinedTimelineItems.length === 0) {
+      text += `（予定はまだ登録されていません）\n`;
+    } else {
+      combinedTimelineItems.forEach((item, idx) => {
+        text += `⏰ ${item.startTime}〜${item.endTime}\n`;
+        text += `📍 ${item.title} (${item.location})\n`;
+        if (item.note) text += `   💬 メモ: ${item.note}\n`;
+        text += `\n`;
+      });
+    }
+    text += `🏫 2026清教学園高校文化祭 公式ガイド\n${generateShareUrl()}`;
+    return text;
+  };
+
+  const handleCopyShareLink = async () => {
+    const url = generateShareUrl();
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast(t.linkCopied);
+    } catch {
+      // Fallback
+      prompt('以下の共有URLをコピーしてください:', url);
+    }
+  };
+
+  const handleCopyTextSummary = async () => {
+    const text = generateFormattedTextSummary();
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast('テキストサマリーをクリップボードにコピーしました！LINEやメモに貼り付けられます。');
+    } catch {
+      prompt('以下のテキストをコピーしてください:', text);
+    }
+  };
+
+  const handleShareLine = () => {
+    const text = generateFormattedTextSummary();
+    const url = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
+  const handleShareX = () => {
+    const text = `清教学園高校文化祭「清教エナジー！」私の巡回スケジュールを作りました！ #清教学園 #文化祭2026`;
+    const shareUrl = generateShareUrl();
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`;
+    window.open(url, '_blank');
+  };
+
   const getCongestionBadge = (level: CongestionLevel) => {
     switch (level) {
       case 'smooth':
-        return <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">🟢 空きあり</span>;
+        return <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">🟢 {t.statusSmooth}</span>;
       case 'moderate':
-        return <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">🟡 やや混雑</span>;
+        return <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">🟡 {t.statusModerate}</span>;
       case 'crowded':
-        return <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold">🔴 大混雑</span>;
+        return <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold">🔴 {t.statusCrowded}</span>;
       case 'ticket':
-        return <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[10px] font-bold">🎫 整理券制</span>;
+        return <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[10px] font-bold">🎫 {t.statusTicket}</span>;
       case 'closed':
-        return <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold">⛔ 一時休止</span>;
+        return <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold">⛔ {t.statusClosed}</span>;
     }
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto relative">
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xs shadow-2xl flex items-center space-x-2 border border-slate-700"
+          >
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header Banner */}
       <div className="p-6 rounded-xs bg-gradient-to-br from-emerald-900 via-emerald-950 to-slate-900 text-white shadow-xl space-y-3 relative overflow-hidden">
         <div className="absolute top-0 right-0 -mt-6 -mr-6 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
@@ -193,30 +314,145 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
             <Sparkles className="w-6 h-6 text-emerald-300" />
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-black">マイタイムスケジュール作成</h2>
+            <h2 className="text-xl sm:text-2xl font-black">{t.timelineTitle}</h2>
             <p className="text-xs sm:text-sm text-emerald-200 mt-0.5">
-              保存した企画の訪問時間を自由に設定したり、休憩・ランチなどの独自スケジュールを追加して、あなただけの完璧な文化祭タイムラインを作れます！
+              {t.timelineSubtitle}
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 pt-2">
+        <div className="flex flex-wrap items-center gap-2.5 pt-2">
           <button
             onClick={() => setIsAddingCustom(true)}
-            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xs bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xs bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>自由スケジュールを追加</span>
+            <span>{t.addCustomSchedule}</span>
+          </button>
+          <button
+            onClick={() => setShowShareModal(true)}
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xs bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-md transition-colors cursor-pointer"
+          >
+            <Share2 className="w-4 h-4 text-emerald-200" />
+            <span>{t.shareTimeline}</span>
           </button>
           <button
             onClick={() => onNavigate('congestion')}
-            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xs bg-white/10 hover:bg-white/20 text-white text-xs font-bold backdrop-blur-md transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xs bg-white/10 hover:bg-white/20 text-white text-xs font-bold backdrop-blur-md transition-colors cursor-pointer"
           >
             <Clock className="w-4 h-4 text-emerald-300" />
-            <span>現在の混雑状況を確認 →</span>
+            <span>{t.checkCongestion} →</span>
           </button>
         </div>
       </div>
+
+      {/* Share Modal Dialog */}
+      <AnimatePresence>
+        {showShareModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-xs border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-5"
+            >
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center space-x-2 text-emerald-900">
+                  <Share2 className="w-5 h-5 text-emerald-600" />
+                  <h3 className="font-bold text-base">タイムラインを友達・家族と共有</h3>
+                </div>
+                <button
+                  onClick={() => setShowShareModal(false)}
+                  className="p-1 text-slate-400 hover:text-slate-600 rounded-xs"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4 text-xs sm:text-sm text-slate-700">
+                <p className="text-slate-600 text-xs">
+                  あなたが作成したタイムスケジュール（保存した企画・時間・メモ）をURLやテキストで送ることができます。
+                </p>
+
+                {/* Quick Share Buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <button
+                    onClick={handleCopyShareLink}
+                    className="flex items-center justify-center space-x-2 p-3 rounded-xs bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    <Copy className="w-4 h-4" />
+                    <span>共有リンクURLをコピー</span>
+                  </button>
+                  <button
+                    onClick={handleCopyTextSummary}
+                    className="flex items-center justify-center space-x-2 p-3 rounded-xs bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    <FileText className="w-4 h-4" />
+                    <span>スケジュール文章をコピー</span>
+                  </button>
+                  <button
+                    onClick={handleShareLine}
+                    className="flex items-center justify-center space-x-2 p-3 rounded-xs bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>LINEで友達に送る</span>
+                  </button>
+                  <button
+                    onClick={handleShareX}
+                    className="flex items-center justify-center space-x-2 p-3 rounded-xs bg-slate-900 hover:bg-black text-white text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    <span className="font-mono text-sm font-black">𝕏</span>
+                    <span>X (Twitter) でシェア</span>
+                  </button>
+                </div>
+
+                {/* Share URL Input Box */}
+                <div className="space-y-1 pt-2">
+                  <label className="block text-[11px] font-bold text-slate-500">共有リンクURL</label>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={generateShareUrl()}
+                      className="w-full px-3 py-2 bg-slate-100 rounded-xs border border-slate-300 text-xs font-mono text-slate-700 select-all truncate"
+                    />
+                    <button
+                      onClick={handleCopyShareLink}
+                      className="px-3 py-2 bg-emerald-900 hover:bg-emerald-950 text-white text-xs font-bold rounded-xs shrink-0 cursor-pointer"
+                    >
+                      コピー
+                    </button>
+                  </div>
+                </div>
+
+                {/* QR Code generator preview via public API */}
+                <div className="p-4 bg-slate-50 rounded-xs border border-slate-200 flex flex-col items-center justify-center space-y-2 text-center">
+                  <div className="flex items-center space-x-1.5 text-xs font-bold text-slate-800">
+                    <QrCode className="w-4 h-4 text-emerald-700" />
+                    <span>対面でスマホカメラから読み取るQRコード</span>
+                  </div>
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(generateShareUrl())}`}
+                    alt="Timeline QR Code"
+                    className="w-32 h-32 bg-white p-1 rounded-xs border border-slate-300 shadow-xs"
+                    loading="lazy"
+                  />
+                  <p className="text-[10px] text-slate-500">友達のスマホのカメラでかざすとスケジュールが一発で開きます</p>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-2 border-t border-slate-100">
+                <button
+                  onClick={() => setShowShareModal(false)}
+                  className="px-4 py-2 rounded-xs bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  {t.close}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Add Custom Event Modal Form */}
       {isAddingCustom && (
@@ -301,7 +537,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xs bg-emerald-900 hover:bg-emerald-950 text-white text-xs font-bold shadow-md transition-colors"
+              className="px-5 py-2 rounded-xs bg-emerald-900 hover:bg-emerald-950 text-white text-xs font-bold shadow-md transition-colors cursor-pointer"
             >
               追加する
             </button>
@@ -323,18 +559,18 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
             <div className="w-12 h-12 rounded-xs bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
               <Calendar className="w-6 h-6" />
             </div>
-            <p className="text-sm font-bold text-slate-800">まだマイタイムラインに項目がありません</p>
+            <p className="text-sm font-bold text-slate-800">{t.emptyTimeline}</p>
             <p className="text-xs text-slate-400">クラス企画一覧からブックマークするか、上記の「自由スケジュールを追加」ボタンを押して予定を組み立ててください。</p>
             <button
               onClick={() => onNavigate('classes')}
               className="mt-2 px-5 py-2.5 rounded-xs bg-emerald-900 hover:bg-emerald-950 text-white text-xs font-bold shadow-md cursor-pointer transition-colors"
             >
-              クラス企画一覧から探す
+              {t.findProjects}
             </button>
           </div>
         ) : (
           <div className="space-y-3">
-            {combinedTimelineItems.map((item, index) => {
+            {combinedTimelineItems.map((item) => {
               const isProject = item.type === 'project';
               const proj = item.project;
               const isEditing = isProject && editingProjectId === item.id;
@@ -448,7 +684,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                           <button
                             type="button"
                             onClick={() => handleSaveProjectMeta(proj!.id)}
-                            className="px-3 py-1 rounded-lg bg-emerald-900 text-white text-xs font-bold shadow-2xs"
+                            className="px-3 py-1 rounded-lg bg-emerald-900 text-white text-xs font-bold shadow-2xs cursor-pointer"
                           >
                             保存
                           </button>

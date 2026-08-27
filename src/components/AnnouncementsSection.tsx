@@ -1,17 +1,10 @@
 import React, { useState } from 'react';
 import { 
-  Megaphone, 
-  Radio, 
-  Pin, 
-  ChevronDown, 
-  ChevronUp, 
   Clock, 
-  AlertCircle, 
   Bell, 
-  Info, 
-  Sparkles,
-  CheckCircle2,
-  Filter
+  Filter,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Announcement } from '../types';
@@ -24,10 +17,21 @@ export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
   announcements = [],
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [expandedIds, setExpandedIds] = useState<string[]>(() => {
-    // Default expand pinned announcements
-    return announcements.filter(a => a.isPinned).map(a => a.id);
-  });
+  
+  // Default to having ONLY pinned announcements expanded; unpinned ones are collapsed by default
+  const [expandedIds, setExpandedIds] = useState<string[]>(() => 
+    announcements.filter(a => a.isPinned).map(a => a.id)
+  );
+
+  // Sync expanded state when announcements change if needed (e.g. initial fetch)
+  React.useEffect(() => {
+    setExpandedIds(prev => {
+      // If user hasn't toggled anything or announcements were loaded asynchronously, ensure pinned are expanded
+      const pinnedIds = announcements.filter(a => a.isPinned).map(a => a.id);
+      const unique = Array.from(new Set([...prev, ...pinnedIds]));
+      return unique;
+    });
+  }, [announcements]);
 
   const toggleExpand = (id: string) => {
     setExpandedIds(prev => 
@@ -42,8 +46,12 @@ export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
     return item.category === selectedCategory;
   });
 
-  const pinnedList = filteredAnnouncements.filter(a => a.isPinned);
-  const normalList = filteredAnnouncements.filter(a => !a.isPinned);
+  // Sort pinned items to the very top
+  const sortedAnnouncements = [...filteredAnnouncements].sort((a, b) => {
+    if (a.isPinned && !b.isPinned) return -1;
+    if (!a.isPinned && b.isPinned) return 1;
+    return 0;
+  });
 
   const getCategoryBadge = (category: string) => {
     switch (category) {
@@ -70,7 +78,7 @@ export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
               <span>お知らせ・緊急速報 配信サービス</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 font-normal">
-              文化祭本部・各ステージからの最新アナウンス、プログラム変更、緊急連絡を掲載しています
+              各ステージ・学園からの最新アナウンス、プログラム変更、緊急連絡を掲載しています
             </p>
           </div>
         </div>
@@ -98,87 +106,36 @@ export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
         )}
 
         {/* Announcements List */}
-        {announcements.length === 0 ? (
+        {sortedAnnouncements.length === 0 ? (
           <div className="bg-white p-8 border border-slate-200 text-center space-y-3 shadow-2xs">
             <Bell className="w-8 h-8 text-slate-300 mx-auto" />
             <p className="text-sm font-bold text-slate-700">現在、新しいお知らせはありません</p>
-            <p className="text-xs text-slate-500">運営本部からの新しいアナウンスがあり次第、ここに自動表示されます。</p>
+            <p className="text-xs text-slate-500">新しいアナウンスがあり次第、ここに自動表示されます。</p>
           </div>
         ) : (
           <div className="space-y-4">
-            
-            {/* Pinned Announcements */}
-            {pinnedList.map((item) => {
+            {sortedAnnouncements.map((item) => {
               const isExpanded = expandedIds.includes(item.id);
+              const hasContent = Boolean(item.content && item.content.trim());
+
               return (
                 <motion.div
                   key={item.id}
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-amber-50/70 border-2 border-amber-300 shadow-2xs transition-all overflow-hidden"
+                  className={`transition-all overflow-hidden border shadow-2xs ${
+                    item.isPinned
+                      ? 'bg-amber-50/50 border-amber-300 ring-1 ring-amber-300/50'
+                      : 'bg-white border-slate-200 hover:border-slate-300'
+                  }`}
                 >
                   <div 
-                    onClick={() => toggleExpand(item.id)}
-                    className="p-5 sm:p-6 cursor-pointer hover:bg-amber-50/90 transition-colors"
+                    onClick={() => hasContent && toggleExpand(item.id)}
+                    className={`p-5 sm:p-6 space-y-2.5 ${hasContent ? 'cursor-pointer select-none hover:bg-slate-50/60' : ''} transition-colors`}
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2.5">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="inline-flex items-center gap-1 bg-amber-500 text-white px-2.5 py-0.5 text-xs font-bold tracking-wider shadow-2xs">
-                          <Pin className="w-3 h-3 fill-current" />
-                          重要告知
-                        </span>
-                        <span className={`px-2.5 py-0.5 text-xs font-bold border ${getCategoryBadge(item.category)}`}>
-                          {item.category || 'お知らせ'}
-                        </span>
-                        <span className="text-xs font-mono text-slate-600 flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 text-amber-700" />
-                          {item.timestamp}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-1.5 text-xs font-bold text-amber-900 self-end sm:self-auto">
-                        <span>{isExpanded ? '折りたたむ' : '詳細を読む'}</span>
-                        {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                      </div>
-                    </div>
-
-                    <h3 className="text-base sm:text-lg font-serif font-bold text-slate-950 leading-snug">
-                      {item.title}
-                    </h3>
-
-                    <AnimatePresence>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="pt-4 mt-3 border-t border-amber-200 text-xs sm:text-sm text-slate-800 leading-relaxed whitespace-pre-line font-sans"
-                        >
-                          {item.content}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </motion.div>
-              );
-            })}
-
-            {/* Standard Announcements */}
-            {normalList.map((item) => {
-              const isExpanded = expandedIds.includes(item.id);
-              return (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white border border-slate-300 shadow-2xs hover:border-slate-400 transition-all overflow-hidden"
-                >
-                  <div 
-                    onClick={() => toggleExpand(item.id)}
-                    className="p-5 sm:p-6 cursor-pointer hover:bg-slate-50 transition-colors"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2.5">
-                      <div className="flex flex-wrap items-center gap-2">
+                    {/* Meta Bar */}
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center space-x-2">
                         <span className={`px-2.5 py-0.5 text-xs font-bold border ${getCategoryBadge(item.category)}`}>
                           {item.category || 'お知らせ'}
                         </span>
@@ -187,26 +144,39 @@ export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
                           {item.timestamp}
                         </span>
                       </div>
-                      <div className="flex items-center space-x-1.5 text-xs font-bold text-slate-600 self-end sm:self-auto">
-                        <span>{isExpanded ? '折りたたむ' : '本文を表示'}</span>
-                        {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
-                      </div>
+
+                      {hasContent && (
+                        <div className="flex items-center space-x-1 text-xs font-bold text-slate-500">
+                          <span>{isExpanded ? '本文を閉じる' : '本文を開く'}</span>
+                          {isExpanded ? (
+                            <ChevronUp className="w-4 h-4 text-slate-500" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4 text-slate-500" />
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
+                    {/* Title */}
+                    <h3 className={`font-serif font-bold text-slate-900 leading-snug ${
+                      item.isPinned ? 'text-base sm:text-lg text-slate-950 font-bold' : 'text-base sm:text-lg'
+                    }`}>
                       {item.title}
                     </h3>
 
-                    <AnimatePresence>
-                      {isExpanded && (
+                    {/* Collapsible Content - Full multi-line rendering with smooth animation */}
+                    <AnimatePresence initial={false}>
+                      {hasContent && isExpanded && (
                         <motion.div
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
                           exit={{ opacity: 0, height: 0 }}
                           transition={{ duration: 0.2 }}
-                          className="pt-4 mt-3 border-t border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line font-sans"
+                          className="overflow-hidden"
                         >
-                          {item.content}
+                          <div className="pt-3 mt-1 border-t border-slate-200/80 text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-wrap font-sans break-words">
+                            {item.content}
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -214,7 +184,6 @@ export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
                 </motion.div>
               );
             })}
-
           </div>
         )}
 
@@ -222,3 +191,4 @@ export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
     </section>
   );
 };
+

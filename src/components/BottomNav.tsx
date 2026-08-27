@@ -1,6 +1,7 @@
 import React from 'react';
 import { Home, Calendar, Layers, Activity, MapPin, Bookmark } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useI18n } from '../utils/i18n';
 
 interface BottomNavProps {
   currentPage: string;
@@ -13,12 +14,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   setCurrentPage,
   bookmarksCount,
 }) => {
+  const { t } = useI18n();
+
   const navItems = [
-    { id: 'home', label: 'ホーム', icon: Home },
-    { id: 'classes', label: 'クラス企画', icon: Layers },
-    { id: 'congestion', label: '混雑状況', icon: Activity },
-    { id: 'bookmarks', label: 'マイタイムライン', icon: Bookmark },
-    { id: 'map', label: '校内マップ', icon: MapPin },
+    { id: 'home', label: t.navHome, icon: Home },
+    { id: 'classes', label: t.navClasses, icon: Layers },
+    { id: 'congestion', label: t.navCongestion, icon: Activity },
+    { id: 'bookmarks', label: t.navBookmarks, icon: Bookmark },
+    { id: 'map', label: t.navMap, icon: MapPin },
   ];
 
   return (

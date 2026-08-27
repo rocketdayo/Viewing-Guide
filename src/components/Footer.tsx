@@ -1,7 +1,8 @@
 import React from 'react';
-import { MapPin, Phone, ShieldCheck, Heart, Sparkles, ChevronUp, ListTree } from 'lucide-react';
+import { MapPin, ShieldCheck, ChevronUp, ListTree, HelpCircle, Globe } from 'lucide-react';
 import { AppDataState } from '../types';
 import { LogoBadge } from './LogoBadge';
+import { useI18n } from '../utils/i18n';
 
 interface FooterProps {
   appData?: AppDataState;
@@ -10,6 +11,8 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }) => {
+  const { language, toggleLanguage, t } = useI18n();
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -26,13 +29,15 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
                 <h3 className="text-base font-bold text-white tracking-tight">
                   {appData?.festivalTitle || '2026 清教学園 中高合同文化祭 SG fes'}
                 </h3>
-                <p className="text-xs text-sky-400 font-medium">
-                  {appData?.festivalTheme ? `テーマ「${appData.festivalTheme.replace(/^「|」$/g, '')}」` : '鑑賞ガイド'}
+                <p className="text-xs text-emerald-400 font-medium">
+                  {appData?.festivalTheme ? `テーマ「${appData.festivalTheme.replace(/^「|」$/g, '')}」` : t.guideTitle}
                 </p>
               </div>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed max-w-md">
-              中高総勢1,700名を超える生徒たちが合同で創り上げる学園の一大イベント。テーマ「清教エナジー！～1度しかない学園生活を楽しもう～」のもと、生徒たちの自主性とエネルギーがあふれる各企画・展示をどうぞお楽しみください。
+              {language === 'en' 
+                ? 'Seikyo Gakuen High School Culture Festival 2026. Enjoy student stage performances, innovative classroom exhibitions, food stalls, and real-time waiting times.'
+                : '中高総勢1,700名を超える生徒たちが合同で創り上げる学園の一大イベント。テーマ「清教エナジー！～1度しかない学園生活を楽しもう～」のもと、生徒たちの自主性とエネルギーがあふれる各企画・展示をどうぞお楽しみください。'}
             </p>
             <div className="text-xs text-slate-400 pt-1 space-y-1">
               <p className="flex items-center gap-1.5">
@@ -45,7 +50,7 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
           {/* Col 2: Navigation Links */}
           <div className="space-y-2">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-              ページ案内
+              {language === 'en' ? 'Quick Links' : 'ページ案内'}
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
               {onNavigate && (
@@ -55,7 +60,7 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
                       onClick={() => onNavigate('home')}
                       className="hover:text-white transition-colors cursor-pointer"
                     >
-                      ホーム（ご挨拶・速報）
+                      {t.navHome}（ご挨拶・速報）
                     </button>
                   </li>
                   <li>
@@ -63,7 +68,7 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
                       onClick={() => onNavigate('schedule')}
                       className="hover:text-white transition-colors cursor-pointer"
                     >
-                      タイムテーブル・ステージ
+                      {t.navSchedule}
                     </button>
                   </li>
                   <li>
@@ -71,7 +76,7 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
                       onClick={() => onNavigate('classes')}
                       className="hover:text-white transition-colors cursor-pointer"
                     >
-                      クラス企画一覧 ({appData?.projects?.length || 25}企画)
+                      {t.navClasses} ({appData?.projects?.length || 21}企画)
                     </button>
                   </li>
                   <li>
@@ -79,7 +84,7 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
                       onClick={() => onNavigate('congestion')}
                       className="hover:text-white text-emerald-400 font-bold transition-colors cursor-pointer"
                     >
-                      リアルタイム混雑状況
+                      {t.navCongestion}
                     </button>
                   </li>
                   <li>
@@ -87,7 +92,16 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
                       onClick={() => onNavigate('map')}
                       className="hover:text-white transition-colors cursor-pointer"
                     >
-                      校内マップ・フロア案内
+                      {t.navMap}
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => onNavigate('faq')}
+                      className="hover:text-teal-300 text-teal-400 font-bold transition-colors cursor-pointer flex items-center gap-1"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                      <span>{t.navFaq}</span>
                     </button>
                   </li>
                 </>
@@ -96,35 +110,45 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
                 <li>
                   <button
                     onClick={onOpenToc}
-                    className="hover:text-sky-300 transition-colors flex items-center gap-1 text-sky-400 cursor-pointer"
+                    className="hover:text-emerald-300 transition-colors flex items-center gap-1 text-emerald-400 cursor-pointer"
                   >
                     <ListTree className="w-3.5 h-3.5" />
-                    <span>全ページ目次一覧</span>
+                    <span>{t.navToc}</span>
                   </button>
                 </li>
               )}
             </ul>
           </div>
 
-          {/* Col 3: Guidelines & Admin */}
-          <div className="space-y-2">
+          {/* Col 3: Guidelines & Utility */}
+          <div className="space-y-3">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-              ご来場の皆様へのお願い
+              {language === 'en' ? 'Etiquette & Guidelines' : '来場者マナー＆重要事項'}
             </h4>
             <p className="text-xs text-slate-400 leading-relaxed">
-              校内は全面禁煙・土足厳禁箇所（上履き・スリッパ・靴袋をご持参ください）です。写真・動画のSNS投稿の際は他の方のお顔の写り込みにご配慮ください。
+              {language === 'en'
+                ? 'Campus is strictly indoor shoes only (please bring slippers & shoe bags). Strictly non-smoking. Please respect the privacy of all students & visitors by avoiding social media photo/video posts.'
+                : '校内は原則土足禁止です（スリッパ・上履き・靴袋をご持参ください）。敷地内全面禁煙。生徒・来場者のプライバシー保護のためSNSへの写真・動画投稿はお控えください。'}
             </p>
-            {onNavigate && (
-              <div className="pt-2">
+            
+            <div className="pt-1 flex flex-col gap-2">
+              <button
+                onClick={toggleLanguage}
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xs bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-bold border border-slate-800 transition-colors cursor-pointer"
+              >
+                <Globe className="w-3.5 h-3.5 text-emerald-400" />
+                <span>言語切替 / Language: {language === 'ja' ? 'English' : '日本語'}</span>
+              </button>
+              {onNavigate && (
                 <button
                   onClick={() => onNavigate('admin')}
-                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xs bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-medium border border-slate-800 transition-colors cursor-pointer"
+                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xs bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-medium border border-slate-800 transition-colors cursor-pointer"
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>管理者・実行委員ログイン</span>
+                  <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
+                  <span>{t.navAdmin}</span>
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 

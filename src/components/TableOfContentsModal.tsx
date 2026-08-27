@@ -16,12 +16,14 @@ import {
   Bookmark,
   Search,
   Sparkles,
-  ExternalLink,
-  Info
+  HelpCircle,
+  Smartphone,
+  Globe
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AppDataState } from '../types';
 import { LogoBadge } from './LogoBadge';
+import { useI18n } from '../utils/i18n';
 
 interface TableOfContentsModalProps {
   isOpen: boolean;
@@ -31,6 +33,7 @@ interface TableOfContentsModalProps {
   onNavigate: (page: string, anchor?: string) => void;
   onSelectProject: (projectId: string) => void;
   onOpenSearch?: () => void;
+  onOpenPwaModal?: () => void;
   bookmarksCount?: number;
   isAdminLoggedIn?: boolean;
 }
@@ -43,9 +46,12 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
   onNavigate,
   onSelectProject,
   onOpenSearch,
+  onOpenPwaModal,
   bookmarksCount = 0,
   isAdminLoggedIn = false,
 }) => {
+  const { language, toggleLanguage, t } = useI18n();
+
   // Close on Escape key
   useEffect(() => {
     if (!isOpen) return;
@@ -70,6 +76,8 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
   }, [isOpen]);
 
   const handleJump = (page: string, anchor?: string) => {
+    // Ensure body scroll is unlocked immediately before starting navigation
+    document.body.style.overflow = '';
     onNavigate(page, anchor);
     onClose();
   };
@@ -82,14 +90,14 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
   const primaryNavItems = [
     { 
       id: 'home', 
-      label: 'ホーム', 
+      label: t.navHome, 
       desc: '総合トップ・開催概要・速報', 
       icon: Home, 
       color: 'emerald' 
     },
     { 
       id: 'schedule', 
-      label: 'タイムテーブル', 
+      label: t.navSchedule, 
       desc: 'チャペル・体育館・ステージ公演', 
       icon: Calendar, 
       isDraft: true, 
@@ -97,21 +105,21 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
     },
     { 
       id: 'classes', 
-      label: 'クラス企画一覧', 
+      label: t.navClasses, 
       desc: `高1・高2 全${appData?.projects?.length || 21}企画の詳細・展示`, 
       icon: Layers, 
       color: 'emerald' 
     },
     { 
       id: 'congestion', 
-      label: 'リアルタイム混雑状況', 
+      label: t.navCongestion, 
       desc: '各教室の待ち時間・現在の状況', 
       icon: Activity, 
       color: 'amber' 
     },
     { 
       id: 'map', 
-      label: '校内マップ・案内図', 
+      label: t.navMap, 
       desc: '本館・新館・特別棟・チャペル', 
       icon: MapPin, 
       isDraft: true, 
@@ -119,14 +127,21 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
     },
     { 
       id: 'bookmarks', 
-      label: 'マイタイムライン', 
-      desc: `保存した企画一覧（${bookmarksCount}件）`, 
+      label: t.navBookmarks, 
+      desc: `保存した企画・巡回スケジュール（${bookmarksCount}件）`, 
       icon: Bookmark, 
       color: 'indigo' 
     },
+    { 
+      id: 'faq', 
+      label: t.navFaq, 
+      desc: '土足禁止・整理券・飲食・プライバシー/撮影・職員室', 
+      icon: HelpCircle, 
+      color: 'teal' 
+    },
     ...(isAdminLoggedIn ? [{ 
       id: 'admin', 
-      label: '管理パネル', 
+      label: t.navAdmin, 
       desc: '混雑度・お知らせ・企画編集', 
       icon: Shield, 
       color: 'slate' 
@@ -135,6 +150,13 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
 
   const specialSections = [
     {
+      title: 'よくある質問＆来場者マナーガイド',
+      desc: '土足禁止・整理券・飲食エリア・撮影/SNSプライバシー・救護・落とし物（職員室）',
+      icon: HelpCircle,
+      color: 'text-teal-800 bg-teal-50 border-teal-200',
+      action: () => handleJump('faq'),
+    },
+    {
       title: 'ご挨拶（学校長・生徒会・実行委員長）',
       desc: '文化祭開催にあたってのメッセージとテーマ発表',
       icon: MessageSquare,
@@ -142,8 +164,8 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
       action: () => handleJump('home', 'greetings-section'),
     },
     {
-      title: '本部お知らせ・緊急速報 配信サービス',
-      desc: 'タイムテーブル変更や本部からの重要なお知らせ',
+      title: 'お知らせ・緊急速報 配信サービス',
+      desc: 'タイムテーブル変更や学園からの重要なお知らせ・緊急連絡',
       icon: Radio,
       color: 'text-emerald-800 bg-emerald-50/80 border-emerald-200',
       action: () => handleJump('home', 'announcements-section'),
@@ -385,16 +407,34 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
             </div>
 
             {/* Drawer Footer */}
-            <div className="p-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 shrink-0">
+            <div className="p-3.5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 shrink-0">
               <div className="flex items-center space-x-2">
-                <span className="text-slate-600 font-medium">清教学園高校 文化祭 2026</span>
+                <button
+                  onClick={toggleLanguage}
+                  className="flex items-center space-x-1 px-2.5 py-1 rounded-xs bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-100 transition-colors"
+                >
+                  <Globe className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>{language === 'ja' ? 'English' : '日本語'}</span>
+                </button>
+                {onOpenPwaModal && (
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onOpenPwaModal();
+                    }}
+                    className="flex items-center space-x-1 px-2.5 py-1 rounded-xs bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold hover:bg-emerald-100 transition-colors"
+                  >
+                    <Smartphone className="w-3.5 h-3.5" />
+                    <span>アプリ化・PWA</span>
+                  </button>
+                )}
               </div>
               <button
                 onClick={onClose}
-                className="px-4 py-2 rounded-xs bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold transition-colors cursor-pointer text-xs flex items-center gap-1"
+                className="px-4 py-1.5 rounded-xs bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold transition-colors cursor-pointer text-xs flex items-center gap-1"
               >
                 <X className="w-3.5 h-3.5" />
-                <span>閉じる</span>
+                <span>{t.close}</span>
               </button>
             </div>
           </motion.div>

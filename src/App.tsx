@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Navbar } from './components/Navbar';
 import { BottomNav } from './components/BottomNav';
 import { HomeView } from './components/HomeView';
@@ -9,6 +9,8 @@ import { ScheduleView } from './components/ScheduleView';
 import { CampusMapView } from './components/CampusMapView';
 import { CongestionLiveView } from './components/CongestionLiveView';
 import { MyTimelineView } from './components/MyTimelineView';
+import { FaqMannersView } from './components/FaqMannersView';
+import { PwaInstallBanner } from './components/PwaInstallBanner';
 import { SearchModal } from './components/SearchModal';
 import { TableOfContentsModal } from './components/TableOfContentsModal';
 import { Footer } from './components/Footer';
@@ -20,8 +22,7 @@ import {
   resetAppDataToDefault,
   fetchServerAppData
 } from './utils/storage';
-import { Bookmark } from 'lucide-react';
-import { AppDataState, ClassProject } from './types';
+import { AppDataState } from './types';
 import { fetchLiveGasCongestion, applyGasSyncToProjects } from './utils/congestionSync';
 import { fetchLiveAnnouncements } from './utils/announcementSync';
 import { motion, AnimatePresence } from 'motion/react';
@@ -35,7 +36,7 @@ export function getAppBasePath(): string {
   }
   // Generic repository name detection (if hosted under GitHub pages subfolder)
   const segments = pathname.split('/').filter(Boolean);
-  const reservedPages = ['home', 'schedule', 'classes', 'congestion', 'bookmarks', 'timeline', 'map', 'admin', 'project'];
+  const reservedPages = ['home', 'schedule', 'classes', 'congestion', 'bookmarks', 'timeline', 'map', 'faq', 'admin', 'project'];
   if (segments.length > 0 && !reservedPages.includes(segments[0]) && !segments[0].includes('.')) {
     return `/${segments[0]}`;
   }
@@ -72,7 +73,7 @@ function parseCurrentUrl(): RouteState {
 
   // Match /project/:id or /classes/:id (excluding reserved page names)
   const projectMatch = relPath.match(/^\/(?:project|classes)\/([a-zA-Z0-9_-]+)$/);
-  const reservedPages = ['home', 'schedule', 'classes', 'congestion', 'bookmarks', 'timeline', 'map', 'admin'];
+  const reservedPages = ['home', 'schedule', 'classes', 'congestion', 'bookmarks', 'timeline', 'map', 'faq', 'admin'];
   
   if (projectMatch && !reservedPages.includes(projectMatch[1])) {
     return {
@@ -88,6 +89,7 @@ function parseCurrentUrl(): RouteState {
   else if (relPath === '/congestion') page = 'congestion';
   else if (relPath === '/bookmarks' || relPath === '/timeline') page = 'bookmarks';
   else if (relPath === '/map') page = 'map';
+  else if (relPath === '/faq') page = 'faq';
   else if (relPath === '/admin') page = 'admin';
   else if (relPath === '/' || relPath === '/home') page = 'home';
   else {
@@ -112,6 +114,7 @@ export default function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
   const [isTocOpen, setIsTocOpen] = useState<boolean>(() => typeof window !== 'undefined' && (window.location.hash === '#toc' || window.location.hash === '#menu'));
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(() => typeof window !== 'undefined' && window.location.hash === '#search');
+  const [showPwaModal, setShowPwaModal] = useState<boolean>(false);
 
   // Synchronized state references to prevent re-creation loops
   const appDataRef = React.useRef(appData);
@@ -193,6 +196,46 @@ export default function App() {
     }
   }, [syncCongestion, syncAnnouncements]);
 
+  const pendingAnchorRef = useRef<string | null>(null);
+
+  // Dedicated robust anchor scroll helper with retry mechanism
+  const scrollToAnchor = useCallback((anchorId: string, retryCount = 0) => {
+    if (!anchorId) return;
+
+    // Ensure document body is scrollable (not locked by any drawer/modal)
+    document.body.style.overflow = '';
+
+    const el = document.getElementById(anchorId);
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const navbarHeight = 70;
+      const targetY = Math.max(0, rect.top + scrollTop - navbarHeight);
+
+      window.scrollTo({
+        top: targetY,
+        behavior: 'smooth',
+      });
+      return;
+    }
+
+    // If element is not yet in DOM (e.g. during page transition or layout), retry up to 30 times (every 40ms = 1.2s)
+    if (retryCount < 30) {
+      setTimeout(() => {
+        scrollToAnchor(anchorId, retryCount + 1);
+      }, 40);
+    }
+  }, []);
+
+  const handleSelectProject = useCallback((id: string) => {
+    setSelectedProjectId(id);
+    const basePath = getAppBasePath();
+    const targetPath = `${basePath}/project/${id}`;
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState({ page: currentPage, projectId: id }, '', targetPath);
+    }
+  }, [currentPage]);
+
   // Primary URL-aware navigation handler
   const handleNavigate = useCallback((page: string, anchorOrProjectId?: string, replace: boolean = false) => {
     if (page === 'classDetail' && anchorOrProjectId) {
@@ -230,25 +273,13 @@ export default function App() {
     setSelectedProjectId(targetProjectId);
 
     if (!targetAnchor) {
+      pendingAnchorRef.current = null;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      setTimeout(() => {
-        const el = document.getElementById(targetAnchor);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
+      pendingAnchorRef.current = targetAnchor;
+      scrollToAnchor(targetAnchor);
     }
-  }, []);
-
-  const handleSelectProject = useCallback((id: string) => {
-    setSelectedProjectId(id);
-    const basePath = getAppBasePath();
-    const targetPath = `${basePath}/project/${id}`;
-    if (window.location.pathname !== targetPath) {
-      window.history.pushState({ page: currentPage, projectId: id }, '', targetPath);
-    }
-  }, [currentPage]);
+  }, [handleSelectProject, scrollToAnchor]);
 
   const handleCloseProjectModal = useCallback(() => {
     setSelectedProjectId(null);
@@ -304,12 +335,8 @@ export default function App() {
       setIsTocOpen(currentHash === '#toc' || currentHash === '#menu');
 
       if (route.anchor) {
-        setTimeout(() => {
-          const el = document.getElementById(route.anchor!);
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth' });
-          }
-        }, 100);
+        pendingAnchorRef.current = route.anchor;
+        scrollToAnchor(route.anchor);
       }
     };
 
@@ -324,18 +351,14 @@ export default function App() {
 
     // Scroll to initial anchor if present
     if (initialRoute.anchor) {
-      setTimeout(() => {
-        const el = document.getElementById(initialRoute.anchor!);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 200);
+      pendingAnchorRef.current = initialRoute.anchor;
+      scrollToAnchor(initialRoute.anchor);
     }
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, []);
+  }, [scrollToAnchor]);
 
   useEffect(() => {
     // Fetch latest app data from server on mount for online sync
@@ -392,7 +415,7 @@ export default function App() {
       <div>
         <Navbar 
           currentPage={currentPage} 
-          setCurrentPage={(page) => handleNavigate(page)} 
+          setCurrentPage={(page, anchor) => handleNavigate(page, anchor)} 
           appData={appData}
           isAdminLoggedIn={isAdminLoggedIn}
           onOpenSearch={handleOpenSearch}
@@ -408,6 +431,11 @@ export default function App() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.25, ease: 'easeOut' }}
+              onAnimationComplete={() => {
+                if (pendingAnchorRef.current) {
+                  scrollToAnchor(pendingAnchorRef.current);
+                }
+              }}
             >
               {currentPage === 'home' && (
                 <HomeView 
@@ -464,6 +492,12 @@ export default function App() {
                   onSelectProject={handleSelectProject}
                 />
               )}
+
+              {currentPage === 'faq' && (
+                <FaqMannersView 
+                  onNavigate={handleNavigate}
+                />
+              )}
               
               {currentPage === 'admin' && (
                 <AdminView 
@@ -510,8 +544,15 @@ export default function App() {
         onNavigate={handleNavigate}
         onSelectProject={handleSelectProject}
         onOpenSearch={handleOpenSearch}
+        onOpenPwaModal={() => setShowPwaModal(true)}
         bookmarksCount={(bookmarks || []).length}
         isAdminLoggedIn={isAdminLoggedIn}
+      />
+
+      {/* PWA Install Guide Banner & Modal */}
+      <PwaInstallBanner
+        forceShowModal={showPwaModal}
+        onCloseModal={() => setShowPwaModal(false)}
       />
 
       {/* Class Detail Modal */}

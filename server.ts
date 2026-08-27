@@ -43,6 +43,61 @@ function getGoogleSpreadsheetCsvUrl(targetUrl: string): string {
   return fetchUrl;
 }
 
+// Robust RFC-4180 compliant CSV parser to handle quotes, commas, and MULTILINE cells
+function parseFullCSV(text: string): string[][] {
+  if (!text || typeof text !== 'string') return [];
+  const rows: string[][] = [];
+  let currentRow: string[] = [];
+  let currentField = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
+
+    if (inQuotes) {
+      if (char === '"' && nextChar === '"') {
+        currentField += '"';
+        i++; // Skip the second quote
+      } else if (char === '"') {
+        inQuotes = false;
+      } else {
+        currentField += char;
+      }
+    } else {
+      if (char === '"') {
+        inQuotes = true;
+      } else if (char === ',') {
+        currentRow.push(currentField.trim());
+        currentField = '';
+      } else if (char === '\r') {
+        if (nextChar === '\n') {
+          i++; // Skip \n
+        }
+        currentRow.push(currentField.trim());
+        rows.push(currentRow);
+        currentRow = [];
+        currentField = '';
+      } else if (char === '\n') {
+        currentRow.push(currentField.trim());
+        rows.push(currentRow);
+        currentRow = [];
+        currentField = '';
+      } else {
+        currentField += char;
+      }
+    }
+  }
+
+  // Push last field and row if any remaining
+  if (currentField.length > 0 || currentRow.length > 0) {
+    currentRow.push(currentField.trim());
+    rows.push(currentRow);
+  }
+
+  return rows;
+}
+
 // Simple CSV line parser to handle quotes and commas inside cells
 function parseCSVLine(text: string): string[] {
   const result: string[] = [];
@@ -64,6 +119,30 @@ function parseCSVLine(text: string): string[] {
   }
   result.push(current.trim());
   return result;
+}
+
+function checkIsPinned(val: any): boolean {
+  if (val === true || val === 1) return true;
+  if (!val) return false;
+  const str = String(val).trim().toLowerCase();
+  return (
+    str === 'true' ||
+    str === '1' ||
+    str === 'yes' ||
+    str === 'y' ||
+    str === 'on' ||
+    str === 't' ||
+    str.includes('ピン') ||
+    str.includes('固定') ||
+    str.includes('重要') ||
+    str.includes('○') ||
+    str.includes('〇') ||
+    str.includes('●') ||
+    str.includes('✓') ||
+    str.includes('✔') ||
+    str.includes('有') ||
+    str.includes('はい')
+  );
 }
 
 // Fetch with retry and timeout (12s per try, max 2 tries)
@@ -105,7 +184,7 @@ async function fetchAndParseGas(targetUrl: string) {
   }
 
   const raw = await res.text();
-  const lines = raw.split("\n");
+  const rows = parseFullCSV(raw);
 
   const results: Record<
     string,
@@ -119,11 +198,10 @@ async function fetchAndParseGas(targetUrl: string) {
     }
   > = {};
 
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
+  for (let i = 1; i < rows.length; i++) {
+    const parts = rows[i];
+    if (!parts || parts.length === 0) continue;
 
-    const parts = parseCSVLine(line);
     const rawClassCode = parts[0]?.trim() || "";
 
     // Normalize class code: e.g. "1A", "1-A", "1年A組", "1a" -> "1A"
@@ -195,7 +273,7 @@ async function fetchAndParseAnnouncements(targetUrl: string) {
       const parsed = JSON.parse(trimmed);
       const items = Array.isArray(parsed) ? parsed : (parsed.announcements || parsed.data || []);
       if (Array.isArray(items)) {
-        return items.map((item: any, i: number) => {
+        const list = items.map((item: any, i: number) => {
           let cat: "重要" | "混雑情報" | "プログラム変更" | "一般案内" = "一般案内";
           const catStr = (item.category || item.type || "").toString();
           if (catStr.includes("重要")) cat = "重要";
@@ -208,28 +286,70 @@ async function fetchAndParseAnnouncements(targetUrl: string) {
             category: cat,
             title: (item.title || item.name || "").trim(),
             content: (item.content || item.detail || item.body || "").trim(),
-            isPinned: Boolean(item.isPinned || item.pinned),
+            isPinned: checkIsPinned(item.isPinned ?? item.pinned ?? item.pin ?? item.fixed),
           };
         }).filter((a: any) => a.title);
+
+        return list.sort((a: any, b: any) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          return 0;
+        });
       }
     } catch {
       // Not JSON, continue to CSV parsing
     }
   }
 
-  const lines = raw.split("\n");
+  const rows = parseFullCSV(raw);
+  if (rows.length === 0) return [];
+
+  // Inspect Header Row (Row 0) to detect column indices if available
+  let dateCol = 0;
+  let categoryCol = 1;
+  let titleCol = 2;
+  let contentCol = 3;
+  let pinCol = 4;
+  let startRow = 1;
+
+  if (rows.length > 0) {
+    const headerRow = rows[0].map(h => (h || "").toLowerCase().replace(/\s+/g, ""));
+    let foundHeaders = false;
+
+    headerRow.forEach((h, idx) => {
+      if (h.includes("日時") || h.includes("日付") || h.includes("時間") || h.includes("date") || h.includes("time") || h.includes("timestamp")) {
+        dateCol = idx;
+        foundHeaders = true;
+      } else if (h.includes("カテゴリ") || h.includes("種別") || h.includes("区分") || h.includes("category") || h.includes("type")) {
+        categoryCol = idx;
+        foundHeaders = true;
+      } else if (h.includes("タイトル") || h.includes("件名") || h.includes("題名") || h.includes("title")) {
+        titleCol = idx;
+        foundHeaders = true;
+      } else if (h.includes("本文") || h.includes("内容") || h.includes("詳細") || h.includes("content") || h.includes("body") || h.includes("detail")) {
+        contentCol = idx;
+        foundHeaders = true;
+      } else if (h.includes("ピン") || h.includes("固定") || h.includes("重要") || h.includes("pin") || h.includes("pinned") || h.includes("top")) {
+        pinCol = idx;
+        foundHeaders = true;
+      }
+    });
+
+    if (!foundHeaders && rows[0].length >= 3 && !rows[0][0].includes("日時") && !rows[0][2].includes("タイトル")) {
+      startRow = 0;
+    }
+  }
 
   const announcements = [];
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
+  for (let i = startRow; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row || row.length === 0) continue;
 
-    const parts = parseCSVLine(line);
-    const dateRaw = parts[0]?.trim();
-    const categoryRaw = parts[1]?.trim();
-    const titleRaw = parts[2]?.trim();
-    const contentRaw = parts[3]?.trim();
-    const isPinnedRaw = (parts[4] || "").trim().toLowerCase();
+    const dateRaw = row[dateCol]?.trim();
+    const categoryRaw = row[categoryCol]?.trim();
+    const titleRaw = row[titleCol]?.trim();
+    const contentRaw = row[contentCol]?.trim();
+    const isPinnedRaw = row[pinCol];
 
     if (!titleRaw) continue;
 
@@ -238,7 +358,7 @@ async function fetchAndParseAnnouncements(targetUrl: string) {
     else if (categoryRaw && categoryRaw.includes("混雑")) category = "混雑情報";
     else if (categoryRaw && categoryRaw.includes("プログラム")) category = "プログラム変更";
 
-    const isPinned = isPinnedRaw === "true" || isPinnedRaw === "1" || isPinnedRaw === "yes" || isPinnedRaw.includes("ピン");
+    const isPinned = checkIsPinned(isPinnedRaw);
 
     announcements.push({
       id: `ann-${i}`,
@@ -249,6 +369,13 @@ async function fetchAndParseAnnouncements(targetUrl: string) {
       isPinned,
     });
   }
+
+  // Sort pinned announcements to top
+  announcements.sort((a, b) => {
+    if (a.isPinned && !b.isPinned) return -1;
+    if (!a.isPinned && b.isPinned) return 1;
+    return 0;
+  });
 
   return announcements;
 }

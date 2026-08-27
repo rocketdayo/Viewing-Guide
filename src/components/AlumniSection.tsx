@@ -101,7 +101,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
   };
 
   return (
-    <section id="alumni-section" className="border-b border-amber-200/90 bg-gradient-to-b from-amber-50/80 via-white to-amber-50/50 py-12 sm:py-16">
+    <section id="alumni-section" className="border-b border-amber-200/90 bg-gradient-to-b from-amber-50/80 via-white to-amber-50/50 py-12 sm:py-16 scroll-mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Section Header */}

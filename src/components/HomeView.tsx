@@ -16,13 +16,16 @@ import {
   ExternalLink,
   Phone,
   ArrowRight,
-  GraduationCap
+  GraduationCap,
+  HelpCircle,
+  Share2
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { AppDataState, ClassProject } from '../types';
 import { AlumniSection } from './AlumniSection';
 import { AnnouncementsSection } from './AnnouncementsSection';
 import { BloodDonationSection } from './BloodDonationSection';
+import { useI18n } from '../utils/i18n';
 
 interface HomeViewProps {
   appData: AppDataState;
@@ -39,6 +42,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onOpenToc,
   bookmarks = [],
 }) => {
+  const { language, t } = useI18n();
   const [selectedGreetingTab, setSelectedGreetingTab] = useState<string>(
     appData?.greetings?.[0]?.id || ''
   );
@@ -199,7 +203,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 )}
 
                 <div className="pt-2 flex items-center justify-between text-xs text-slate-600 border-t border-slate-200">
-                  <span className="text-[11px]">案内所・落とし物：本館1階事務室前</span>
+                  <span className="text-[11px]">落とし物・お問い合わせ：本館1階 職員室</span>
                   <button 
                     onClick={() => onNavigate('map')}
                     className="text-emerald-800 hover:underline font-bold flex items-center space-x-1"
@@ -232,31 +236,45 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
               {
-                title: 'クラス・部活企画一覧',
-                desc: '模擬店、演劇、展示の場所や詳細を一覧で検索',
+                title: t.navClasses,
+                desc: '高1・高2の全企画、模擬店、演劇、展示の場所や詳細を一覧で検索',
                 icon: Layers,
                 action: () => onNavigate('classes'),
                 tag: '全企画掲載',
               },
               {
-                title: 'リアルタイム混雑状況',
+                title: t.navCongestion,
                 desc: '各教室・劇場の待ち時間と混雑度をリアルタイム配信',
                 icon: Activity,
                 action: () => onNavigate('congestion'),
-                tag: '混雑状況',
+                tag: 'リアルタイム',
               },
               {
-                title: 'タイムスケジュール',
+                title: 'よくある質問＆来場マナー',
+                desc: '土足禁止・整理券・飲食・撮影/プライバシー配慮・ゴミ分別ガイド',
+                icon: HelpCircle,
+                action: () => onNavigate('faq'),
+                tag: '必読案内',
+              },
+              {
+                title: 'マイタイムライン＆共有',
+                desc: '気になる企画をクリップして当日巡回計画を作成・LINEやSNSで共有',
+                icon: Bookmark,
+                action: () => onNavigate('bookmarks'),
+                tag: '便利ツール',
+              },
+              {
+                title: t.navSchedule,
                 desc: '各ステージ・イベントの公演タイムテーブル（制作中）',
                 icon: Calendar,
                 action: () => onNavigate('schedule'),
                 tag: '制作中',
               },
               {
-                title: '校内マップ・施設案内',
+                title: t.navMap,
                 desc: '清教学園校内の配置図・フロアマップ（制作中）',
                 icon: MapPin,
                 action: () => onNavigate('map'),

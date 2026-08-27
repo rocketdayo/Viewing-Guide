@@ -453,7 +453,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                         {ann.isPinned && (
                           <span className="text-[10px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full flex items-center gap-1">
                             <Pin className="w-3 h-3 fill-current" />
-                            ピン留め中
+                            最上部固定中
                           </span>
                         )}
                       </div>
@@ -464,7 +464,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                           onClick={() => handleTogglePinAnnouncement(ann.id)}
                           className="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-medium cursor-pointer"
                         >
-                          {ann.isPinned ? 'ピン解除' : 'ピン留め'}
+                          {ann.isPinned ? '固定解除' : '最上部に固定'}
                         </button>
                         <button
                           type="button"
@@ -478,7 +478,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                     </div>
 
                     <h4 className="text-sm font-bold text-slate-900">{ann.title}</h4>
-                    <p className="text-xs text-slate-600 mt-1 whitespace-pre-line leading-relaxed">
+                    <p className="text-xs text-slate-600 mt-1 whitespace-pre-wrap leading-relaxed">
                       {ann.content}
                     </p>
                   </div>
@@ -524,7 +524,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                     onChange={(e) => setNewAnn({ ...newAnn, isPinned: e.target.checked })}
                     className="w-4 h-4 text-emerald-600 rounded"
                   />
-                  <span>最上部にピン留めする</span>
+                  <span>最上部に固定表示する</span>
                 </label>
               </div>
             </div>

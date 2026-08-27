@@ -17,7 +17,7 @@ interface SearchModalProps {
   onClose: () => void;
   appData: AppDataState;
   onSelectProject: (projectId: string) => void;
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, anchor?: string) => void;
 }
 
 export const SearchModal: React.FC<SearchModalProps> = ({
@@ -197,11 +197,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                         <div
                           key={item.id}
                           onClick={() => {
-                            onNavigate('home');
+                            document.body.style.overflow = '';
+                            onNavigate('home', item.targetId);
                             onClose();
-                            setTimeout(() => {
-                              document.getElementById(item.targetId)?.scrollIntoView({ behavior: 'smooth' });
-                            }, 100);
                           }}
                           className="p-3 rounded-xs bg-rose-50/40 hover:bg-rose-50 border border-rose-200/80 hover:border-rose-300 transition-all cursor-pointer flex items-center justify-between group"
                         >
@@ -315,7 +313,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                         <div
                           key={g.id}
                           onClick={() => {
-                            onNavigate('home');
+                            document.body.style.overflow = '';
+                            onNavigate('home', 'greetings-section');
                             onClose();
                           }}
                           className="p-3 rounded-xs bg-white hover:bg-purple-50/60 border border-slate-200/80 hover:border-purple-200 transition-all cursor-pointer flex items-center justify-between group"
