@@ -96,33 +96,33 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     };
   }, [query, appData]);
 
-  if (!isOpen) return null;
-
   const totalResults =
-    searchResults.projects.length +
-    searchResults.schedules.length +
-    searchResults.greetings.length +
-    searchResults.specialEvents.length;
+    (searchResults?.projects?.length || 0) +
+    (searchResults?.schedules?.length || 0) +
+    (searchResults?.greetings?.length || 0) +
+    (searchResults?.specialEvents?.length || 0);
 
   return (
     <AnimatePresence>
-      <motion.div
-        id="search-modal-backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-start justify-center pt-16 sm:pt-24 p-3 overflow-y-auto"
-        onClick={onClose}
-      >
+      {isOpen && (
         <motion.div
-          id="search-modal-content"
-          initial={{ opacity: 0, scale: 0.95, y: -10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: -10 }}
+          id="search-modal-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          onClick={(e) => e.stopPropagation()}
-          className="bg-white rounded-xs shadow-2xl max-w-2xl w-full flex flex-col overflow-hidden border border-slate-200"
+          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-start justify-center pt-16 sm:pt-24 p-3 overflow-y-auto"
+          onClick={onClose}
         >
+          <motion.div
+            id="search-modal-content"
+            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+            transition={{ duration: 0.2 }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-xs shadow-2xl max-w-2xl w-full flex flex-col overflow-hidden border border-slate-200"
+          >
           {/* Search Input Box */}
           <div className="p-4 border-b border-slate-200 flex items-center space-x-3 bg-slate-50/80">
             <Search className="w-5 h-5 text-emerald-600 shrink-0" />
@@ -226,7 +226,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                 )}
 
                 {/* 1. Classes / Projects results */}
-                {searchResults.projects.length > 0 && (
+                {(searchResults?.projects || []).length > 0 && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs font-bold text-slate-400 uppercase">
                       <span className="flex items-center gap-1">
@@ -263,7 +263,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                 )}
 
                 {/* 2. Schedule results */}
-                {searchResults.schedules.length > 0 && (
+                {(searchResults?.schedules || []).length > 0 && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs font-bold text-slate-400 uppercase">
                       <span className="flex items-center gap-1">
@@ -302,7 +302,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                 )}
 
                 {/* 3. Greeting results */}
-                {searchResults.greetings.length > 0 && (
+                {(searchResults?.greetings || []).length > 0 && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs font-bold text-slate-400 uppercase">
                       <span className="flex items-center gap-1">
@@ -342,6 +342,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
           </div>
         </motion.div>
       </motion.div>
+      )}
     </AnimatePresence>
   );
 };

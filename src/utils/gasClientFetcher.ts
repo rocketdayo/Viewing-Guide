@@ -42,6 +42,7 @@ export function getGoogleSpreadsheetCsvUrl(targetUrl: string): string {
  * Robust CSV line parser to handle quotes and commas inside cells
  */
 export function parseCSVLine(text: string): string[] {
+  if (!text || typeof text !== 'string') return [];
   const result: string[] = [];
   let current = "";
   let inQuotes = false;
@@ -67,6 +68,7 @@ export function parseCSVLine(text: string): string[] {
  * Parse raw CSV text from Google Spreadsheet into Congestion data
  */
 export function parseGasCongestionCsv(rawText: string): Record<string, GasParsedItem> {
+  if (!rawText || typeof rawText !== 'string') return {};
   const lines = rawText.split(/\r?\n/);
   const results: Record<string, GasParsedItem> = {};
 
@@ -125,6 +127,7 @@ export function parseGasCongestionCsv(rawText: string): Record<string, GasParsed
  * Parse raw CSV or JSON text into Announcements
  */
 export function parseAnnouncementCsvOrJson(rawText: string): Announcement[] {
+  if (!rawText || typeof rawText !== 'string') return [];
   const trimmed = rawText.trim();
 
   // Try parsing JSON if GAS Web App returns JSON

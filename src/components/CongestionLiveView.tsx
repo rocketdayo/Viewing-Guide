@@ -30,15 +30,16 @@ interface CongestionLiveViewProps {
 }
 
 export const CongestionLiveView: React.FC<CongestionLiveViewProps> = ({
-  projects,
+  projects = [],
   onSelectProject,
   isSyncing = false,
   lastSyncTime = null,
   syncError = null,
   onSyncNow,
 }) => {
-  const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(15); // default 15s
-  const [secondsLeft, setSecondsLeft] = useState<number>(15);
+  const safeProjects = projects || [];
+  const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(60); // default 60s (1 minute)
+  const [secondsLeft, setSecondsLeft] = useState<number>(60);
   const [selectedFloor, setSelectedFloor] = useState<string>('all');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -74,11 +75,11 @@ export const CongestionLiveView: React.FC<CongestionLiveViewProps> = ({
     if (onSyncNow) {
       onSyncNow();
     }
-    setSecondsLeft(autoRefreshInterval || 15);
+    setSecondsLeft(autoRefreshInterval || 60);
   };
 
   const floors = [
-    { id: 'all', label: `全校舎・全企画 (${projects.length})` },
+    { id: 'all', label: `全校舎・全企画 (${safeProjects.length})` },
     { id: 'high1', label: '本館 (高1 A〜J組 / 10クラス)' },
     { id: 'high2', label: '新館 (高2 A〜K組 / 11クラス)' },
   ];
@@ -86,8 +87,8 @@ export const CongestionLiveView: React.FC<CongestionLiveViewProps> = ({
   // Helper to check if a project uses tickets (either status level is 'ticket', ticketRequired is true, or has online ticket)
   const isTicketProject = (p: ClassProject) => {
     return (
-      p.congestion.level === 'ticket' ||
-      p.congestion.ticketRequired === true ||
+      p.congestion?.level === 'ticket' ||
+      p.congestion?.ticketRequired === true ||
       ['p-1b', 'p-1d', 'p-2a', 'p-2d', 'p-2e', 'p-2j'].includes(p.id) ||
       Boolean(p.onlineTicketUrl || p.onlineTicketNote)
     );
@@ -101,21 +102,21 @@ export const CongestionLiveView: React.FC<CongestionLiveViewProps> = ({
     let ticket = 0;
     let closed = 0;
 
-    projects.forEach((p) => {
+    safeProjects.forEach((p) => {
       if (isTicketProject(p)) ticket++;
       
-      if (p.congestion.level === 'smooth') smooth++;
-      else if (p.congestion.level === 'moderate') moderate++;
-      else if (p.congestion.level === 'crowded') crowded++;
-      else if (p.congestion.level === 'closed') closed++;
+      if (p.congestion?.level === 'smooth') smooth++;
+      else if (p.congestion?.level === 'moderate') moderate++;
+      else if (p.congestion?.level === 'crowded') crowded++;
+      else if (p.congestion?.level === 'closed') closed++;
     });
 
-    return { smooth, moderate, crowded, ticket, closed, total: projects.length };
-  }, [projects]);
+    return { smooth, moderate, crowded, ticket, closed, total: safeProjects.length };
+  }, [safeProjects]);
 
   // Filtered and Sorted projects
   const filteredProjects = useMemo(() => {
-    let list = projects.filter((p) => {
+    let list = safeProjects.filter((p) => {
       // Floor filter
       if (selectedFloor === 'high1' && p.grade !== '1年') return false;
       if (selectedFloor === 'high2' && p.grade !== '2年') return false;
@@ -192,10 +193,10 @@ export const CongestionLiveView: React.FC<CongestionLiveViewProps> = ({
               onChange={(e) => setAutoRefreshInterval(Number(e.target.value))}
               className="bg-transparent font-bold text-emerald-900 focus:outline-none cursor-pointer"
             >
-              <option value={10}>10秒</option>
-              <option value={15}>15秒</option>
               <option value={30}>30秒</option>
               <option value={60}>1分</option>
+              <option value={120}>2分</option>
+              <option value={180}>3分</option>
               <option value={0}>手動のみ</option>
             </select>
             {autoRefreshInterval > 0 && (

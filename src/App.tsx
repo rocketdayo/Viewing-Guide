@@ -78,7 +78,7 @@ function parseCurrentUrl(): RouteState {
     return {
       page: 'classes',
       projectId: projectMatch[1],
-      anchor: hash && hash !== 'toc' && hash !== 'search' ? hash : null,
+      anchor: hash && hash !== 'toc' && hash !== 'menu' && hash !== 'search' ? hash : null,
     };
   }
 
@@ -97,7 +97,7 @@ function parseCurrentUrl(): RouteState {
   return {
     page,
     projectId: paramProjectId || null,
-    anchor: hash && hash !== 'toc' && hash !== 'search' ? hash : null,
+    anchor: hash && hash !== 'toc' && hash !== 'menu' && hash !== 'search' ? hash : null,
   };
 }
 
@@ -110,7 +110,7 @@ export default function App() {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(initialRoute.projectId);
   const [bookmarks, setBookmarks] = useState<string[]>(() => getBookmarks());
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
-  const [isTocOpen, setIsTocOpen] = useState<boolean>(() => typeof window !== 'undefined' && window.location.hash === '#toc');
+  const [isTocOpen, setIsTocOpen] = useState<boolean>(() => typeof window !== 'undefined' && (window.location.hash === '#toc' || window.location.hash === '#menu'));
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(() => typeof window !== 'undefined' && window.location.hash === '#search');
 
   // Synchronized state references to prevent re-creation loops
@@ -125,58 +125,65 @@ export default function App() {
   const [syncError, setSyncError] = useState<string | null>(null);
   const [syncedCount, setSyncedCount] = useState(0);
 
+  const syncCongestion = useCallback(async () => {
+    const currentData = appDataRef.current;
+    const congestionUrl = currentData.gasCongestionUrl;
+    if (!congestionUrl) return;
+
+    try {
+      const cResult = await fetchLiveGasCongestion(congestionUrl);
+      if (cResult.success && cResult.data && Object.keys(cResult.data).length > 0) {
+        const { updatedProjects, syncedCount: count } = applyGasSyncToProjects(
+          appDataRef.current.projects || [],
+          cResult.data
+        );
+
+        if (count > 0) {
+          setAppData((prev) => {
+            const next = { ...prev, projects: updatedProjects };
+            saveAppData(next);
+            return next;
+          });
+          setSyncedCount(count);
+          setLastSyncTime(new Date());
+        }
+      }
+    } catch (e: any) {
+      console.error('Congestion sync error:', e);
+    }
+  }, []);
+
+  const syncAnnouncements = useCallback(async () => {
+    const currentData = appDataRef.current;
+    const announcementUrl = currentData.gasAnnouncementUrl;
+    if (!announcementUrl) return;
+
+    try {
+      const aResult = await fetchLiveAnnouncements(announcementUrl);
+      if (aResult.success && aResult.data !== undefined) {
+        setAppData((prev) => {
+          const next = { ...prev, announcements: aResult.data! };
+          saveAppData(next);
+          return next;
+        });
+        setLastSyncTime(new Date());
+      }
+    } catch (e: any) {
+      console.error('Announcement sync error:', e);
+    }
+  }, []);
+
   const syncNow = useCallback(async () => {
     if (isSyncingRef.current) return;
     isSyncingRef.current = true;
     setIsSyncing(true);
     setSyncError(null);
 
-    const currentData = appDataRef.current;
-    let hasUpdatedProjects = false;
-    let hasUpdatedAnnouncements = false;
-
     try {
-      // 1. Sync Congestion Data from data endpoint
-      const congestionUrl = currentData.gasCongestionUrl;
-      if (congestionUrl) {
-        const cResult = await fetchLiveGasCongestion(congestionUrl);
-
-        if (cResult.success && cResult.data && Object.keys(cResult.data).length > 0) {
-          const { updatedProjects, syncedCount: count } = applyGasSyncToProjects(
-            appDataRef.current.projects || [],
-            cResult.data
-          );
-
-          if (count > 0) {
-            setAppData((prev) => {
-              const next = { ...prev, projects: updatedProjects };
-              saveAppData(next);
-              return next;
-            });
-            hasUpdatedProjects = true;
-            setSyncedCount(count);
-          }
-        }
-      }
-
-      // 2. Sync Announcements Data from data endpoint
-      const announcementUrl = currentData.gasAnnouncementUrl;
-      if (announcementUrl) {
-        const aResult = await fetchLiveAnnouncements(announcementUrl);
-        if (aResult.success && aResult.data !== undefined) {
-          // If the spreadsheet is empty or rows were deleted, sync the empty/updated list
-          setAppData((prev) => {
-            const next = { ...prev, announcements: aResult.data! };
-            saveAppData(next);
-            return next;
-          });
-          hasUpdatedAnnouncements = true;
-        }
-      }
-
-      if (hasUpdatedProjects || hasUpdatedAnnouncements) {
-        setLastSyncTime(new Date());
-      }
+      await Promise.allSettled([
+        syncCongestion(),
+        syncAnnouncements(),
+      ]);
     } catch (e: any) {
       console.error('Background sync failed:', e);
       setSyncError(e.message || 'データ同期エラー');
@@ -184,7 +191,7 @@ export default function App() {
       isSyncingRef.current = false;
       setIsSyncing(false);
     }
-  }, []);
+  }, [syncCongestion, syncAnnouncements]);
 
   // Primary URL-aware navigation handler
   const handleNavigate = useCallback((page: string, anchorOrProjectId?: string, replace: boolean = false) => {
@@ -272,14 +279,14 @@ export default function App() {
 
   const handleOpenToc = useCallback(() => {
     setIsTocOpen(true);
-    if (window.location.hash !== '#toc') {
-      window.history.pushState({ modal: 'toc' }, '', window.location.pathname + '#toc');
+    if (window.location.hash !== '#menu' && window.location.hash !== '#toc') {
+      window.history.pushState({ modal: 'menu' }, '', window.location.pathname + '#menu');
     }
   }, []);
 
   const handleCloseToc = useCallback(() => {
     setIsTocOpen(false);
-    if (window.location.hash === '#toc') {
+    if (window.location.hash === '#menu' || window.location.hash === '#toc') {
       window.history.back();
     }
   }, []);
@@ -294,7 +301,7 @@ export default function App() {
       // Handle modals based on hash
       const currentHash = window.location.hash;
       setIsSearchOpen(currentHash === '#search');
-      setIsTocOpen(currentHash === '#toc');
+      setIsTocOpen(currentHash === '#toc' || currentHash === '#menu');
 
       if (route.anchor) {
         setTimeout(() => {
@@ -339,12 +346,24 @@ export default function App() {
       }
     });
 
+    // Initial immediate fetch for both
     syncNow();
-    const timer = setInterval(() => {
-      syncNow();
-    }, 20000);
-    return () => clearInterval(timer);
-  }, [syncNow]);
+
+    // 1. Congestion live sync: 1 minute (60 seconds) interval as standard
+    const congestionTimer = setInterval(() => {
+      syncCongestion();
+    }, 60000);
+
+    // 2. Announcements live sync: 45 seconds fixed interval
+    const announcementTimer = setInterval(() => {
+      syncAnnouncements();
+    }, 45000);
+
+    return () => {
+      clearInterval(congestionTimer);
+      clearInterval(announcementTimer);
+    };
+  }, [syncNow, syncCongestion, syncAnnouncements]);
 
   const handleDataUpdate = (newData: AppDataState) => {
     setAppData(newData);
@@ -365,8 +384,8 @@ export default function App() {
   };
 
   const selectedProject = useMemo(() => 
-    selectedProjectId ? appData.projects.find((p) => p.id === selectedProjectId) || null : null
-  , [selectedProjectId, appData.projects]);
+    selectedProjectId ? (appData?.projects || []).find((p) => p.id === selectedProjectId) || null : null
+  , [selectedProjectId, appData?.projects]);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-emerald-200 selection:text-emerald-900 pb-20 sm:pb-0 flex flex-col justify-between">
@@ -378,7 +397,7 @@ export default function App() {
           isAdminLoggedIn={isAdminLoggedIn}
           onOpenSearch={handleOpenSearch}
           onOpenToc={handleOpenToc}
-          bookmarksCount={bookmarks.length}
+          bookmarksCount={(bookmarks || []).length}
         />
         
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 min-h-[calc(100vh-14rem)]">
@@ -396,7 +415,7 @@ export default function App() {
                   onNavigate={handleNavigate}
                   onSelectProject={handleSelectProject}
                   onOpenToc={handleOpenToc}
-                  bookmarks={bookmarks}
+                  bookmarks={bookmarks || []}
                 />
               )}
               
@@ -410,7 +429,7 @@ export default function App() {
                 <ClassesView 
                   projects={appData?.projects || []}
                   onSelectProject={handleSelectProject}
-                  bookmarks={bookmarks}
+                  bookmarks={bookmarks || []}
                   onToggleBookmark={handleToggleBookmark}
                   onNavigateToCongestion={() => handleNavigate('congestion')}
                 />
@@ -430,9 +449,9 @@ export default function App() {
               
               {currentPage === 'bookmarks' && (
                 <MyTimelineView
-                  bookmarkedProjects={(appData?.projects || []).filter((p) => bookmarks.includes(p.id))}
+                  bookmarkedProjects={(appData?.projects || []).filter((p) => (bookmarks || []).includes(p.id))}
                   allProjects={appData?.projects || []}
-                  bookmarks={bookmarks}
+                  bookmarks={bookmarks || []}
                   onToggleBookmark={handleToggleBookmark}
                   onSelectProject={handleSelectProject}
                   onNavigate={handleNavigate}
@@ -470,7 +489,7 @@ export default function App() {
       <BottomNav
         currentPage={currentPage}
         setCurrentPage={(page) => handleNavigate(page)}
-        bookmarksCount={bookmarks.length}
+        bookmarksCount={(bookmarks || []).length}
       />
 
       {/* Quick Search Modal */}
@@ -482,7 +501,7 @@ export default function App() {
         onNavigate={handleNavigate}
       />
 
-      {/* Table of Contents Modal */}
+      {/* Table of Contents / Hamburger Menu Modal */}
       <TableOfContentsModal
         isOpen={isTocOpen}
         onClose={handleCloseToc}
@@ -490,6 +509,9 @@ export default function App() {
         appData={appData}
         onNavigate={handleNavigate}
         onSelectProject={handleSelectProject}
+        onOpenSearch={handleOpenSearch}
+        bookmarksCount={(bookmarks || []).length}
+        isAdminLoggedIn={isAdminLoggedIn}
       />
 
       {/* Class Detail Modal */}
@@ -497,7 +519,7 @@ export default function App() {
         <ClassDetailModal
           project={selectedProject}
           onClose={handleCloseProjectModal}
-          isBookmarked={bookmarks.includes(selectedProject.id)}
+          isBookmarked={(bookmarks || []).includes(selectedProject.id)}
           onToggleBookmark={handleToggleBookmark}
           onNavigateToCongestion={() => handleNavigate('congestion')}
         />

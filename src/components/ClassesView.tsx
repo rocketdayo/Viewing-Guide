@@ -21,9 +21,9 @@ interface ClassesViewProps {
 }
 
 export const ClassesView: React.FC<ClassesViewProps> = ({
-  projects,
+  projects = [],
   onSelectProject,
-  bookmarks,
+  bookmarks = [],
   onToggleBookmark,
   onNavigateToCongestion,
 }) => {
@@ -67,8 +67,11 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
 
   const onlineTicketClassIds = ['p-1b', 'p-1d', 'p-2a', 'p-2d', 'p-2e', 'p-2j'];
 
+  const safeProjects = projects || [];
+  const safeBookmarks = bookmarks || [];
+
   const filteredProjects = useMemo(() => {
-    return projects.filter((p) => {
+    return safeProjects.filter((p) => {
       // Grade filter
       if (selectedGrade !== 'all' && p.grade !== selectedGrade) return false;
 
@@ -79,10 +82,10 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
       if (selectedBuilding !== 'all' && p.building !== selectedBuilding) return false;
 
       // Congestion filter
-      if (selectedCongestion !== 'all' && p.congestion.level !== selectedCongestion) return false;
+      if (selectedCongestion !== 'all' && p.congestion?.level !== selectedCongestion) return false;
 
       // Bookmarks only filter
-      if (onlyBookmarks && !bookmarks.includes(p.id)) return false;
+      if (onlyBookmarks && !safeBookmarks.includes(p.id)) return false;
 
       // Online ticket only filter
       if (onlyOnlineTickets && !onlineTicketClassIds.includes(p.id) && !p.onlineTicketUrl && !p.onlineTicketNote) {
@@ -93,26 +96,26 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
         const matches =
-          p.title.toLowerCase().includes(q) ||
-          p.classNumber.toLowerCase().includes(q) ||
-          p.catchphrase.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q) ||
-          p.location.toLowerCase().includes(q);
+          (p.title || '').toLowerCase().includes(q) ||
+          (p.classNumber || '').toLowerCase().includes(q) ||
+          (p.catchphrase || '').toLowerCase().includes(q) ||
+          (p.description || '').toLowerCase().includes(q) ||
+          (p.location || '').toLowerCase().includes(q);
         if (!matches) return false;
       }
 
       return true;
     }).sort((a, b) => {
       if (sortBy === 'waitTime') {
-        return a.congestion.waitTimeMinutes - b.congestion.waitTimeMinutes;
+        return (a.congestion?.waitTimeMinutes || 0) - (b.congestion?.waitTimeMinutes || 0);
       }
       if (sortBy === 'title') {
-        return a.title.localeCompare(b.title, 'ja');
+        return (a.title || '').localeCompare(b.title || '', 'ja');
       }
       return 0;
     });
   }, [
-    projects,
+    safeProjects,
     selectedGrade,
     selectedCategory,
     selectedBuilding,
@@ -121,7 +124,7 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
     onlyOnlineTickets,
     searchQuery,
     sortBy,
-    bookmarks,
+    safeBookmarks,
   ]);
 
   const renderCongestionBadge = (level: CongestionLevel, waitTime: number) => {

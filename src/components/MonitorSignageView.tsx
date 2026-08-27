@@ -43,8 +43,8 @@ export const MonitorSignageView: React.FC<MonitorSignageViewProps> = ({
   onSyncNow,
 }) => {
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
-  const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(15); // 15s
-  const [secondsLeft, setSecondsLeft] = useState<number>(15);
+  const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(60); // 60s (1 minute)
+  const [secondsLeft, setSecondsLeft] = useState<number>(60);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [displayMode, setDisplayMode] = useState<'all' | 'high1' | 'high2' | 'ranking'>('all');
   const [isAutoCycling, setIsAutoCycling] = useState<boolean>(false);

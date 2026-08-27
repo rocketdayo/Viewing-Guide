@@ -11,10 +11,10 @@ export function sanitizeAppData(parsed: any): AppDataState {
 
   // Filter projects to only active class projects (filter out any alumni- ids if previously cached)
   let mergedProjects = Array.isArray(parsed.projects)
-    ? parsed.projects.filter((p: any) => !p.id.startsWith('alumni-'))
+    ? parsed.projects.filter((p: any) => p && typeof p === 'object' && !p.id?.startsWith('alumni-'))
     : INITIAL_APP_DATA.projects;
   
-  if (mergedProjects.length !== INITIAL_APP_DATA.projects.length) {
+  if (!Array.isArray(mergedProjects) || mergedProjects.length === 0) {
     mergedProjects = INITIAL_APP_DATA.projects;
   }
 
@@ -22,6 +22,7 @@ export function sanitizeAppData(parsed: any): AppDataState {
   let cleanAnnouncements = parsed.announcements;
   if (Array.isArray(cleanAnnouncements)) {
     cleanAnnouncements = cleanAnnouncements.filter((a: any) => 
+      a && typeof a === 'object' &&
       !a.title?.includes("熱中症対策") && 
       !a.title?.includes("静かにして下さい") &&
       !a.title?.includes("同窓会特別企画") &&
@@ -46,11 +47,11 @@ export function sanitizeAppData(parsed: any): AppDataState {
     festivalTheme: INITIAL_APP_DATA.festivalTheme,
     gasCongestionUrl: isOldCongestionUrl ? INITIAL_APP_DATA.gasCongestionUrl : parsed.gasCongestionUrl,
     gasAnnouncementUrl: isOldAnnouncementUrl ? INITIAL_APP_DATA.gasAnnouncementUrl : parsed.gasAnnouncementUrl,
-    projects: mergedProjects,
+    projects: mergedProjects || INITIAL_APP_DATA.projects,
     // Always use official greetings and schedules
-    greetings: INITIAL_APP_DATA.greetings,
-    schedules: INITIAL_APP_DATA.schedules,
-    announcements: cleanAnnouncements,
+    greetings: Array.isArray(parsed.greetings) && parsed.greetings.length > 0 ? parsed.greetings : INITIAL_APP_DATA.greetings,
+    schedules: Array.isArray(parsed.schedules) && parsed.schedules.length > 0 ? parsed.schedules : INITIAL_APP_DATA.schedules,
+    announcements: cleanAnnouncements || INITIAL_APP_DATA.announcements,
   };
 }
 
@@ -143,7 +144,9 @@ export function resetAppDataToDefault(): AppDataState {
 export function getBookmarks(): string[] {
   try {
     const raw = localStorage.getItem(BOOKMARKS_KEY);
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((id) => typeof id === 'string') : [];
   } catch {
     return [];
   }
@@ -152,7 +155,8 @@ export function getBookmarks(): string[] {
 export function toggleBookmark(id: string): string[] {
   try {
     const current = getBookmarks();
-    const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
+    const safeCurrent = Array.isArray(current) ? current : [];
+    const next = safeCurrent.includes(id) ? safeCurrent.filter((x) => x !== id) : [...safeCurrent, id];
     localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(next));
     return next;
   } catch {

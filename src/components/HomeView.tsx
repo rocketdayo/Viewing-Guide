@@ -40,7 +40,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   bookmarks = [],
 }) => {
   const [selectedGreetingTab, setSelectedGreetingTab] = useState<string>(
-    appData.greetings[0]?.id || ''
+    appData?.greetings?.[0]?.id || ''
   );
 
   const projects = appData?.projects || [];

@@ -98,7 +98,7 @@ export function useGasCongestionSync(
   gasUrl: string,
   projects: ClassProject[],
   onUpdateProjects: (updated: ClassProject[]) => void,
-  intervalSeconds: number = 180 // default 180s
+  intervalSeconds: number = 60 // default 60s (1 minute)
 ) {
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);

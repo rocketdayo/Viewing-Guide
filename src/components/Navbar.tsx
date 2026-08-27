@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   Home, 
   Calendar, 
@@ -7,15 +7,11 @@ import {
   MapPin, 
   Shield, 
   Menu, 
-  X, 
-  Sparkles, 
   Search, 
   ChevronRight,
-  Bookmark,
-  ListTree,
-  Radio
+  Bookmark
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { AppDataState } from '../types';
 import { LogoBadge } from './LogoBadge';
 
@@ -38,8 +34,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenToc,
   bookmarksCount,
 }) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   const navItems = [
     { id: 'home', label: 'ホーム', icon: Home },
     { id: 'schedule', label: 'タイムテーブル', icon: Calendar, isDraft: true },
@@ -51,7 +45,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const handleNav = (id: string) => {
     setCurrentPage(id);
-    setMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -146,12 +139,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </nav>
 
-          {/* Desktop Action Buttons */}
+          {/* Action Buttons & Hamburger Menu */}
           <div className="flex items-center space-x-1 sm:space-x-2">
             <button
               onClick={onOpenSearch}
               className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xs transition-colors cursor-pointer"
               title="サイト内検索"
+              aria-label="サイト内検索"
             >
               <Search className="w-5 h-5" />
             </button>
@@ -159,82 +153,29 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => handleNav('bookmarks')}
               className="p-2 text-slate-500 hover:text-rose-500 hover:bg-rose-50 rounded-xs transition-colors relative cursor-pointer"
               title="ブックマーク"
+              aria-label="ブックマーク"
             >
               <Bookmark className="w-5 h-5" />
               {bookmarksCount > 0 && (
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full"></span>
               )}
             </button>
+            
+            {/* Unified Hamburger Menu Button (Mobile & Desktop) */}
             <button
+              id="hamburger-menu-btn"
               onClick={onOpenToc}
-              className="p-2 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xs transition-colors cursor-pointer"
-              title="目次一覧"
+              className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xs bg-emerald-50/90 hover:bg-emerald-100/80 text-emerald-900 border border-emerald-200/80 transition-colors cursor-pointer"
+              title="メニュー・全ページ目次を開く"
+              aria-label="メニュー・全ページ目次"
             >
-              <ListTree className="w-5 h-5" />
+              <Menu className="w-5 h-5 text-emerald-800" />
+              <span className="text-xs font-bold hidden sm:inline">メニュー・目次</span>
             </button>
-
-            {/* Mobile Menu Toggle Button */}
-            <div className="lg:hidden">
-              <button
-                id="mobile-menu-btn"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-xs bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
-              >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </button>
-            </div>
           </div>
         </div>
       </div>
-
-      {/* Mobile Navigation Menu Dropdown */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-white border-t border-slate-100 shadow-xl overflow-hidden"
-          >
-            <div className="p-4 space-y-3">
-              <div className="grid grid-cols-2 gap-2">
-                {navItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = currentPage === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => handleNav(item.id)}
-                      className={`flex items-center space-x-2.5 p-3 rounded-xs transition-all cursor-pointer ${
-                        isActive 
-                          ? 'bg-emerald-50 text-emerald-900 font-bold border border-emerald-200' 
-                          : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-transparent'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4 shrink-0" />
-                      <span className="text-xs font-bold">{item.label}</span>
-                      {item.isDraft && (
-                        <span className="text-[9px] bg-amber-100 text-amber-800 font-semibold px-1 py-0.2 rounded-xs ml-auto">制作中</span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-              
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <button
-                  onClick={onOpenToc}
-                  className="flex items-center space-x-1 text-emerald-700 font-bold py-1 cursor-pointer"
-                >
-                  <ListTree className="w-4 h-4" />
-                  <span>全ページ目次</span>
-                </button>
-                <span>清教学園文化祭実行委員会</span>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </header>
   );
 };
+

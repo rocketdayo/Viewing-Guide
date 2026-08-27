@@ -35,14 +35,14 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
 
-  if (!project) return null;
-
   // Determine if this project is one of the designated online ticket classes
-  const isOnlineTicketClass = ['p-1b', 'p-1d', 'p-2a', 'p-2d', 'p-2e', 'p-2j'].includes(project.id) || 
-    Boolean(project.onlineTicketUrl || project.onlineTicketNote);
+  const isOnlineTicketClass = project
+    ? ['p-1b', 'p-1d', 'p-2a', 'p-2d', 'p-2e', 'p-2j'].includes(project.id) || 
+      Boolean(project.onlineTicketUrl || project.onlineTicketNote)
+    : false;
 
   const handleShare = () => {
-    if (navigator.clipboard) {
+    if (project && navigator.clipboard) {
       navigator.clipboard.writeText(
         `【2026清教学園文化祭】${project.classNumber}「${project.title}」\n${project.catchphrase}\n場所: ${project.location}`
       );
@@ -93,23 +93,24 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({
 
   return (
     <AnimatePresence>
-      <motion.div
-        id="class-detail-backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
-        onClick={onClose}
-      >
+      {project && (
         <motion.div
-          id="class-detail-modal"
-          initial={{ opacity: 0, scale: 0.95, y: 15 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-          onClick={(e) => e.stopPropagation()}
-          className="bg-white rounded-xs shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200"
+          id="class-detail-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+          onClick={onClose}
         >
+          <motion.div
+            id="class-detail-modal"
+            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 15 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-xs shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200"
+          >
           {/* Modal Header Banner */}
           <div className="relative bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900 text-white p-5 sm:p-6">
             <div className="flex items-start justify-between">
@@ -326,6 +327,7 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({
           </div>
         </motion.div>
       </motion.div>
+      )}
     </AnimatePresence>
   );
 };

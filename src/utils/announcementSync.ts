@@ -16,7 +16,7 @@ export function useAnnouncementSync(
   gasUrl: string | undefined,
   currentAnnouncements: Announcement[],
   onUpdateAnnouncements: (updated: Announcement[]) => void,
-  intervalSeconds: number = 30
+  intervalSeconds: number = 45 // 45 seconds fixed
 ) {
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);

@@ -413,7 +413,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
               <div>
                 <h3 className="text-base font-bold text-slate-900 flex items-center space-x-2">
                   <Radio className="w-4 h-4 text-emerald-600" />
-                  <span>現在配信中のお知らせ一覧 ({formData.announcements.length}件)</span>
+                  <span>現在配信中のお知らせ一覧 ({(formData?.announcements || []).length}件)</span>
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
                   アプリ上で全校生徒・来場者に公開されているお知らせです
@@ -421,13 +421,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
               </div>
             </div>
 
-            {formData.announcements.length === 0 ? (
+            {(formData?.announcements || []).length === 0 ? (
               <div className="p-6 rounded-xs bg-slate-50 border border-slate-200 text-center text-xs text-slate-500">
                 現在配信中のお知らせはありません。上の配信ポータルから送信するか、下の手動フォームから追加してください。
               </div>
             ) : (
               <div className="space-y-3">
-                {formData.announcements.map((ann) => (
+                {(formData?.announcements || []).map((ann) => (
                   <div
                     key={ann.id}
                     className={`p-4 rounded-xs border transition-all ${
@@ -579,7 +579,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
 
           {/* Grouped by Grade */}
           {(['1年', '2年'] as const).map((gradeName) => {
-            const gradeProjects = formData.projects.filter(p => p.grade === gradeName);
+            const gradeProjects = (formData?.projects || []).filter(p => p.grade === gradeName);
             if (gradeProjects.length === 0) return null;
 
             return (

@@ -30,9 +30,9 @@ const SCHEDULE_META_KEY = 'seikyo_fes_2026_project_schedules_v1';
 const CUSTOM_EVENTS_KEY = 'seikyo_fes_2026_custom_events_v1';
 
 export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
-  bookmarkedProjects,
-  allProjects,
-  bookmarks,
+  bookmarkedProjects = [],
+  allProjects = [],
+  bookmarks = [],
   onToggleBookmark,
   onSelectProject,
   onNavigate,
@@ -41,7 +41,8 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
   const [projectMeta, setProjectMeta] = useState<Record<string, ProjectScheduleMeta>>(() => {
     try {
       const saved = localStorage.getItem(SCHEDULE_META_KEY);
-      return saved ? JSON.parse(saved) : {};
+      const parsed = saved ? JSON.parse(saved) : {};
+      return parsed && typeof parsed === 'object' ? parsed : {};
     } catch {
       return {};
     }
@@ -51,7 +52,8 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
   const [customEvents, setCustomEvents] = useState<CustomTimelineEvent[]>(() => {
     try {
       const saved = localStorage.getItem(CUSTOM_EVENTS_KEY);
-      return saved ? JSON.parse(saved) : [
+      const parsed = saved ? JSON.parse(saved) : null;
+      return Array.isArray(parsed) ? parsed : [
         { id: 'c-1', title: 'お昼休憩・模擬店ランチ', startTime: '12:00', endTime: '12:45', note: 'カフェテリアまたは中庭で軽食', location: 'カフェテリア' },
       ];
     } catch {
@@ -122,19 +124,22 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
       note: newNote.trim(),
     };
 
-    setCustomEvents(prev => [...prev, item]);
+    setCustomEvents(prev => [...(Array.isArray(prev) ? prev : []), item]);
     setNewTitle('');
     setNewNote('');
     setIsAddingCustom(false);
   };
 
   const handleDeleteCustomEvent = (id: string) => {
-    setCustomEvents(prev => prev.filter(e => e.id !== id));
+    setCustomEvents(prev => (Array.isArray(prev) ? prev : []).filter(e => e.id !== id));
   };
+
+  const safeBookmarkedProjects = Array.isArray(bookmarkedProjects) ? bookmarkedProjects : [];
+  const safeCustomEvents = Array.isArray(customEvents) ? customEvents : [];
 
   // Combine bookmarked projects and custom events into a unified chronological timeline
   const combinedTimelineItems = [
-    ...bookmarkedProjects.map(proj => {
+    ...safeBookmarkedProjects.map(proj => {
       const meta = projectMeta[proj.id] || { startTime: '09:30', endTime: '10:00', note: proj.scheduleNote || '' };
       return {
         type: 'project' as const,
@@ -149,7 +154,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
         project: proj,
       };
     }),
-    ...customEvents.map(ce => ({
+    ...safeCustomEvents.map(ce => ({
       type: 'custom' as const,
       id: ce.id,
       startTime: ce.startTime,
@@ -161,7 +166,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
       congestion: null,
       project: null,
     }))
-  ].sort((a, b) => a.startTime.localeCompare(b.startTime));
+  ].sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
 
   const getCongestionBadge = (level: CongestionLevel) => {
     switch (level) {
