@@ -450,6 +450,7 @@ export default function App() {
               {currentPage === 'schedule' && (
                 <ScheduleView 
                   schedules={appData?.schedules || []}
+                  onNavigate={handleNavigate}
                 />
               )}
               

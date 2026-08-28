@@ -36,12 +36,16 @@ export interface ClassProject {
 export interface ScheduleEvent {
   id: string;
   day: 'Day1' | 'Day2' | '両日';
-  startTime: string; // '09:30'
-  endTime: string;   // '10:15'
+  programNumber?: number | string; // PN / 番号 e.g. 1, 2, '②'
+  startTime: string; // '09:00'
+  endTime: string;   // '09:30'
+  duration?: string; // '30分'
   title: string;
-  performer: string; // '吹奏楽部', '高2有志ダンス', '生徒会企画'
-  venue: string;     // 'チャペル', '体育館ステージ', '中庭特設ステージ'
-  category: 'ステージ' | 'セレモニー' | 'ライブ' | '特別企画' | 'コンテスト';
+  performer: string; // '吹奏楽部', '^_^☺(にこにこすまいる)', 'UNISON', 'That\'s brass'
+  performerType?: '部活' | '有志' | 'クラス' | '一般' | '特別';
+  venue: string;     // '第一体育館', 'レクチャールーム'
+  stagePosition?: '舞台上' | '舞台下' | '舞台上・下' | 'フロア' | string;
+  category: 'ステージ' | 'セレモニー' | 'ライブ' | '特別企画' | 'コンテスト' | 'ダンス' | '音楽・演奏' | '演劇' | 'パフォーマンス';
   description: string;
   isImportant?: boolean;
 }

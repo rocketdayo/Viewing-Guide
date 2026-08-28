@@ -12,6 +12,7 @@ import {
   GraduationCap, 
   Radio, 
   Heart,
+  Compass,
   Home,
   Bookmark,
   Search,
@@ -176,6 +177,13 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
       icon: GraduationCap,
       color: 'text-amber-800 bg-amber-50 border-amber-200',
       action: () => handleJump('home', 'alumni-section'),
+    },
+    {
+      title: 'OB・入試希望者向け キャンパスツアー',
+      desc: '10:00〜 / 12:00〜 / 14:00〜 集合：第一体育館前（景品あり）',
+      icon: Compass,
+      color: 'text-teal-900 bg-teal-50 border-teal-200',
+      action: () => handleJump('home', 'campus-tour-section'),
     },
     {
       title: '文化祭 献血コーナー（食堂前）',

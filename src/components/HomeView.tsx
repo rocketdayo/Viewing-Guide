@@ -25,6 +25,7 @@ import { AppDataState, ClassProject } from '../types';
 import { AlumniSection } from './AlumniSection';
 import { AnnouncementsSection } from './AnnouncementsSection';
 import { BloodDonationSection } from './BloodDonationSection';
+import { CampusTourSection } from './CampusTourSection';
 import { useI18n } from '../utils/i18n';
 
 interface HomeViewProps {
@@ -384,7 +385,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* 2.5 清教学園同窓会（清教会）特別企画 特設セクション (PDF 1P: 未来の仕事図鑑 / PDF 2P: 先輩グルメ) */}
       <AlumniSection />
 
-      {/* 2.6 文化祭 献血（食堂前・オンライン整理券受付） */}
+      {/* 2.6 OB・入試希望者向け キャンパスツアー (10:00~ / 12:00~ / 14:00~ 景品あり) */}
+      <CampusTourSection />
+
+      {/* 2.7 文化祭 献血（食堂前・オンライン整理券受付） */}
       <BloodDonationSection />
 
       {/* 4. 注目のピックアップ企画 (Featured Projects Section with progressive fade-out styling) */}

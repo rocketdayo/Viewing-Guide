@@ -1,7 +1,7 @@
 import { AppDataState } from '../types';
 import { INITIAL_APP_DATA } from '../data/defaultData';
 
-const STORAGE_KEY = 'seikyo_fes_2026_data_v12';
+const STORAGE_KEY = 'seikyo_fes_2026_data_v13';
 const BOOKMARKS_KEY = 'seikyo_fes_2026_bookmarks';
 
 export function sanitizeAppData(parsed: any): AppDataState {

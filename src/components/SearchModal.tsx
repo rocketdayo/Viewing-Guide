@@ -69,6 +69,15 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     );
 
     const specialEvents = [];
+    if ('ツアー キャンパスツアー ob 入試 受験 景品 案内 ポスター チラシ 10時 12時 14時 ガイド 校内 体育館'.toLowerCase().includes(q) || q.includes('ツアー') || q.includes('景品') || q.includes('ob') || q.includes('入試') || q.includes('受験') || q.includes('体育館')) {
+      specialEvents.push({
+        id: 'special-campus-tour',
+        title: 'OB・入試希望者向け キャンパスツアー',
+        desc: '10:00〜 / 12:00〜 / 14:00〜 集合：第一体育館前（景品プレゼントあり）',
+        tag: '校内ツアー',
+        targetId: 'campus-tour-section'
+      });
+    }
     if ('献血 けんけつ 食堂前 整理券 blood 血液 16歳 医療 社会貢献'.toLowerCase().includes(q) || q.includes('献血') || q.includes('けんけつ') || q.includes('食堂')) {
       specialEvents.push({
         id: 'special-blood-donation',
