@@ -69,10 +69,10 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     );
 
     const specialEvents = [];
-    if ('ツアー キャンパスツアー ob 入試 受験 景品 案内 ポスター チラシ 10時 12時 14時 ガイド 校内 体育館'.toLowerCase().includes(q) || q.includes('ツアー') || q.includes('景品') || q.includes('ob') || q.includes('入試') || q.includes('受験') || q.includes('体育館')) {
+    if ('ツアー 校内ツアー ob 入試 受験 景品 案内 ポスター チラシ 10時 12時 14時 ガイド 校内 体育館'.toLowerCase().includes(q) || q.includes('ツアー') || q.includes('景品') || q.includes('ob') || q.includes('入試') || q.includes('受験') || q.includes('体育館')) {
       specialEvents.push({
         id: 'special-campus-tour',
-        title: 'OB・入試希望者向け キャンパスツアー',
+        title: 'OB・入試希望者向け 校内ツアー',
         desc: '10:00〜 / 12:00〜 / 14:00〜 集合：第一体育館前（景品プレゼントあり）',
         tag: '校内ツアー',
         targetId: 'campus-tour-section'

@@ -61,14 +61,14 @@ export const CampusTourSection: React.FC = () => {
               <span>特別案内・みんなで巡るツアー</span>
             </div>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight flex items-center flex-wrap gap-2.5">
-              <span>OB・入試希望者向け キャンパスツアー</span>
+              <span>OB・入試希望者向け 校内ツアー</span>
               <span className="text-xs sm:text-sm font-sans font-medium text-emerald-800 bg-emerald-100/80 border border-emerald-300 px-3 py-1 rounded-full flex items-center gap-1">
                 <Gift className="w-3.5 h-3.5 text-amber-600" />
                 <span>参加特典：特製景品プレゼントあり！</span>
               </span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 max-w-2xl leading-relaxed">
-              文化祭の賑やかな見どころや話題の企画を、ガイドと一緒にワイワイ楽しく回るキャンパスツアー！卒業生（OB・OG）の皆様も、受験生・保護者の皆様もお気軽にご参加ください。
+              文化祭の賑やかな見どころや話題の企画を、ガイドと一緒にワイワイ楽しく回る校内ツアー！卒業生（OB・OG）の皆様も、受験生・保護者の皆様もお気軽にご参加ください。
             </p>
           </div>
 
@@ -227,7 +227,7 @@ export const CampusTourSection: React.FC = () => {
             <div className="flex items-center justify-between border-b border-teal-200/90 pb-3">
               <h3 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
                 <FileText className="w-5 h-5 text-teal-700" />
-                <span>キャンパスツアー 案内チラシ（縦型PDF）</span>
+                <span>校内ツアー 案内チラシ（縦型PDF）</span>
               </h3>
             </div>
 
@@ -240,7 +240,7 @@ export const CampusTourSection: React.FC = () => {
                 {/* Vertical Flyer Image (Currently using vertical PDF placeholder) */}
                 <img
                   src={tourPosterPlaceholder}
-                  alt="キャンパスツアー 案内チラシ（縦型PDF）"
+                  alt="校内ツアー 案内チラシ（縦型PDF）"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
 
@@ -298,7 +298,7 @@ export const CampusTourSection: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <Compass className="w-5 h-5 text-teal-400" />
                 <span className="font-serif font-bold text-sm sm:text-base">
-                  キャンパスツアー 案内チラシ（縦型ポスター）
+                  校内ツアー 案内チラシ（縦型ポスター）
                 </span>
               </div>
               <button
@@ -313,7 +313,7 @@ export const CampusTourSection: React.FC = () => {
             <div className="p-4 overflow-y-auto max-h-[75vh] bg-slate-950 flex justify-center">
               <img
                 src={tourPosterPlaceholder}
-                alt="キャンパスツアー 案内チラシ 拡大画像"
+                alt="校内ツアー 案内チラシ 拡大画像"
                 className="max-w-full h-auto object-contain rounded border border-slate-800"
               />
             </div>

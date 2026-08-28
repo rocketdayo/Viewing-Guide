@@ -179,7 +179,7 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
       action: () => handleJump('home', 'alumni-section'),
     },
     {
-      title: 'OB・入試希望者向け キャンパスツアー',
+      title: 'OB・入試希望者向け 校内ツアー',
       desc: '10:00〜 / 12:00〜 / 14:00〜 集合：第一体育館前（景品あり）',
       icon: Compass,
       color: 'text-teal-900 bg-teal-50 border-teal-200',
