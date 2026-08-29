@@ -7,19 +7,14 @@ import {
   Plus, 
   Trash2, 
   Edit3, 
-  Check, 
-  AlertCircle, 
-  ArrowRight, 
   Calendar, 
   Sparkles,
   Share2,
   Copy,
   CheckCircle2,
   QrCode,
-  Download,
-  ExternalLink,
-  MessageCircle,
   FileText,
+  MessageCircle,
   X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -60,11 +55,9 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
   onToggleBookmark,
   onSelectProject,
   onNavigate,
-  onImportTimelineData,
 }) => {
   const { language, t } = useI18n();
 
-  // Project-specific schedule metadata (startTime, endTime, note)
   const [projectMeta, setProjectMeta] = useState<Record<string, ProjectScheduleMeta>>(() => {
     try {
       const saved = localStorage.getItem(SCHEDULE_META_KEY);
@@ -75,20 +68,18 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
     }
   });
 
-  // Custom user events (e.g. Lunch, Meetup)
   const [customEvents, setCustomEvents] = useState<CustomTimelineEvent[]>(() => {
     try {
       const saved = localStorage.getItem(CUSTOM_EVENTS_KEY);
       const parsed = saved ? JSON.parse(saved) : null;
       return Array.isArray(parsed) ? parsed : [
-        { id: 'c-1', title: 'お昼休憩・模擬店ランチ', startTime: '12:00', endTime: '12:45', note: 'カフェテリアまたは中庭で軽食', location: 'カフェテリア' },
+        { id: 'c-1', title: language === 'en' ? 'Lunch Break at Cafeteria' : 'お昼休憩・模擬店ランチ', startTime: '12:00', endTime: '12:45', note: language === 'en' ? 'Quick bite at cafeteria or courtyard' : 'カフェテリアまたは中庭で軽食', location: language === 'en' ? 'Cafeteria' : 'カフェテリア' },
       ];
     } catch {
       return [];
     }
   });
 
-  // Modal / Form state for adding custom event
   const [isAddingCustom, setIsAddingCustom] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newStartTime, setNewStartTime] = useState('13:00');
@@ -96,13 +87,11 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
   const [newLocation, setNewLocation] = useState('本館中庭');
   const [newNote, setNewNote] = useState('');
 
-  // Editing project time inline
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editStart, setEditStart] = useState('10:00');
   const [editEnd, setEditEnd] = useState('10:30');
   const [editNote, setEditNote] = useState('');
 
-  // Share Modal & Toast State
   const [showShareModal, setShowShareModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -158,7 +147,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
       title: newTitle.trim(),
       startTime: newStartTime,
       endTime: newEndTime,
-      location: newLocation.trim() || '校内',
+      location: newLocation.trim() || (language === 'en' ? 'Campus' : '校内'),
       note: newNote.trim(),
     };
 
@@ -175,7 +164,6 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
   const safeBookmarkedProjects = Array.isArray(bookmarkedProjects) ? bookmarkedProjects : [];
   const safeCustomEvents = Array.isArray(customEvents) ? customEvents : [];
 
-  // Combine bookmarked projects and custom events into a unified chronological timeline
   const combinedTimelineItems = [
     ...safeBookmarkedProjects.map(proj => {
       const meta = projectMeta[proj.id] || { startTime: '09:30', endTime: '10:00', note: proj.scheduleNote || '' };
@@ -198,7 +186,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
       startTime: ce.startTime,
       endTime: ce.endTime,
       title: ce.title,
-      subtitle: '自由スケジュール・休憩',
+      subtitle: language === 'en' ? 'Personal Event / Break' : '自由スケジュール・休憩',
       location: ce.location,
       note: ce.note,
       congestion: null,
@@ -206,7 +194,6 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
     }))
   ].sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
 
-  // Generate Compressed Shareable URL
   const generateShareUrl = () => {
     const payload = {
       b: bookmarks,
@@ -223,20 +210,21 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
     }
   };
 
-  // Generate Formatted Text Summary for LINE / Chat
   const generateFormattedTextSummary = () => {
-    let text = `✨【私の清教学園文化祭タイムスケジュール】✨\n\n`;
+    let text = language === 'en' 
+      ? `✨【My Seikyo Gakuen Culture Festival Schedule】✨\n\n`
+      : `✨【私の清教学園文化祭タイムスケジュール】✨\n\n`;
     if (combinedTimelineItems.length === 0) {
-      text += `（予定はまだ登録されていません）\n`;
+      text += language === 'en' ? `(No plans scheduled yet)\n` : `（予定はまだ登録されていません）\n`;
     } else {
-      combinedTimelineItems.forEach((item, idx) => {
+      combinedTimelineItems.forEach((item) => {
         text += `⏰ ${item.startTime}〜${item.endTime}\n`;
         text += `📍 ${item.title} (${item.location})\n`;
-        if (item.note) text += `   💬 メモ: ${item.note}\n`;
+        if (item.note) text += `   💬 ${language === 'en' ? 'Note:' : 'メモ:'} ${item.note}\n`;
         text += `\n`;
       });
     }
-    text += `🏫 2026清教学園高校文化祭 公式ガイド\n${generateShareUrl()}`;
+    text += `${t.schoolName} ${t.academicYear} ${t.guideTitle}\n${generateShareUrl()}`;
     return text;
   };
 
@@ -246,8 +234,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
       await navigator.clipboard.writeText(url);
       showToast(t.linkCopied);
     } catch {
-      // Fallback
-      prompt('以下の共有URLをコピーしてください:', url);
+      prompt(language === 'en' ? 'Copy this share URL:' : '以下の共有URLをコピーしてください:', url);
     }
   };
 
@@ -255,9 +242,9 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
     const text = generateFormattedTextSummary();
     try {
       await navigator.clipboard.writeText(text);
-      showToast('テキストサマリーをクリップボードにコピーしました！LINEやメモに貼り付けられます。');
+      showToast(language === 'en' ? 'Schedule copied to clipboard!' : 'テキストサマリーをクリップボードにコピーしました！LINEやメモに貼り付けられます。');
     } catch {
-      prompt('以下のテキストをコピーしてください:', text);
+      prompt(language === 'en' ? 'Copy this text:' : '以下のテキストをコピーしてください:', text);
     }
   };
 
@@ -291,7 +278,6 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto relative">
-      {/* Toast Notification */}
       <AnimatePresence>
         {toastMessage && (
           <motion.div
@@ -306,7 +292,6 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Header Banner */}
       <div className="p-6 rounded-xs bg-gradient-to-br from-emerald-900 via-emerald-950 to-slate-900 text-white shadow-xl space-y-3 relative overflow-hidden">
         <div className="absolute top-0 right-0 -mt-6 -mr-6 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
         <div className="flex items-center space-x-3">
@@ -346,7 +331,6 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
         </div>
       </div>
 
-      {/* Share Modal Dialog */}
       <AnimatePresence>
         {showShareModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs">
@@ -359,7 +343,9 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center space-x-2 text-emerald-900">
                   <Share2 className="w-5 h-5 text-emerald-600" />
-                  <h3 className="font-bold text-base">タイムラインを友達・家族と共有</h3>
+                  <h3 className="font-bold text-base">
+                    {language === 'en' ? 'Share Timeline with Friends & Family' : 'タイムラインを友達・家族と共有'}
+                  </h3>
                 </div>
                 <button
                   onClick={() => setShowShareModal(false)}
@@ -371,44 +357,46 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
 
               <div className="space-y-4 text-xs sm:text-sm text-slate-700">
                 <p className="text-slate-600 text-xs">
-                  あなたが作成したタイムスケジュール（保存した企画・時間・メモ）をURLやテキストで送ることができます。
+                  {language === 'en' 
+                    ? 'Share your planned schedule, bookmarked exhibits, visiting times, and notes with anyone via link or message.' 
+                    : 'あなたが作成したタイムスケジュール（保存した企画・時間・メモ）をURLやテキストで送ることができます。'}
                 </p>
 
-                {/* Quick Share Buttons */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <button
                     onClick={handleCopyShareLink}
                     className="flex items-center justify-center space-x-2 p-3 rounded-xs bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer"
                   >
                     <Copy className="w-4 h-4" />
-                    <span>共有リンクURLをコピー</span>
+                    <span>{language === 'en' ? 'Copy Share Link URL' : '共有リンクURLをコピー'}</span>
                   </button>
                   <button
                     onClick={handleCopyTextSummary}
                     className="flex items-center justify-center space-x-2 p-3 rounded-xs bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold transition-colors cursor-pointer"
                   >
                     <FileText className="w-4 h-4" />
-                    <span>スケジュール文章をコピー</span>
+                    <span>{language === 'en' ? 'Copy Text Summary' : 'スケジュール文章をコピー'}</span>
                   </button>
                   <button
                     onClick={handleShareLine}
                     className="flex items-center justify-center space-x-2 p-3 rounded-xs bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-bold transition-colors cursor-pointer"
                   >
                     <MessageCircle className="w-4 h-4" />
-                    <span>LINEで友達に送る</span>
+                    <span>{language === 'en' ? 'Send via LINE' : 'LINEで友達に送る'}</span>
                   </button>
                   <button
                     onClick={handleShareX}
                     className="flex items-center justify-center space-x-2 p-3 rounded-xs bg-slate-900 hover:bg-black text-white text-xs font-bold transition-colors cursor-pointer"
                   >
                     <span className="font-mono text-sm font-black">𝕏</span>
-                    <span>X (Twitter) でシェア</span>
+                    <span>{language === 'en' ? 'Share on X (Twitter)' : 'X (Twitter) でシェア'}</span>
                   </button>
                 </div>
 
-                {/* Share URL Input Box */}
                 <div className="space-y-1 pt-2">
-                  <label className="block text-[11px] font-bold text-slate-500">共有リンクURL</label>
+                  <label className="block text-[11px] font-bold text-slate-500">
+                    {language === 'en' ? 'Share Link URL' : '共有リンクURL'}
+                  </label>
                   <div className="flex items-center space-x-2">
                     <input
                       type="text"
@@ -420,16 +408,15 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                       onClick={handleCopyShareLink}
                       className="px-3 py-2 bg-emerald-900 hover:bg-emerald-950 text-white text-xs font-bold rounded-xs shrink-0 cursor-pointer"
                     >
-                      コピー
+                      {language === 'en' ? 'Copy' : 'コピー'}
                     </button>
                   </div>
                 </div>
 
-                {/* QR Code generator preview via public API */}
                 <div className="p-4 bg-slate-50 rounded-xs border border-slate-200 flex flex-col items-center justify-center space-y-2 text-center">
                   <div className="flex items-center space-x-1.5 text-xs font-bold text-slate-800">
                     <QrCode className="w-4 h-4 text-emerald-700" />
-                    <span>対面でスマホカメラから読み取るQRコード</span>
+                    <span>{language === 'en' ? 'In-Person Smartphone QR Code' : '対面でスマホカメラから読み取るQRコード'}</span>
                   </div>
                   <img
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(generateShareUrl())}`}
@@ -437,7 +424,9 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                     className="w-32 h-32 bg-white p-1 rounded-xs border border-slate-300 shadow-xs"
                     loading="lazy"
                   />
-                  <p className="text-[10px] text-slate-500">友達のスマホのカメラでかざすとスケジュールが一発で開きます</p>
+                  <p className="text-[10px] text-slate-500">
+                    {language === 'en' ? 'Scan with your camera to open this schedule immediately' : '友達のスマホのカメラでかざすとスケジュールが一発で開きます'}
+                  </p>
                 </div>
               </div>
 
@@ -454,40 +443,43 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Add Custom Event Modal Form */}
       {isAddingCustom && (
         <form onSubmit={handleAddCustomEvent} className="p-5 bg-white rounded-xs border border-emerald-200 shadow-lg space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
               <Calendar className="w-4 h-4 text-emerald-600" />
-              <span>オリジナルのスケジュール項目を追加</span>
+              <span>{language === 'en' ? 'Add Custom Schedule Item' : 'オリジナルのスケジュール項目を追加'}</span>
             </h3>
             <button
               type="button"
               onClick={() => setIsAddingCustom(false)}
               className="text-xs text-slate-400 hover:text-slate-600 font-bold"
             >
-              ✕ 閉じる
+              ✕ {t.close}
             </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-slate-600 mb-1">イベント名 / 内容</label>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">
+                {language === 'en' ? 'Event Name / Details' : 'イベント名 / 内容'}
+              </label>
               <input
                 type="text"
                 required
-                placeholder="例: カフェテリアでランチ、中庭で友達と合流"
+                placeholder={language === 'en' ? 'e.g. Cafeteria Lunch, Meetup in courtyard' : '例: カフェテリアでランチ、中庭で友達と合流'}
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 className="w-full px-3 py-2 rounded-xs border border-slate-300 text-xs font-bold"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1">場所</label>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">
+                {language === 'en' ? 'Location' : '場所'}
+              </label>
               <input
                 type="text"
-                placeholder="例: 食堂・新館2F"
+                placeholder={language === 'en' ? 'e.g. Cafeteria, New Bldg 2F' : '例: 食堂・新館2F'}
                 value={newLocation}
                 onChange={(e) => setNewLocation(e.target.value)}
                 className="w-full px-3 py-2 rounded-xs border border-slate-300 text-xs"
@@ -497,7 +489,9 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
 
           <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1">開始時刻</label>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">
+                {language === 'en' ? 'Start Time' : '開始時刻'}
+              </label>
               <input
                 type="time"
                 value={newStartTime}
@@ -506,7 +500,9 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1">終了時刻</label>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">
+                {language === 'en' ? 'End Time' : '終了時刻'}
+              </label>
               <input
                 type="time"
                 value={newEndTime}
@@ -517,10 +513,12 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">メモ・注意点</label>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">
+              {language === 'en' ? 'Personal Note' : 'メモ・注意点'}
+            </label>
             <input
               type="text"
-              placeholder="例: 食券を忘れずに持っていく"
+              placeholder={language === 'en' ? 'e.g. Bring meal ticket' : '例: 食券を忘れずに持っていく'}
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
               className="w-full px-3 py-2 rounded-xs border border-slate-300 text-xs"
@@ -533,25 +531,26 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
               onClick={() => setIsAddingCustom(false)}
               className="px-4 py-2 rounded-xs bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
             >
-              キャンセル
+              {language === 'en' ? 'Cancel' : 'キャンセル'}
             </button>
             <button
               type="submit"
               className="px-5 py-2 rounded-xs bg-emerald-900 hover:bg-emerald-950 text-white text-xs font-bold shadow-md transition-colors cursor-pointer"
             >
-              追加する
+              {language === 'en' ? 'Add Item' : '追加する'}
             </button>
           </div>
         </form>
       )}
 
-      {/* Timeline List */}
       <div className="space-y-4">
         <div className="flex items-center justify-between px-1">
           <h3 className="text-sm font-bold text-slate-800">
-            タイムライン順スケジュール ({combinedTimelineItems.length}件)
+            {language === 'en' ? 'Chronological Schedule' : 'タイムライン順スケジュール'} ({combinedTimelineItems.length} {language === 'en' ? 'items' : '件'})
           </h3>
-          <span className="text-[11px] text-slate-400">※時間順に自動並び替えされます</span>
+          <span className="text-[11px] text-slate-400">
+            {language === 'en' ? 'Automatically sorted by time' : '※時間順に自動並び替えされます'}
+          </span>
         </div>
 
         {combinedTimelineItems.length === 0 ? (
@@ -560,7 +559,9 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
               <Calendar className="w-6 h-6" />
             </div>
             <p className="text-sm font-bold text-slate-800">{t.emptyTimeline}</p>
-            <p className="text-xs text-slate-400">クラス企画一覧からブックマークするか、上記の「自由スケジュールを追加」ボタンを押して予定を組み立ててください。</p>
+            <p className="text-xs text-slate-400">
+              {language === 'en' ? 'Bookmark projects from the Class Projects list or add custom events above to craft your itinerary.' : 'クラス企画一覧からブックマークするか、上記の「自由スケジュールを追加」ボタンを押して予定を組み立ててください。'}
+            </p>
             <button
               onClick={() => onNavigate('classes')}
               className="mt-2 px-5 py-2.5 rounded-xs bg-emerald-900 hover:bg-emerald-950 text-white text-xs font-bold shadow-md cursor-pointer transition-colors"
@@ -580,7 +581,6 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                   key={`${item.type}-${item.id}`}
                   className="p-4 sm:p-5 rounded-xs bg-white border border-slate-200 shadow-2xs hover:border-emerald-300 transition-all space-y-3 relative overflow-hidden"
                 >
-                  {/* Left Accent Bar */}
                   <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${isProject ? 'bg-emerald-600' : 'bg-emerald-500'}`} />
 
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3 pl-2">
@@ -615,7 +615,6 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                     </div>
                   </div>
 
-                  {/* Main Content */}
                   <div className="pl-2 space-y-1.5">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
@@ -634,18 +633,21 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                           className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xs bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 text-xs font-bold transition-colors cursor-pointer self-start sm:self-auto"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
-                          <span>訪問時間を変更</span>
+                          <span>{language === 'en' ? 'Edit Visit Time' : '訪問時間を変更'}</span>
                         </button>
                       )}
                     </div>
 
-                    {/* Inline Editor for Project Time */}
                     {isEditing && (
                       <div className="p-3 bg-emerald-50/70 rounded-xs border border-emerald-200 space-y-3 mt-2">
-                        <div className="text-xs font-bold text-emerald-900">訪問時間とメモの編集</div>
+                        <div className="text-xs font-bold text-emerald-900">
+                          {language === 'en' ? 'Edit Visit Time & Personal Note' : '訪問時間とメモの編集'}
+                        </div>
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <label className="block text-[10px] font-semibold text-slate-600 mb-0.5">開始時刻</label>
+                            <label className="block text-[10px] font-semibold text-slate-600 mb-0.5">
+                              {language === 'en' ? 'Start' : '開始時刻'}
+                            </label>
                             <input
                               type="time"
                               value={editStart}
@@ -654,7 +656,9 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                             />
                           </div>
                           <div>
-                            <label className="block text-[10px] font-semibold text-slate-600 mb-0.5">終了時刻</label>
+                            <label className="block text-[10px] font-semibold text-slate-600 mb-0.5">
+                              {language === 'en' ? 'End' : '終了時刻'}
+                            </label>
                             <input
                               type="time"
                               value={editEnd}
@@ -664,10 +668,12 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                           </div>
                         </div>
                         <div>
-                          <label className="block text-[10px] font-semibold text-slate-600 mb-0.5">個人メモ</label>
+                          <label className="block text-[10px] font-semibold text-slate-600 mb-0.5">
+                            {language === 'en' ? 'Personal Note' : '個人メモ'}
+                          </label>
                           <input
                             type="text"
-                            placeholder="例: 11時回の整理券を10時に取りに行く"
+                            placeholder={language === 'en' ? 'e.g. Pick up morning tickets' : '例: 11時回の整理券を10時に取りに行く'}
                             value={editNote}
                             onChange={(e) => setEditNote(e.target.value)}
                             className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs bg-white"
@@ -679,23 +685,22 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                             onClick={() => setEditingProjectId(null)}
                             className="px-3 py-1 rounded-lg bg-white text-slate-600 text-xs font-bold border border-slate-200"
                           >
-                            キャンセル
+                            {language === 'en' ? 'Cancel' : 'キャンセル'}
                           </button>
                           <button
                             type="button"
                             onClick={() => handleSaveProjectMeta(proj!.id)}
                             className="px-3 py-1 rounded-lg bg-emerald-900 text-white text-xs font-bold shadow-2xs cursor-pointer"
                           >
-                            保存
+                            {language === 'en' ? 'Save' : '保存'}
                           </button>
                         </div>
                       </div>
                     )}
 
-                    {/* Note display if not editing */}
                     {item.note && !isEditing && (
                       <div className="text-xs text-slate-600 bg-slate-50 px-3 py-2 rounded-xs border border-slate-100 flex items-start space-x-2">
-                        <span className="font-bold text-emerald-700 shrink-0">メモ:</span>
+                        <span className="font-bold text-emerald-700 shrink-0">{language === 'en' ? 'Note:' : 'メモ:'}</span>
                         <span>{item.note}</span>
                       </div>
                     )}

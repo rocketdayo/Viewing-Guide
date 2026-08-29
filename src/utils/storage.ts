@@ -49,7 +49,7 @@ export function sanitizeAppData(parsed: any): AppDataState {
     gasAnnouncementUrl: isOldAnnouncementUrl ? INITIAL_APP_DATA.gasAnnouncementUrl : parsed.gasAnnouncementUrl,
     projects: mergedProjects || INITIAL_APP_DATA.projects,
     // Always use official greetings and schedules
-    greetings: Array.isArray(parsed.greetings) && parsed.greetings.length > 0 ? parsed.greetings : INITIAL_APP_DATA.greetings,
+    greetings: INITIAL_APP_DATA.greetings,
     schedules: Array.isArray(parsed.schedules) && parsed.schedules.length > 0 ? parsed.schedules : INITIAL_APP_DATA.schedules,
     announcements: cleanAnnouncements || INITIAL_APP_DATA.announcements,
   };

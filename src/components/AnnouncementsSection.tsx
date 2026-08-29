@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Announcement } from '../types';
+import { useI18n } from '../utils/i18n';
 
 interface AnnouncementsSectionProps {
   announcements: Announcement[];
@@ -16,17 +17,15 @@ interface AnnouncementsSectionProps {
 export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
   announcements = [],
 }) => {
+  const { language } = useI18n();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
-  // Default to having ONLY pinned announcements expanded; unpinned ones are collapsed by default
   const [expandedIds, setExpandedIds] = useState<string[]>(() => 
     announcements.filter(a => a.isPinned).map(a => a.id)
   );
 
-  // Sync expanded state when announcements change if needed (e.g. initial fetch)
   React.useEffect(() => {
     setExpandedIds(prev => {
-      // If user hasn't toggled anything or announcements were loaded asynchronously, ensure pinned are expanded
       const pinnedIds = announcements.filter(a => a.isPinned).map(a => a.id);
       const unique = Array.from(new Set([...prev, ...pinnedIds]));
       return unique;
@@ -46,7 +45,6 @@ export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
     return item.category === selectedCategory;
   });
 
-  // Sort pinned items to the very top
   const sortedAnnouncements = [...filteredAnnouncements].sort((a, b) => {
     if (a.isPinned && !b.isPinned) return -1;
     if (!a.isPinned && b.isPinned) return 1;
@@ -71,23 +69,23 @@ export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
     <section id="announcements-section" className="border-b border-slate-200 bg-[#FAFBFD] py-12 sm:py-16 scroll-mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-5">
           <div className="space-y-1.5">
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 flex items-center gap-2.5">
-              <span>お知らせ・緊急速報 配信サービス</span>
+              <span>{language === 'en' ? 'Announcements & News Flash' : 'お知らせ・緊急速報 配信サービス'}</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 font-normal">
-              各ステージ・学園からの最新アナウンス、プログラム変更、緊急連絡を掲載しています
+              {language === 'en' 
+                ? 'Latest official announcements, timetable changes, and alerts from the school' 
+                : '各ステージ・学園からの最新アナウンス、プログラム変更、緊急連絡を掲載しています'}
             </p>
           </div>
         </div>
 
-        {/* Category Filter Tabs */}
         {categories.length > 2 && (
           <div className="flex flex-wrap items-center gap-1.5 pt-1">
             <span className="text-xs font-mono text-slate-500 font-bold flex items-center gap-1 mr-1">
-              <Filter className="w-3.5 h-3.5" /> 絞り込み:
+              <Filter className="w-3.5 h-3.5" /> {language === 'en' ? 'Filter:' : '絞り込み:'}
             </span>
             {categories.map((cat) => (
               <button
@@ -99,18 +97,21 @@ export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
                     : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                 }`}
               >
-                {cat === 'all' ? `すべて (${announcements.length})` : cat}
+                {cat === 'all' ? (language === 'en' ? `All (${announcements.length})` : `すべて (${announcements.length})`) : cat}
               </button>
             ))}
           </div>
         )}
 
-        {/* Announcements List */}
         {sortedAnnouncements.length === 0 ? (
           <div className="bg-white p-8 border border-slate-200 text-center space-y-3 shadow-2xs">
             <Bell className="w-8 h-8 text-slate-300 mx-auto" />
-            <p className="text-sm font-bold text-slate-700">現在、新しいお知らせはありません</p>
-            <p className="text-xs text-slate-500">新しいアナウンスがあり次第、ここに自動表示されます。</p>
+            <p className="text-sm font-bold text-slate-700">
+              {language === 'en' ? 'No announcements at this time' : '現在、新しいお知らせはありません'}
+            </p>
+            <p className="text-xs text-slate-500">
+              {language === 'en' ? 'New updates will automatically appear here.' : '新しいアナウンスがあり次第、ここに自動表示されます。'}
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -133,11 +134,10 @@ export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
                     onClick={() => hasContent && toggleExpand(item.id)}
                     className={`p-5 sm:p-6 space-y-2.5 ${hasContent ? 'cursor-pointer select-none hover:bg-slate-50/60' : ''} transition-colors`}
                   >
-                    {/* Meta Bar */}
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center space-x-2">
                         <span className={`px-2.5 py-0.5 text-xs font-bold border ${getCategoryBadge(item.category)}`}>
-                          {item.category || 'お知らせ'}
+                          {item.category || (language === 'en' ? 'Notice' : 'お知らせ')}
                         </span>
                         <span className="text-xs font-mono text-slate-500 flex items-center gap-1">
                           <Clock className="w-3.5 h-3.5 text-slate-400" />
@@ -147,7 +147,7 @@ export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
 
                       {hasContent && (
                         <div className="flex items-center space-x-1 text-xs font-bold text-slate-500">
-                          <span>{isExpanded ? '本文を閉じる' : '本文を開く'}</span>
+                          <span>{isExpanded ? (language === 'en' ? 'Close details' : '本文を閉じる') : (language === 'en' ? 'Read details' : '本文を開く')}</span>
                           {isExpanded ? (
                             <ChevronUp className="w-4 h-4 text-slate-500" />
                           ) : (
@@ -157,14 +157,12 @@ export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
                       )}
                     </div>
 
-                    {/* Title */}
                     <h3 className={`font-serif font-bold text-slate-900 leading-snug ${
                       item.isPinned ? 'text-base sm:text-lg text-slate-950 font-bold' : 'text-base sm:text-lg'
                     }`}>
                       {item.title}
                     </h3>
 
-                    {/* Collapsible Content - Full multi-line rendering with smooth animation */}
                     <AnimatePresence initial={false}>
                       {hasContent && isExpanded && (
                         <motion.div
@@ -191,4 +189,3 @@ export const AnnouncementsSection: React.FC<AnnouncementsSectionProps> = ({
     </section>
   );
 };
-

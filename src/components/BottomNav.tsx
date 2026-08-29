@@ -38,7 +38,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 setCurrentPage(item.id);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="relative flex flex-col items-center justify-center py-1 px-2.5 rounded-xs transition-all"
+              className="relative flex flex-col items-center justify-center py-1 px-2.5 rounded-xs transition-all cursor-pointer"
             >
               <div className="relative">
                 <Icon

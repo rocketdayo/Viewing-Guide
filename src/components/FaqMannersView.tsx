@@ -12,10 +12,7 @@ import {
   Ban, 
   Sparkles, 
   MapPin, 
-  PhoneCall, 
-  Clock, 
-  AlertTriangle,
-  FileText
+  PhoneCall
 } from 'lucide-react';
 import { useI18n } from '../utils/i18n';
 
@@ -46,7 +43,6 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
   ];
 
   const faqList: FaqItem[] = [
-    // Admission
     {
       id: 'faq-1',
       category: 'admission',
@@ -74,8 +70,6 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
       answerEn: 'No visitor car parking is available on campus or nearby. Please use public transportation (Nankai Koya Line / Kintetsu Nagano Line to Kawachinagano Station). Bicycle parking is located near the main gate.',
       tag: 'アクセス・駐車場'
     },
-
-    // Tickets
     {
       id: 'faq-4',
       category: 'tickets',
@@ -94,8 +88,6 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
       answerEn: 'Tickets are distributed outside each classroom or through online ticketing links. Distribution typically occurs in morning (9:30~) and afternoon (12:30~) batches.',
       tag: '配布時間'
     },
-
-    // Food & Cafeteria
     {
       id: 'faq-6',
       category: 'food',
@@ -123,8 +115,6 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
       answerEn: 'Please dispose of garbage at designated Eco Stations by sorting into Burnables, Plastics, PET Bottles (caps/labels removed), and Cans.',
       tag: 'ゴミ分別'
     },
-
-    // Photos & Social Media
     {
       id: 'faq-9',
       category: 'photos',
@@ -143,8 +133,6 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
       answerEn: 'To protect the privacy and portrait rights of all students and visitors, please REFRAIN from posting photos or videos taken at the festival to social media. If you must share, you are strictly required to blur or conceal all identifiable faces.',
       tag: 'SNS・プライバシー'
     },
-
-    // Safety & First Aid
     {
       id: 'faq-11',
       category: 'safety',
@@ -159,7 +147,7 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
       category: 'safety',
       question: 'AED（自動体外式除細動器）の設置場所はどこですか？',
       questionEn: 'Where are the AED devices located?',
-      answer: 'AEDの詳細な設置場所につきましては、現在確認・調整中です（後ほど確定次第更新いたします）。万一緊急の救急事態が発生した場合は、直ちにお近くの教職員、または本館1階の職員室・保健室へお知らせください。',
+      answer: 'AEDの詳細な設置場所につきましては、現在確認・調整中です（確定次第更新いたします）。万一緊急の救急事態が発生した場合は、直ちにお近くの教職員、または本館1階の職員室・保健室へお知らせください。',
       answerEn: 'Exact AED locations are currently pending confirmation and will be announced soon. In an emergency, please immediately alert the nearest faculty member, the Faculty Office, or the Health Room (Main Building 1F).',
       tag: 'AED・緊急時'
     },
@@ -172,8 +160,6 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
       answerEn: 'Please note there is no Student Council or Executive Headquarters booth. All lost and found items are handled at the Faculty Office (Staff Room, Main Building 1F). Please visit the Faculty Office or notify faculty members.',
       tag: '落とし物・職員室'
     },
-
-    // Prohibitions & Manners
     {
       id: 'faq-14',
       category: 'manners',
@@ -223,7 +209,6 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
-      {/* Top Banner */}
       <div className="p-6 sm:p-8 rounded-xs bg-gradient-to-br from-emerald-900 via-emerald-950 to-slate-900 text-white shadow-xl space-y-4 relative overflow-hidden">
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center space-x-3">
@@ -238,7 +223,6 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
           </div>
         </div>
 
-        {/* Quick Search Bar */}
         <div className="relative pt-2">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-5 pointer-events-none" />
           <input
@@ -251,7 +235,6 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
         </div>
       </div>
 
-      {/* Crucial Visitor Manners Card Grid */}
       <div className="space-y-3">
         <div className="flex items-center space-x-2 px-1">
           <ShieldCheck className="w-5 h-5 text-emerald-700" />
@@ -259,57 +242,52 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {/* Card 1: 土足禁止 */}
           <div className="p-4 bg-white rounded-xs border border-slate-200/90 shadow-2xs space-y-2 relative overflow-hidden">
             <div className="w-1.5 absolute left-0 top-0 bottom-0 bg-teal-600" />
             <div className="flex items-center space-x-2 text-teal-900 font-bold text-xs">
               <Ban className="w-4 h-4 text-teal-700" />
-              <span>校内は原則土足禁止</span>
+              <span>{language === 'en' ? 'Indoor Shoes Only' : '校内は原則土足禁止'}</span>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              校内は土足禁止です。スリッパ・上履きと靴袋をご持参ください。
+              {language === 'en' ? 'Please bring indoor slippers and a shoe bag for outdoor shoes.' : '校内は土足禁止です。スリッパ・上履きと靴袋をご持参ください。'}
             </p>
           </div>
 
-          {/* Card 2: 撮影・SNS */}
           <div className="p-4 bg-white rounded-xs border border-slate-200/90 shadow-2xs space-y-2 relative overflow-hidden">
             <div className="w-1.5 absolute left-0 top-0 bottom-0 bg-emerald-600" />
             <div className="flex items-center space-x-2 text-emerald-800 font-bold text-xs">
               <Camera className="w-4 h-4" />
-              <span>プライバシー尊重・SNS配慮</span>
+              <span>{language === 'en' ? 'Photo & SNS Privacy' : 'プライバシー尊重・SNS配慮'}</span>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              生徒や他の方のプライバシーを最優先に。SNSへの写真・動画投稿はお控えください。
+              {language === 'en' ? 'Prioritize student privacy. Refrain from posting photos/videos to SNS.' : '生徒や他の方のプライバシーを最優先に。SNSへの写真・動画投稿はお控えください。'}
             </p>
           </div>
 
-          {/* Card 3: 飲食・ゴミ */}
           <div className="p-4 bg-white rounded-xs border border-slate-200/90 shadow-2xs space-y-2 relative overflow-hidden">
             <div className="w-1.5 absolute left-0 top-0 bottom-0 bg-amber-500" />
             <div className="flex items-center space-x-2 text-amber-800 font-bold text-xs">
               <Utensils className="w-4 h-4" />
-              <span>指定エリア飲食・ゴミ分別</span>
+              <span>{language === 'en' ? 'Designated Dining & Trash' : '指定エリア飲食・ゴミ分別'}</span>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              飲食は食堂や中庭等の指定エリアで。廊下の食べ歩きは禁止です。
+              {language === 'en' ? 'Eat only in the cafeteria & courtyard. Sort trash at Eco Stations.' : '飲食は食堂や中庭等の指定エリアで。廊下の食べ歩きは禁止です。'}
             </p>
           </div>
 
-          {/* Card 4: 禁煙・禁酒 */}
           <div className="p-4 bg-white rounded-xs border border-slate-200/90 shadow-2xs space-y-2 relative overflow-hidden">
             <div className="w-1.5 absolute left-0 top-0 bottom-0 bg-rose-600" />
             <div className="flex items-center space-x-2 text-rose-800 font-bold text-xs">
               <Ban className="w-4 h-4" />
-              <span>敷地内全面禁煙・飲酒禁止</span>
+              <span>{language === 'en' ? 'No Smoking & No Alcohol' : '敷地内全面禁煙・飲酒禁止'}</span>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              学校敷地内・周辺は完全禁煙です。酒類の持ち込みも固く禁止されています。
+              {language === 'en' ? 'Campus is completely non-smoking. Alcohol is strictly forbidden.' : '学校敷地内・周辺は完全禁煙です。酒類の持ち込みも固く禁止されています。'}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Category Tabs */}
       <div className="flex items-center space-x-1.5 overflow-x-auto pb-2 scrollbar-none">
         {categories.map((cat) => {
           const Icon = cat.icon;
@@ -331,10 +309,9 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
         })}
       </div>
 
-      {/* FAQ Accordion List */}
       <div className="space-y-3">
         <div className="flex items-center justify-between text-xs text-slate-500 px-1 font-bold">
-          <span>{filteredFaqs.length} 件の質問</span>
+          <span>{filteredFaqs.length} {language === 'en' ? 'questions' : '件の質問'}</span>
           <button
             onClick={() => {
               if (expandedIds.size === filteredFaqs.length) {
@@ -345,14 +322,14 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
             }}
             className="text-emerald-700 hover:underline cursor-pointer"
           >
-            {expandedIds.size === filteredFaqs.length ? 'すべて閉じる' : 'すべて開く'}
+            {expandedIds.size === filteredFaqs.length ? (language === 'en' ? 'Collapse all' : 'すべて閉じる') : (language === 'en' ? 'Expand all' : 'すべて開く')}
           </button>
         </div>
 
         {filteredFaqs.length === 0 ? (
           <div className="p-12 text-center bg-white rounded-xs border border-slate-200 text-slate-500 space-y-2">
-            <p className="text-sm font-bold text-slate-800">該当する質問が見つかりませんでした</p>
-            <p className="text-xs">別のキーワードで検索するか、カテゴリーを変更してお試しください。</p>
+            <p className="text-sm font-bold text-slate-800">{language === 'en' ? 'No matching questions found' : '該当する質問が見つかりませんでした'}</p>
+            <p className="text-xs">{language === 'en' ? 'Try searching with different keywords or switch categories.' : '別のキーワードで検索するか、カテゴリーを変更してお試しください。'}</p>
           </div>
         ) : (
           <div className="space-y-2.5">
@@ -409,16 +386,19 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
         )}
       </div>
 
-      {/* Bottom Help Contact Strip */}
       <div className="p-4 sm:p-5 rounded-xs bg-emerald-50 border border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-emerald-950">
         <div className="flex items-center space-x-3 text-center sm:text-left">
           <div className="p-2.5 rounded-xs bg-emerald-100 text-emerald-800 shrink-0">
             <PhoneCall className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs sm:text-sm font-black">ご不明な点・落とし物は職員室へ</p>
+            <p className="text-xs sm:text-sm font-black">
+              {language === 'en' ? 'Questions & Lost Items: Visit Faculty Office' : 'ご不明な点・落とし物は職員室へ'}
+            </p>
             <p className="text-[11px] text-emerald-800">
-              落とし物や各種お問い合わせは「本館1階 職員室」またはお近くの教職員までお気軽にお声がけください。（※生徒会・実行本部ブースはございません）
+              {language === 'en' 
+                ? 'For lost and found or inquiries, please contact the Faculty Office (Main Building 1F) or nearby staff.' 
+                : '落とし物や各種お問い合わせは「本館1階 職員室」またはお近くの教職員までお気軽にお声がけください。（※生徒会・実行本部ブースはございません）'}
             </p>
           </div>
         </div>
@@ -426,7 +406,7 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
           onClick={() => onNavigate('map')}
           className="px-4 py-2 rounded-xs bg-emerald-900 hover:bg-emerald-950 text-white text-xs font-bold whitespace-nowrap shadow-md cursor-pointer transition-colors"
         >
-          校内マップで場所を確認 →
+          {language === 'en' ? 'Check Campus Map →' : '校内マップで場所を確認 →'}
         </button>
       </div>
     </div>

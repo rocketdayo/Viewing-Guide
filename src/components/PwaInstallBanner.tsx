@@ -12,7 +12,7 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
   forceShowModal = false,
   onCloseModal
 }) => {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isDismissed, setIsDismissed] = useState<boolean>(() => {
     return localStorage.getItem('seikyo_pwa_banner_dismissed') === 'true';
@@ -23,17 +23,14 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
   const [isOffline, setIsOffline] = useState<boolean>(!navigator.onLine);
 
   useEffect(() => {
-    // Check if already in standalone mode (installed)
     const checkStandalone = window.matchMedia('(display-mode: standalone)').matches ||
       (window.navigator as any).standalone === true;
     setIsStandalone(checkStandalone);
 
-    // Detect iOS
     const userAgent = window.navigator.userAgent.toLowerCase();
     const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
     setIsIOS(isIosDevice);
 
-    // Listen for beforeinstallprompt
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -41,7 +38,6 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // Offline / Online network status listener
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
 
@@ -80,7 +76,6 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
 
   return (
     <>
-      {/* Offline Status Top Bar */}
       <AnimatePresence>
         {isOffline && (
           <motion.div
@@ -95,10 +90,9 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Floating Mini Banner on First Visit (Mobile only if not installed) */}
       {!isStandalone && !isDismissed && (deferredPrompt || isIOS) && (
         <aside 
-          aria-label="アプリのインストール案内"
+          aria-label={t.pwaInstallTitle}
           className="fixed bottom-16 sm:bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-md z-40 bg-emerald-950/95 backdrop-blur-md text-white p-3.5 rounded-xs border border-emerald-700/60 shadow-xl"
         >
           <div className="flex items-start justify-between gap-3">
@@ -125,14 +119,14 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
                     onClick={handleDismiss}
                     className="px-2.5 py-1.5 text-[11px] text-emerald-300 hover:text-white transition-colors cursor-pointer"
                   >
-                    あとで
+                    {language === 'en' ? 'Later' : 'あとで'}
                   </button>
                 </div>
               </div>
             </div>
             <button
               onClick={handleDismiss}
-              className="text-emerald-400 hover:text-white p-1 rounded-xs"
+              className="text-emerald-400 hover:text-white p-1 rounded-xs cursor-pointer"
               title={t.close}
             >
               <X className="w-4 h-4" />
@@ -141,7 +135,6 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
         </aside>
       )}
 
-      {/* iOS or Manual Install Modal Guide */}
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs">
@@ -154,11 +147,13 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center space-x-2 text-emerald-900">
                   <Smartphone className="w-5 h-5 text-emerald-600" />
-                  <h3 className="font-bold text-sm sm:text-base">ホーム画面に追加して快適に利用</h3>
+                  <h3 className="font-bold text-sm sm:text-base">
+                    {language === 'en' ? 'Add to Home Screen for best experience' : 'ホーム画面に追加して快適に利用'}
+                  </h3>
                 </div>
                 <button
                   onClick={handleCloseInternalModal}
-                  className="p-1 text-slate-400 hover:text-slate-600 rounded-xs"
+                  className="p-1 text-slate-400 hover:text-slate-600 rounded-xs cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -168,11 +163,11 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
                 <div className="p-3 bg-emerald-50 rounded-xs border border-emerald-200 flex items-start space-x-3">
                   <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-emerald-900">メリット</span>
+                    <span className="font-bold text-emerald-900">{language === 'en' ? 'Benefits' : 'メリット'}</span>
                     <ul className="list-disc list-inside text-emerald-800 text-xs mt-1 space-y-0.5">
-                      <li>校内の電波が不安定でも即座に起動</li>
-                      <li>ブラウザの検索バーが消えて全画面で広々表示</li>
-                      <li>ワンタップでいつでも混雑度・地図を確認</li>
+                      <li>{language === 'en' ? 'Fast launch even with weak mobile signal' : '校内の電波が不安定でも即座に起動'}</li>
+                      <li>{language === 'en' ? 'Full-screen app view without browser bars' : 'ブラウザの検索バーが消えて全画面で広々表示'}</li>
+                      <li>{language === 'en' ? '1-tap instant access to map & live queues' : 'ワンタップでいつでも混雑度・地図を確認'}</li>
                     </ul>
                   </div>
                 </div>
@@ -180,29 +175,34 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
                 {isIOS ? (
                   <div className="space-y-3 p-4 bg-slate-50 rounded-xs border border-slate-200 text-xs">
                     <p className="font-bold text-slate-900 flex items-center space-x-1.5">
-                      <span>iPhone / iPad (Safari) での手順:</span>
+                      <span>{language === 'en' ? 'iPhone / iPad (Safari) instructions:' : 'iPhone / iPad (Safari) での手順:'}</span>
                     </p>
                     <ol className="list-decimal list-inside space-y-2 text-slate-700">
                       <li className="flex items-center space-x-1.5">
-                        <span>1. 画面下の</span>
+                        <span>{language === 'en' ? '1. Tap ' : '1. 画面下の'}</span>
                         <span className="inline-flex items-center px-1.5 py-0.5 bg-slate-200 rounded text-slate-800 font-bold">
-                          <Share className="w-3.5 h-3.5 mr-1" /> 共有ボタン
+                          <Share className="w-3.5 h-3.5 mr-1" /> {language === 'en' ? 'Share' : '共有ボタン'}
                         </span>
-                        <span>をタップ</span>
+                        <span>{language === 'en' ? ' button' : 'をタップ'}</span>
                       </li>
                       <li>
-                        2. メニューをスクロールし <span className="font-bold text-emerald-800">「ホーム画面に追加」</span> を選択
+                        {language === 'en' ? '2. Scroll and select ' : '2. メニューをスクロールし '}
+                        <span className="font-bold text-emerald-800">{language === 'en' ? '"Add to Home Screen"' : '「ホーム画面に追加」'}</span>
                       </li>
                       <li>
-                        3. 右上の <span className="font-bold text-emerald-800">「追加」</span> をタップして完了！
+                        {language === 'en' ? '3. Tap ' : '3. 右上の '}
+                        <span className="font-bold text-emerald-800">{language === 'en' ? '"Add"' : '「追加」'}</span>
+                        {language === 'en' ? ' in top right to finish!' : ' をタップして完了！'}
                       </li>
                     </ol>
                   </div>
                 ) : (
                   <div className="space-y-3 p-4 bg-slate-50 rounded-xs border border-slate-200 text-xs">
-                    <p className="font-bold text-slate-900">Android / PC (Chrome / Edge) の場合:</p>
+                    <p className="font-bold text-slate-900">{language === 'en' ? 'Android / PC (Chrome / Edge):' : 'Android / PC (Chrome / Edge) の場合:'}</p>
                     <p className="text-slate-600">
-                      下の「ホーム画面に追加」ボタンを押すか、ブラウザ右上のメニュー（︙）から「アプリをインストール」または「ホーム画面に追加」を選択してください。
+                      {language === 'en'
+                        ? 'Tap "Add to Home Screen" below or choose "Install app" from your browser menu (⋮).'
+                        : '下の「ホーム画面に追加」ボタンを押すか、ブラウザ右上のメニュー（︙）から「アプリをインストール」または「ホーム画面に追加」を選択してください。'}
                     </p>
                     {deferredPrompt && (
                       <button
@@ -210,7 +210,7 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
                         className="w-full py-2.5 rounded-xs bg-emerald-900 hover:bg-emerald-950 text-white font-bold flex items-center justify-center space-x-2 shadow-md cursor-pointer"
                       >
                         <Download className="w-4 h-4" />
-                        <span>今すぐホーム画面に追加</span>
+                        <span>{t.installBtn}</span>
                       </button>
                     )}
                   </div>

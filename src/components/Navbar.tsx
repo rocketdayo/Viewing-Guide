@@ -57,7 +57,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs">
-      {/* Pinned News Banner if exists */}
       {pinnedAnnouncement && (
         <motion.div 
           initial={{ opacity: 0, height: 0 }}
@@ -81,10 +80,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         </motion.div>
       )}
 
-      {/* Main Navbar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo & School Branding */}
           <div 
             id="brand-logo-btn"
             onClick={() => handleNav('home')}
@@ -109,7 +106,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center space-x-1">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -143,9 +139,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </nav>
 
-          {/* Action Buttons & Hamburger Menu */}
           <div className="flex items-center space-x-1 sm:space-x-2">
-            {/* Language Toggle Button */}
             <button
               onClick={toggleLanguage}
               className="flex items-center space-x-1 px-2.5 py-1.5 rounded-xs text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
@@ -176,7 +170,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
             
-            {/* Unified Hamburger Menu Button (Mobile & Desktop) */}
             <button
               id="hamburger-menu-btn"
               onClick={onOpenToc}
@@ -193,4 +186,3 @@ export const Navbar: React.FC<NavbarProps> = ({
     </header>
   );
 };
-

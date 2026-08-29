@@ -21,7 +21,6 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
     <footer className="bg-slate-950 text-slate-300 border-t border-slate-800 text-xs sm:text-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Col 1: Brand & Theme */}
           <div className="md:col-span-2 space-y-3">
             <div className="flex items-center space-x-3">
               <LogoBadge className="w-10 h-10" size={40} />
@@ -42,12 +41,11 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
             <div className="text-xs text-slate-400 pt-1 space-y-1">
               <p className="flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                <span>大阪府河内長野市末広町380-1（南海高野線・近鉄長野線 河内長野駅より徒歩約10分）</span>
+                <span>{language === 'en' ? '380-1 Suehirocho, Kawachinagano, Osaka (10 min walk from Kawachinagano Station)' : '大阪府河内長野市末広町380-1（南海高野線・近鉄長野線 河内長野駅より徒歩約10分）'}</span>
               </p>
             </div>
           </div>
 
-          {/* Col 2: Navigation Links */}
           <div className="space-y-2">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">
               {language === 'en' ? 'Quick Links' : 'ページ案内'}
@@ -60,7 +58,7 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
                       onClick={() => onNavigate('home')}
                       className="hover:text-white transition-colors cursor-pointer"
                     >
-                      {t.navHome}（ご挨拶・速報）
+                      {t.navHome} ({language === 'en' ? 'Greetings & News' : 'ご挨拶・速報'})
                     </button>
                   </li>
                   <li>
@@ -76,7 +74,7 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
                       onClick={() => onNavigate('classes')}
                       className="hover:text-white transition-colors cursor-pointer"
                     >
-                      {t.navClasses} ({appData?.projects?.length || 21}企画)
+                      {t.navClasses} ({appData?.projects?.length || 21} {language === 'en' ? 'projects' : '企画'})
                     </button>
                   </li>
                   <li>
@@ -120,7 +118,6 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
             </ul>
           </div>
 
-          {/* Col 3: Guidelines & Utility */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">
               {language === 'en' ? 'Etiquette & Guidelines' : '来場者マナー＆重要事項'}
@@ -137,7 +134,7 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
                 className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xs bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-bold border border-slate-800 transition-colors cursor-pointer"
               >
                 <Globe className="w-3.5 h-3.5 text-emerald-400" />
-                <span>言語切替 / Language: {language === 'ja' ? 'English' : '日本語'}</span>
+                <span>Language / 言語切替: {language === 'ja' ? 'English' : '日本語'}</span>
               </button>
               {onNavigate && (
                 <button
@@ -152,14 +149,13 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div className="pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
           <p>© 2026 Seikyo Gakuen High School Culture Festival. All Rights Reserved.</p>
           <button
             onClick={scrollToTop}
             className="flex items-center space-x-1 text-slate-400 hover:text-white transition-colors cursor-pointer"
           >
-            <span>ページ上部へ戻る</span>
+            <span>{language === 'en' ? 'Back to top' : 'ページ上部へ戻る'}</span>
             <ChevronUp className="w-4 h-4" />
           </button>
         </div>

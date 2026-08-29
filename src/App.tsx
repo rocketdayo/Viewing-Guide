@@ -27,14 +27,12 @@ import { fetchLiveGasCongestion, applyGasSyncToProjects } from './utils/congesti
 import { fetchLiveAnnouncements } from './utils/announcementSync';
 import { motion, AnimatePresence } from 'motion/react';
 
-// Helper to detect repository base path (e.g. '/Viewing-Guide')
 export function getAppBasePath(): string {
   if (typeof window === 'undefined') return '';
   const pathname = window.location.pathname;
   if (pathname.startsWith('/Viewing-Guide')) {
     return '/Viewing-Guide';
   }
-  // Generic repository name detection (if hosted under GitHub pages subfolder)
   const segments = pathname.split('/').filter(Boolean);
   const reservedPages = ['home', 'schedule', 'classes', 'congestion', 'bookmarks', 'timeline', 'map', 'faq', 'admin', 'project'];
   if (segments.length > 0 && !reservedPages.includes(segments[0]) && !segments[0].includes('.')) {
@@ -54,7 +52,6 @@ export function getRelativePath(): string {
   return pathname;
 }
 
-// Helper to parse current URL into application route state
 interface RouteState {
   page: string;
   projectId: string | null;
@@ -71,7 +68,6 @@ function parseCurrentUrl(): RouteState {
   const searchParams = new URLSearchParams(window.location.search);
   const paramProjectId = searchParams.get('project') || searchParams.get('id');
 
-  // Match /project/:id or /classes/:id (excluding reserved page names)
   const projectMatch = relPath.match(/^\/(?:project|classes)\/([a-zA-Z0-9_-]+)$/);
   const reservedPages = ['home', 'schedule', 'classes', 'congestion', 'bookmarks', 'timeline', 'map', 'faq', 'admin'];
   
@@ -106,7 +102,6 @@ function parseCurrentUrl(): RouteState {
 export default function App() {
   const [appData, setAppData] = useState<AppDataState>(() => loadAppData());
   
-  // Initialize navigation state directly from the browser URL
   const initialRoute = parseCurrentUrl();
   const [currentPage, setCurrentPage] = useState<string>(initialRoute.page);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(initialRoute.projectId);
@@ -116,17 +111,15 @@ export default function App() {
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(() => typeof window !== 'undefined' && window.location.hash === '#search');
   const [showPwaModal, setShowPwaModal] = useState<boolean>(false);
 
-  // Synchronized state references to prevent re-creation loops
   const appDataRef = React.useRef(appData);
   appDataRef.current = appData;
 
   const isSyncingRef = React.useRef(false);
 
-  // Top level initial background sync state
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
-  const [syncedCount, setSyncedCount] = useState(0);
+  const [, setSyncedCount] = useState(0);
 
   const syncCongestion = useCallback(async () => {
     const currentData = appDataRef.current;
@@ -189,7 +182,7 @@ export default function App() {
       ]);
     } catch (e: any) {
       console.error('Background sync failed:', e);
-      setSyncError(e.message || 'データ同期エラー');
+      setSyncError(e.message || 'Error');
     } finally {
       isSyncingRef.current = false;
       setIsSyncing(false);
@@ -198,11 +191,9 @@ export default function App() {
 
   const pendingAnchorRef = useRef<string | null>(null);
 
-  // Dedicated robust anchor scroll helper with retry mechanism
   const scrollToAnchor = useCallback((anchorId: string, retryCount = 0) => {
     if (!anchorId) return;
 
-    // Ensure document body is scrollable (not locked by any drawer/modal)
     document.body.style.overflow = '';
 
     const el = document.getElementById(anchorId);
@@ -219,7 +210,6 @@ export default function App() {
       return;
     }
 
-    // If element is not yet in DOM (e.g. during page transition or layout), retry up to 30 times (every 40ms = 1.2s)
     if (retryCount < 30) {
       setTimeout(() => {
         scrollToAnchor(anchorId, retryCount + 1);
@@ -236,7 +226,6 @@ export default function App() {
     }
   }, [currentPage]);
 
-  // Primary URL-aware navigation handler
   const handleNavigate = useCallback((page: string, anchorOrProjectId?: string, replace: boolean = false) => {
     if (page === 'classDetail' && anchorOrProjectId) {
       handleSelectProject(anchorOrProjectId);
@@ -322,14 +311,12 @@ export default function App() {
     }
   }, []);
 
-  // Sync browser back / forward navigation events
   useEffect(() => {
     const handlePopState = () => {
       const route = parseCurrentUrl();
       setCurrentPage(route.page);
       setSelectedProjectId(route.projectId);
 
-      // Handle modals based on hash
       const currentHash = window.location.hash;
       setIsSearchOpen(currentHash === '#search');
       setIsTocOpen(currentHash === '#toc' || currentHash === '#menu');
@@ -342,14 +329,12 @@ export default function App() {
 
     window.addEventListener('popstate', handlePopState);
 
-    // Initial normalize if user opens root "/" or repository root
     const basePath = getAppBasePath();
     const currentPath = window.location.pathname;
     if (currentPath === '/' || currentPath === basePath || currentPath === `${basePath}/`) {
       window.history.replaceState({ page: 'home', projectId: null }, '', `${basePath}/home`);
     }
 
-    // Scroll to initial anchor if present
     if (initialRoute.anchor) {
       pendingAnchorRef.current = initialRoute.anchor;
       scrollToAnchor(initialRoute.anchor);
@@ -361,7 +346,6 @@ export default function App() {
   }, [scrollToAnchor]);
 
   useEffect(() => {
-    // Fetch latest app data from server on mount for online sync
     fetchServerAppData().then((serverData) => {
       if (serverData) {
         setAppData(serverData);
@@ -369,15 +353,12 @@ export default function App() {
       }
     });
 
-    // Initial immediate fetch for both
     syncNow();
 
-    // 1. Congestion live sync: 1 minute (60 seconds) interval as standard
     const congestionTimer = setInterval(() => {
       syncCongestion();
     }, 60000);
 
-    // 2. Announcements live sync: 45 seconds fixed interval
     const announcementTimer = setInterval(() => {
       syncAnnouncements();
     }, 45000);
@@ -520,14 +501,12 @@ export default function App() {
         onOpenToc={handleOpenToc} 
       />
 
-      {/* Mobile Sticky Bottom Navigation */}
       <BottomNav
         currentPage={currentPage}
         setCurrentPage={(page) => handleNavigate(page)}
         bookmarksCount={(bookmarks || []).length}
       />
 
-      {/* Quick Search Modal */}
       <SearchModal
         isOpen={isSearchOpen}
         onClose={handleCloseSearch}
@@ -536,7 +515,6 @@ export default function App() {
         onNavigate={handleNavigate}
       />
 
-      {/* Table of Contents / Hamburger Menu Modal */}
       <TableOfContentsModal
         isOpen={isTocOpen}
         onClose={handleCloseToc}
@@ -550,13 +528,11 @@ export default function App() {
         isAdminLoggedIn={isAdminLoggedIn}
       />
 
-      {/* PWA Install Guide Banner & Modal */}
       <PwaInstallBanner
         forceShowModal={showPwaModal}
         onCloseModal={() => setShowPwaModal(false)}
       />
 
-      {/* Class Detail Modal */}
       {selectedProject && (
         <ClassDetailModal
           project={selectedProject}

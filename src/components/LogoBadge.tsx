@@ -10,9 +10,8 @@ export const LogoBadge: React.FC<LogoBadgeProps> = ({ className = "w-10 h-10", s
   return (
     <img 
       src={logoImg} 
-      alt="SG FESTIVAL ロゴ" 
+      alt="SG FESTIVAL" 
       onError={(e) => {
-        // Fallback to /logo.png if asset import fails
         (e.currentTarget as HTMLImageElement).src = './logo.png';
       }}
       className={`${className} object-contain shrink-0 drop-shadow-2xs`} 
@@ -21,5 +20,3 @@ export const LogoBadge: React.FC<LogoBadgeProps> = ({ className = "w-10 h-10", s
     />
   );
 };
-
-
