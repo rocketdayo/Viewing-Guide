@@ -424,6 +424,7 @@ export default function App() {
                   onNavigate={handleNavigate}
                   onSelectProject={handleSelectProject}
                   onOpenToc={handleOpenToc}
+                  onOpenPwaModal={() => setShowPwaModal(true)}
                   bookmarks={bookmarks || []}
                 />
               )}

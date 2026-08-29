@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, 
   Calendar, 
@@ -18,7 +18,8 @@ import {
   ArrowRight,
   GraduationCap,
   HelpCircle,
-  Share2
+  Share2,
+  WifiOff
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { AppDataState, ClassProject } from '../types';
@@ -33,6 +34,7 @@ interface HomeViewProps {
   onNavigate: (page: string, anchor?: string) => void;
   onSelectProject: (projectId: string) => void;
   onOpenToc: () => void;
+  onOpenPwaModal?: () => void;
   bookmarks?: string[];
 }
 
@@ -41,12 +43,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onNavigate,
   onSelectProject,
   onOpenToc,
+  onOpenPwaModal,
   bookmarks = [],
 }) => {
   const { language, t } = useI18n();
   const [selectedGreetingTab, setSelectedGreetingTab] = useState<string>(
     appData?.greetings?.[0]?.id || ''
   );
+  const [isOffline, setIsOffline] = useState<boolean>(typeof navigator !== 'undefined' ? !navigator.onLine : false);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   const projects = appData?.projects || [];
   const featuredProjects = projects.slice(0, 4);
@@ -115,7 +130,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div className="bg-white p-5 border border-slate-300/90 shadow-2xs space-y-2.5">
                 <div className="flex flex-wrap items-center justify-between text-xs font-mono border-b border-slate-100 pb-2 gap-2">
                   <span className="text-emerald-800 font-bold uppercase tracking-wider">{t.heroInfoLabel}</span>
-                  <span className="text-amber-800 bg-amber-50 px-2.5 py-0.5 border border-amber-200 font-sans font-semibold text-[11px]">{t.heroAudience}</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-700 pt-1">
                   <div className="flex items-center space-x-2">
@@ -154,7 +168,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     <Activity className="w-4 h-4 text-emerald-700" />
                     <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900">{t.heroTodayStatus}</span>
                   </div>
-                  <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 font-mono font-bold">{t.heroOperating}</span>
+                  {isOffline ? (
+                    <span className="text-[10px] bg-amber-500 text-white px-2 py-0.5 font-mono font-bold flex items-center gap-1">
+                      <WifiOff className="w-3 h-3" />
+                      {language === 'en' ? 'OFFLINE MODE' : 'オフラインです'}
+                    </span>
+                  ) : (
+                    <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 font-mono font-bold">{t.heroOperating}</span>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -171,6 +192,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     </div>
                   </div>
                 </div>
+
+                {isOffline && (
+                  <div className="p-3 bg-amber-50 border border-amber-300 text-amber-950 text-xs flex items-start space-x-2">
+                    <WifiOff className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold">{language === 'en' ? 'Offline mode active' : '現在オフラインです'}</p>
+                      <p className="text-[11px] text-amber-900 leading-snug">
+                        {language === 'en'
+                          ? 'Viewing saved map, timetable, and exhibition data.'
+                          : '保存された校内マップ・企画・タイムテーブル情報を表示しています。'}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {pinnedAnnouncement && (
                   <div 
@@ -365,7 +400,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
-      <AnnouncementsSection announcements={appData?.announcements || []} />
+      <AnnouncementsSection 
+        announcements={appData?.announcements || []} 
+        onOpenPwaModal={onOpenPwaModal}
+      />
 
       <AlumniSection />
 

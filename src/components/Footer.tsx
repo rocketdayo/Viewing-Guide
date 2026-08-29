@@ -41,7 +41,7 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
             <div className="text-xs text-slate-400 pt-1 space-y-1">
               <p className="flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                <span>{language === 'en' ? '380-1 Suehirocho, Kawachinagano, Osaka (10 min walk from Kawachinagano Station)' : '大阪府河内長野市末広町380-1（南海高野線・近鉄長野線 河内長野駅より徒歩約10分）'}</span>
+                <span>{language === 'en' ? '〒586-8585 623 Suehiro-cho, Kawachinagano-shi, Osaka (approx. 10 min walk from Kawachinagano Station)' : '〒586-8585 大阪府河内長野市末広町623（南海高野線・近鉄長野線 河内長野駅より徒歩約10分）'}</span>
               </p>
             </div>
           </div>

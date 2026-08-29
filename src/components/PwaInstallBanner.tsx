@@ -17,15 +17,38 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
   const [isDismissed, setIsDismissed] = useState<boolean>(() => {
     return localStorage.getItem('seikyo_pwa_banner_dismissed') === 'true';
   });
-  const [isStandalone, setIsStandalone] = useState<boolean>(false);
+  const [isStandalone, setIsStandalone] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true ||
+      document.referrer.includes('android-app://')
+    );
+  });
+  const [isInstalled, setIsInstalled] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const standalone = (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true ||
+      document.referrer.includes('android-app://')
+    );
+    return standalone || localStorage.getItem('seikyo_pwa_installed') === 'true';
+  });
   const [isIOS, setIsIOS] = useState<boolean>(false);
   const [showIOSModal, setShowIOSModal] = useState<boolean>(false);
-  const [isOffline, setIsOffline] = useState<boolean>(!navigator.onLine);
+  const [isOffline, setIsOffline] = useState<boolean>(typeof navigator !== 'undefined' ? !navigator.onLine : false);
 
   useEffect(() => {
-    const checkStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as any).standalone === true;
+    const checkStandalone = 
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true ||
+      document.referrer.includes('android-app://');
+    
     setIsStandalone(checkStandalone);
+    if (checkStandalone) {
+      setIsInstalled(true);
+      localStorage.setItem('seikyo_pwa_installed', 'true');
+    }
 
     const userAgent = window.navigator.userAgent.toLowerCase();
     const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
@@ -36,7 +59,15 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
       setDeferredPrompt(e);
     };
 
+    const handleAppInstalled = () => {
+      setIsInstalled(true);
+      setIsStandalone(true);
+      setDeferredPrompt(null);
+      localStorage.setItem('seikyo_pwa_installed', 'true');
+    };
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
 
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
@@ -46,6 +77,7 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
@@ -57,6 +89,8 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
         setDeferredPrompt(null);
+        setIsInstalled(true);
+        localStorage.setItem('seikyo_pwa_installed', 'true');
       }
     } else if (isIOS) {
       setShowIOSModal(true);
@@ -90,7 +124,7 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
         )}
       </AnimatePresence>
 
-      {!isStandalone && !isDismissed && (deferredPrompt || isIOS) && (
+      {!isInstalled && !isStandalone && !isDismissed && (deferredPrompt || isIOS) && (
         <aside 
           aria-label={t.pwaInstallTitle}
           className="fixed bottom-16 sm:bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-md z-40 bg-emerald-950/95 backdrop-blur-md text-white p-3.5 rounded-xs border border-emerald-700/60 shadow-xl"
