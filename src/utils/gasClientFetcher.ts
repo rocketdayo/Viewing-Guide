@@ -18,9 +18,6 @@ export function getGoogleSpreadsheetGvizUrl(targetUrl: string): string {
   return getGoogleSpreadsheetCsvUrl(targetUrl);
 }
 
-/**
- * Convert Google Spreadsheet view/edit/pub URLs to a direct CSV export URL
- */
 export function getGoogleSpreadsheetCsvUrl(targetUrl: string): string {
   let fetchUrl = targetUrl.trim();
   if (!fetchUrl.includes("docs.google.com/spreadsheets")) {
@@ -38,9 +35,6 @@ export function getGoogleSpreadsheetCsvUrl(targetUrl: string): string {
   return fetchUrl;
 }
 
-/**
- * Robust RFC-4180 compliant CSV parser to handle quotes, commas, and MULTILINE cells
- */
 export function parseFullCSV(text: string): string[][] {
   if (!text || typeof text !== 'string') return [];
   const rows: string[][] = [];
@@ -55,7 +49,7 @@ export function parseFullCSV(text: string): string[][] {
     if (inQuotes) {
       if (char === '"' && nextChar === '"') {
         currentField += '"';
-        i++; // Skip the second quote
+        i++;
       } else if (char === '"') {
         inQuotes = false;
       } else {
@@ -69,7 +63,7 @@ export function parseFullCSV(text: string): string[][] {
         currentField = '';
       } else if (char === '\r') {
         if (nextChar === '\n') {
-          i++; // Skip \n
+          i++;
         }
         currentRow.push(currentField.trim());
         rows.push(currentRow);
@@ -86,7 +80,6 @@ export function parseFullCSV(text: string): string[][] {
     }
   }
 
-  // Push last field and row if any remaining
   if (currentField.length > 0 || currentRow.length > 0) {
     currentRow.push(currentField.trim());
     rows.push(currentRow);
@@ -95,9 +88,6 @@ export function parseFullCSV(text: string): string[][] {
   return rows;
 }
 
-/**
- * Robust CSV line parser to handle quotes and commas inside single-line cells
- */
 export function parseCSVLine(text: string): string[] {
   if (!text || typeof text !== 'string') return [];
   const result: string[] = [];
@@ -121,9 +111,6 @@ export function parseCSVLine(text: string): string[] {
   return result;
 }
 
-/**
- * Check if a cell value represents a pinned announcement
- */
 export function checkIsPinned(val: any): boolean {
   if (val === true || val === 1) return true;
   if (!val) return false;
@@ -148,47 +135,53 @@ export function checkIsPinned(val: any): boolean {
   );
 }
 
-/**
- * Parse raw CSV text from Google Spreadsheet into Congestion data
- */
 export function parseGasCongestionCsv(rawText: string): Record<string, GasParsedItem> {
   if (!rawText || typeof rawText !== 'string') return {};
   const rows = parseFullCSV(rawText);
   const results: Record<string, GasParsedItem> = {};
 
-  for (let i = 1; i < rows.length; i++) {
+  for (let i = 0; i < rows.length; i++) {
     const parts = rows[i];
     if (!parts || parts.length === 0) continue;
 
     const rawClassCode = parts[0]?.trim() || "";
-
-    // Normalize class code: e.g. "1A", "1-A", "1年A組", "1a" -> "1A"
     const cleaned = rawClassCode.replace(/[\s\-_]/g, "").toUpperCase();
     const classMatch = cleaned.match(/^([0-9])(?:年)?([A-Z])(?:組)?$/);
     if (!classMatch) continue;
     const classCode = `${classMatch[1]}${classMatch[2]}`;
 
-    const statusText = parts[1]?.trim() || "";
-    const waitRaw = parts[2]?.trim() || "0";
-    const detailText = parts[3]?.trim() || "";
+    let statusText = "";
+    let waitRaw = "0";
+    let detailText = "";
+
+    if (parts.length >= 5 || (parts[1] && /^[a-z0-9]{6,12}$/i.test(parts[1]))) {
+      statusText = parts[2]?.trim() || "";
+      waitRaw = parts[3]?.trim() || "0";
+      detailText = parts[4]?.trim() || "";
+    } else {
+      statusText = parts[1]?.trim() || "";
+      waitRaw = parts[2]?.trim() || "0";
+      detailText = parts[3]?.trim() || "";
+    }
 
     const waitNumMatch = waitRaw.match(/(\d+)/);
     const waitMinutes = waitNumMatch ? parseInt(waitNumMatch[1], 10) : 0;
 
     let level: "smooth" | "moderate" | "crowded" | "ticket" | "closed" = "smooth";
-    if (statusText.includes("大混") || statusText.includes("混んでいる") || statusText.includes("混雑") || waitMinutes >= 35) {
-      level = "crowded";
-    } else if (statusText.includes("普通") || statusText.includes("やや") || waitMinutes >= 15) {
-      level = "moderate";
-    } else if (statusText.includes("券") || statusText.includes("整理券")) {
-      level = "ticket";
-    } else if (
+    if (
       statusText.includes("休") ||
       statusText.includes("終了") ||
       statusText.includes("閉") ||
-      statusText.includes("準備")
+      statusText.includes("準備") ||
+      statusText.includes("中止")
     ) {
       level = "closed";
+    } else if (statusText.includes("券") || statusText.includes("整理券")) {
+      level = "ticket";
+    } else if (statusText.includes("大混") || statusText.includes("混んでいる") || statusText.includes("混雑") || waitMinutes >= 35) {
+      level = "crowded";
+    } else if (statusText.includes("普通") || statusText.includes("やや") || waitMinutes >= 15) {
+      level = "moderate";
     } else if (statusText.includes("空") || statusText.includes("スムーズ") || statusText.includes("なし") || waitMinutes <= 5) {
       level = "smooth";
     }
@@ -206,14 +199,10 @@ export function parseGasCongestionCsv(rawText: string): Record<string, GasParsed
   return results;
 }
 
-/**
- * Parse raw CSV or JSON text into Announcements
- */
 export function parseAnnouncementCsvOrJson(rawText: string): Announcement[] {
   if (!rawText || typeof rawText !== 'string') return [];
   const trimmed = rawText.trim();
 
-  // Try parsing JSON if GAS Web App returns JSON
   if (trimmed.startsWith("[") || (trimmed.startsWith("{") && !trimmed.startsWith("<!DOCTYPE"))) {
     try {
       const parsed = JSON.parse(trimmed);
@@ -236,7 +225,6 @@ export function parseAnnouncementCsvOrJson(rawText: string): Announcement[] {
           };
         }).filter((a: Announcement) => a.title);
 
-        // Sort pinned items to top
         return list.sort((a: Announcement, b: Announcement) => {
           if (a.isPinned && !b.isPinned) return -1;
           if (!a.isPinned && b.isPinned) return 1;
@@ -244,14 +232,12 @@ export function parseAnnouncementCsvOrJson(rawText: string): Announcement[] {
         });
       }
     } catch {
-      // Not JSON, continue to CSV parsing
     }
   }
 
   const rows = parseFullCSV(rawText);
   if (rows.length === 0) return [];
 
-  // Inspect Header Row (Row 0) to detect column indices if available
   let dateCol = 0;
   let categoryCol = 1;
   let titleCol = 2;
@@ -282,7 +268,6 @@ export function parseAnnouncementCsvOrJson(rawText: string): Announcement[] {
       }
     });
 
-    // If row 0 did not look like a header (e.g. no header row in sheet), start from row 0
     if (!foundHeaders && rows[0].length >= 3 && !rows[0][0].includes("日時") && !rows[0][2].includes("タイトル")) {
       startRow = 0;
     }
@@ -319,7 +304,6 @@ export function parseAnnouncementCsvOrJson(rawText: string): Announcement[] {
     });
   }
 
-  // Sort pinned announcements to top
   announcements.sort((a, b) => {
     if (a.isPinned && !b.isPinned) return -1;
     if (!a.isPinned && b.isPinned) return 1;
@@ -329,14 +313,10 @@ export function parseAnnouncementCsvOrJson(rawText: string): Announcement[] {
   return announcements;
 }
 
-/**
- * Fetch raw text with direct fetch (gviz/export) and fallback to CORS proxies
- */
 export async function fetchRawTextDirect(targetUrl: string): Promise<string> {
   const gvizUrl = getGoogleSpreadsheetGvizUrl(targetUrl);
   const csvUrl = getGoogleSpreadsheetCsvUrl(targetUrl);
 
-  // Attempt 1: Direct gviz fetch
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
@@ -352,10 +332,8 @@ export async function fetchRawTextDirect(targetUrl: string): Promise<string> {
       }
     }
   } catch {
-    // Direct gviz failed, try other methods
   }
 
-  // Attempt 2: Direct CSV export fetch
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
@@ -371,10 +349,8 @@ export async function fetchRawTextDirect(targetUrl: string): Promise<string> {
       }
     }
   } catch {
-    // Direct CSV export failed, try proxy
   }
 
-  // Attempt 3: CORS Proxy via allorigins
   try {
     const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(csvUrl)}`;
     const controller = new AbortController();
@@ -388,10 +364,8 @@ export async function fetchRawTextDirect(targetUrl: string): Promise<string> {
       }
     }
   } catch {
-    // allorigins failed
   }
 
-  // Attempt 4: CORS Proxy via corsproxy.io
   try {
     const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(csvUrl)}`;
     const controller = new AbortController();
@@ -405,15 +379,11 @@ export async function fetchRawTextDirect(targetUrl: string): Promise<string> {
       }
     }
   } catch {
-    // corsproxy failed
   }
 
   throw new Error("スプレッドシート・GASからの直接取得に失敗しました");
 }
 
-/**
- * Main Congestion fetcher (supports both backend API and static browser client)
- */
 export async function fetchLiveGasCongestionSmart(gasUrl?: string): Promise<GasSyncResult> {
   const targetUrl = gasUrl || DEFAULT_CONGESTION_URL;
 
@@ -422,7 +392,6 @@ export async function fetchLiveGasCongestionSmart(gasUrl?: string): Promise<GasS
     window.location.protocol === 'file:'
   );
 
-  // First, try Express backend /api/congestion-live if available and NOT on static host
   if (!isStaticHost) {
     try {
       const apiUrl = `/api/congestion-live?url=${encodeURIComponent(targetUrl)}`;
@@ -444,11 +413,9 @@ export async function fetchLiveGasCongestionSmart(gasUrl?: string): Promise<GasS
         }
       }
     } catch {
-      // Backend API unavailable or failed
     }
   }
 
-  // Fallback / Static host: Direct client browser fetch
   try {
     const rawText = await fetchRawTextDirect(targetUrl);
     const data = parseGasCongestionCsv(rawText);
@@ -467,9 +434,6 @@ export async function fetchLiveGasCongestionSmart(gasUrl?: string): Promise<GasS
   }
 }
 
-/**
- * Main Announcement fetcher (supports both backend API and static browser client)
- */
 export async function fetchLiveAnnouncementsSmart(gasUrl?: string): Promise<AnnouncementSyncResult> {
   const targetUrl = gasUrl || DEFAULT_ANNOUNCEMENT_URL;
 
@@ -478,7 +442,6 @@ export async function fetchLiveAnnouncementsSmart(gasUrl?: string): Promise<Anno
     window.location.protocol === 'file:'
   );
 
-  // First, try Express backend /api/announcements-live if available and NOT on static host
   if (!isStaticHost) {
     try {
       const apiUrl = `/api/announcements-live?url=${encodeURIComponent(targetUrl)}`;
@@ -500,11 +463,9 @@ export async function fetchLiveAnnouncementsSmart(gasUrl?: string): Promise<Anno
         }
       }
     } catch {
-      // Backend API unavailable or failed
     }
   }
 
-  // Fallback / Static host: Direct client browser fetch
   try {
     const rawText = await fetchRawTextDirect(targetUrl);
     const announcements = parseAnnouncementCsvOrJson(rawText);

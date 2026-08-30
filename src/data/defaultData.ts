@@ -4,6 +4,41 @@ export const INITIAL_GAS_URL = "https://docs.google.com/spreadsheets/d/154F3vcdc
 export const INITIAL_ANNOUNCEMENT_URL = "https://docs.google.com/spreadsheets/d/1Ajv5ErGHjhIz740IaB-IqhywYkV66dREwOdk7G3EiEg/edit?gid=0#gid=0";
 export const ANNOUNCEMENT_PORTAL_URL = "https://script.google.com/a/macros/stu.seikyo.ed.jp/s/AKfycbwsTDpMSe6Kdr1RoQ8TVByVtVVqAZG5q3mSvPmMxhH_SRUx8wZSwJdaKD8qwwphmAgaEg/exec";
 
+export const CLASS_CONGESTION_BASE_URL = "https://script.google.com/a/macros/stu.seikyo.ed.jp/s/AKfycbw9YPL2B506p_7KNog97UfAaO4JXRYma5HBmzY5MCIguxxzkm_E3e6tIysFdbuS1Jjm9g/exec?";
+
+export const CLASS_CONGESTION_TOKENS: Record<string, string> = {
+  '1A': 'a7k9p2x4',
+  '1B': 'm3v8q1z6',
+  '1C': 'j5w2r9f8',
+  '1D': 'b4n6t0y1',
+  '1E': 'g8c1k3s7',
+  '1F': 'd2p9v4m5',
+  '1G': 'x0z7f1w3',
+  '1H': 'h6r3n8q2',
+  '1I': 't1y5b9c4',
+  '1J': 'k4m8s2p0',
+  '2A': 'v9f3w7z1',
+  '2B': 'q2r6n0t8',
+  '2C': 'c5y1k4m9',
+  '2D': 's8z3p7v2',
+  '2E': 'f0w5r2g6',
+  '2F': 'n7t9y1b4',
+  '2G': 'p3c8m6k0',
+  '2H': 'z1v4f9w2',
+  '2I': 'r6q0t5n8',
+  '2J': 'w2k7y3c1',
+  '2K': 'y9m1z8p4',
+};
+
+export function getClassCongestionInputUrl(classCode: string): string {
+  const normalized = classCode.replace(/[\s\-_]/g, '').toUpperCase();
+  const token = CLASS_CONGESTION_TOKENS[normalized] || '';
+  if (token) {
+    return `${CLASS_CONGESTION_BASE_URL}${token}`;
+  }
+  return `${CLASS_CONGESTION_BASE_URL}${classCode}`;
+}
+
 export const INITIAL_APP_DATA: AppDataState = {
   festivalTitle: "2026 清教学園 中高合同文化祭 SG fes",
   festivalTheme: "清教エナジー！～1度しかない学園生活を楽しもう～",

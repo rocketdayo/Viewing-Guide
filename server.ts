@@ -198,39 +198,48 @@ async function fetchAndParseGas(targetUrl: string) {
     }
   > = {};
 
-  for (let i = 1; i < rows.length; i++) {
+  for (let i = 0; i < rows.length; i++) {
     const parts = rows[i];
     if (!parts || parts.length === 0) continue;
 
     const rawClassCode = parts[0]?.trim() || "";
-
-    // Normalize class code: e.g. "1A", "1-A", "1年A組", "1a" -> "1A"
     const cleaned = rawClassCode.replace(/[\s\-_]/g, "").toUpperCase();
     const classMatch = cleaned.match(/^([0-9])(?:年)?([A-Z])(?:組)?$/);
     if (!classMatch) continue;
     const classCode = `${classMatch[1]}${classMatch[2]}`;
 
-    const statusText = parts[1]?.trim() || "";
-    const waitRaw = parts[2]?.trim() || "0";
-    const detailText = parts[3]?.trim() || "";
+    let statusText = "";
+    let waitRaw = "0";
+    let detailText = "";
+
+    if (parts.length >= 5 || (parts[1] && /^[a-z0-9]{6,12}$/i.test(parts[1]))) {
+      statusText = parts[2]?.trim() || "";
+      waitRaw = parts[3]?.trim() || "0";
+      detailText = parts[4]?.trim() || "";
+    } else {
+      statusText = parts[1]?.trim() || "";
+      waitRaw = parts[2]?.trim() || "0";
+      detailText = parts[3]?.trim() || "";
+    }
 
     const waitNumMatch = waitRaw.match(/(\d+)/);
     const waitMinutes = waitNumMatch ? parseInt(waitNumMatch[1], 10) : 0;
 
     let level: "smooth" | "moderate" | "crowded" | "ticket" | "closed" = "smooth";
-    if (statusText.includes("大混") || statusText.includes("混んでいる") || statusText.includes("混雑") || waitMinutes >= 35) {
-      level = "crowded";
-    } else if (statusText.includes("普通") || statusText.includes("やや") || waitMinutes >= 15) {
-      level = "moderate";
-    } else if (statusText.includes("券") || statusText.includes("整理券")) {
-      level = "ticket";
-    } else if (
+    if (
       statusText.includes("休") ||
       statusText.includes("終了") ||
       statusText.includes("閉") ||
-      statusText.includes("準備")
+      statusText.includes("準備") ||
+      statusText.includes("中止")
     ) {
       level = "closed";
+    } else if (statusText.includes("券") || statusText.includes("整理券")) {
+      level = "ticket";
+    } else if (statusText.includes("大混") || statusText.includes("混んでいる") || statusText.includes("混雑") || waitMinutes >= 35) {
+      level = "crowded";
+    } else if (statusText.includes("普通") || statusText.includes("やや") || waitMinutes >= 15) {
+      level = "moderate";
     } else if (statusText.includes("空") || statusText.includes("スムーズ") || statusText.includes("なし") || waitMinutes <= 5) {
       level = "smooth";
     }

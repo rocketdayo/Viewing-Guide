@@ -20,7 +20,7 @@ import {
   Radio
 } from 'lucide-react';
 import { AppDataState, Announcement, Greeting, ClassProject, ScheduleEvent, CongestionLevel } from '../types';
-import { ANNOUNCEMENT_PORTAL_URL } from '../data/defaultData';
+import { ANNOUNCEMENT_PORTAL_URL, getClassCongestionInputUrl, CLASS_CONGESTION_TOKENS } from '../data/defaultData';
 import { useI18n } from '../utils/i18n';
 
 interface AdminViewProps {
@@ -548,7 +548,8 @@ export const AdminView: React.FC<AdminViewProps> = ({
                       classCode = `${gradeNum}${letter}`;
                     }
 
-                    const gasUrl = `https://script.google.com/a/macros/stu.seikyo.ed.jp/s/AKfycbyv4N5J-H6SdqnzUrGErypC89TnpwPJ2tW7FpnZwmHg_cCD7-0ImMHUjrSLZ5GIis4xpA/exec?class=${classCode}`;
+                    const token = CLASS_CONGESTION_TOKENS[classCode] || '';
+                    const gasUrl = getClassCongestionInputUrl(classCode);
 
                     return (
                       <div
@@ -561,22 +562,22 @@ export const AdminView: React.FC<AdminViewProps> = ({
                               {proj.classNumber}
                             </span>
                             <span className="text-[10px] font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-600">
-                              class={classCode}
+                              {classCode} {token ? `(${token})` : ''}
                             </span>
                           </div>
                           <h3 className="text-sm font-bold text-slate-900 line-clamp-1">{proj.title}</h3>
                           <p className="text-[11px] text-slate-500">📍 {proj.location}</p>
                         </div>
 
-                        <div className="pt-2 border-t border-slate-100">
+                        <div className="pt-2 border-t border-slate-100 space-y-2">
                           <a
                             href={gasUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 py-2 px-3 rounded-xs shadow-2xs transition-colors"
+                            className="w-full inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 py-2 px-3 rounded-xs shadow-2xs transition-colors"
                             title={`${proj.classNumber} GAS`}
                           >
-                            <span>{language === 'en' ? `Open ${proj.classNumber} GAS` : `${proj.classNumber}のGASを開く`}</span>
+                            <span>{language === 'en' ? `Open ${proj.classNumber} GAS` : `${proj.classNumber}の入力サイトを開く`}</span>
                             <ExternalLink className="w-3.5 h-3.5" />
                           </a>
                         </div>
