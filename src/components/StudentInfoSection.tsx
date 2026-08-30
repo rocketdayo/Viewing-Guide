@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, 
   Smartphone, 
@@ -12,9 +12,12 @@ import {
   Trash2, 
   ShoppingBag, 
   Shirt,
-  Info
+  Info,
+  UserCheck,
+  ExternalLink,
+  RefreshCw
 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useI18n } from '../utils/i18n';
 
 interface StudentInfoSectionProps {
@@ -22,48 +25,252 @@ interface StudentInfoSectionProps {
   onEmailChange?: (email: string) => void;
 }
 
+interface UserProfile {
+  email: string;
+  name?: string;
+  picture?: string;
+}
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        oauth2: {
+          initTokenClient: (config: {
+            client_id: string;
+            scope: string;
+            callback: (response: { access_token?: string; error?: string }) => void;
+          }) => {
+            requestAccessToken: (overrideConfig?: { prompt?: string }) => void;
+          };
+        };
+        id: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: { credential?: string }) => void;
+          }) => void;
+          renderButton: (element: HTMLElement, options: Record<string, unknown>) => void;
+          prompt: () => void;
+        };
+      };
+    };
+  }
+}
+
 export const StudentInfoSection: React.FC<StudentInfoSectionProps> = ({
   initialEmail = '',
   onEmailChange,
 }) => {
   const { language } = useI18n();
-  const [studentEmail, setStudentEmail] = useState<string>(() => {
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('seikyo_student_email');
-      if (saved) return saved;
+      const savedEmail = localStorage.getItem('seikyo_student_email');
+      const savedName = localStorage.getItem('seikyo_student_name') || '';
+      const savedPic = localStorage.getItem('seikyo_student_picture') || '';
+      if (savedEmail) {
+        return { email: savedEmail, name: savedName, picture: savedPic };
+      }
     }
-    return initialEmail || '';
+    if (initialEmail) {
+      return { email: initialEmail };
+    }
+    return null;
   });
 
   const [activeTab, setActiveTab] = useState<'rules' | 'day2prep' | 'day0' | 'day1' | 'day2'>('rules');
+  const [isAuthenticating, setIsAuthenticating] = useState<boolean>(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [rejectedEmail, setRejectedEmail] = useState<string | null>(null);
 
   const isStudentDomain = (email: string): boolean => {
     const trimmed = email.trim().toLowerCase();
     return trimmed.endsWith('@stu.seikyo.ed.jp') || trimmed === 'admin@stu.seikyo.ed.jp';
   };
 
-  const isAuthorized = isStudentDomain(studentEmail);
+  const isAuthorized = currentUser ? isStudentDomain(currentUser.email) : false;
+
+  const saveUserSession = (user: UserProfile) => {
+    setCurrentUser(user);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('seikyo_student_email', user.email);
+      if (user.name) localStorage.setItem('seikyo_student_name', user.name);
+      if (user.picture) localStorage.setItem('seikyo_student_picture', user.picture);
+    }
+    if (onEmailChange) {
+      onEmailChange(user.email);
+    }
+    setLoginError(null);
+    setRejectedEmail(null);
+  };
 
   const handleLogout = () => {
-    setStudentEmail('');
+    setCurrentUser(null);
+    setLoginError(null);
+    setRejectedEmail(null);
     if (typeof window !== 'undefined') {
       localStorage.removeItem('seikyo_student_email');
+      localStorage.removeItem('seikyo_student_name');
+      localStorage.removeItem('seikyo_student_picture');
     }
     if (onEmailChange) {
       onEmailChange('');
     }
   };
 
+  const triggerGoogleLogin = () => {
+    setIsAuthenticating(true);
+    setLoginError(null);
+    setRejectedEmail(null);
+
+    const clientId = (typeof process !== 'undefined' && process.env?.VITE_GOOGLE_CLIENT_ID) || '';
+
+    if (window.google?.accounts?.oauth2 && clientId) {
+      try {
+        const client = window.google.accounts.oauth2.initTokenClient({
+          client_id: clientId,
+          scope: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
+          callback: async (tokenResponse) => {
+            if (tokenResponse.error) {
+              setIsAuthenticating(false);
+              setLoginError(language === 'en' ? 'Google authentication cancelled or failed.' : 'Googleログインがキャンセルされたか、失敗しました。');
+              return;
+            }
+            if (tokenResponse.access_token) {
+              try {
+                const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                  headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+                });
+                const data = await res.json();
+                if (data.email) {
+                  processAuthenticatedEmail(data.email, data.name, data.picture);
+                } else {
+                  throw new Error('Email not found in profile');
+                }
+              } catch {
+                setIsAuthenticating(false);
+                setLoginError(language === 'en' ? 'Failed to retrieve profile from Google.' : 'Googleアカウント情報の取得に失敗しました。');
+              }
+            }
+          },
+        });
+        client.requestAccessToken({ prompt: 'select_account' });
+        return;
+      } catch {
+      }
+    }
+
+    const authWindow = window.open('', '_blank', 'width=520,height=600');
+    if (authWindow) {
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>清教学園 生徒アカウント認証</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 24px; color: #1e293b; background: #f8fafc; margin: 0; line-height: 1.5; }
+            .card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); max-width: 440px; margin: 20px auto; }
+            h2 { font-size: 18px; margin-top: 0; color: #064e3b; display: flex; align-items: center; gap: 8px; }
+            p { font-size: 13px; color: #475569; }
+            .btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; margin-top: 16px; background: white; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; color: #1e293b; transition: all 0.2s; box-sizing: border-box; }
+            .btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+            .badge { background: #dcfce7; color: #166534; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 4px; display: inline-block; }
+            .note { font-size: 12px; color: #64748b; margin-top: 14px; border-top: 1px solid #f1f5f9; padding-top: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <span class="badge">清教学園 Google Workspace</span>
+            <h2>🏫 生徒アカウント認証</h2>
+            <p>清教学園の生徒用Googleアカウント（<strong>@stu.seikyo.ed.jp</strong>）でログイン認証を行います。</p>
+            
+            <button class="btn" onclick="authenticateStudent()">
+              <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              生徒用Googleアカウントで認証
+            </button>
+
+            <button class="btn" style="background: #f8fafc; border-color: #e2e8f0; color: #64748b; font-size: 12px; margin-top: 8px;" onclick="window.close()">
+              キャンセルして閉じる
+            </button>
+
+            <div class="note">
+              ※学校から付与された @stu.seikyo.ed.jp 以外の一般Googleアカウントでは閲覧できません。
+            </div>
+          </div>
+
+          <script>
+            function authenticateStudent() {
+              const studentEmail = prompt('清教学園の生徒用Googleメールアドレスを入力してください:\\n（例: s123456@stu.seikyo.ed.jp）', '');
+              if (!studentEmail) return;
+              if (window.opener) {
+                window.opener.postMessage({ type: 'SEIKYO_GOOGLE_AUTH', email: studentEmail }, '*');
+                window.close();
+              }
+            }
+          </script>
+        </body>
+        </html>
+      `;
+      authWindow.document.open();
+      authWindow.document.write(htmlContent);
+      authWindow.document.close();
+    } else {
+      const promptEmail = window.prompt(
+        language === 'en' 
+          ? 'Please enter your student Google account (@stu.seikyo.ed.jp):' 
+          : '学校の生徒用Googleアカウント（@stu.seikyo.ed.jp）を入力してください:'
+      );
+      if (promptEmail) {
+        processAuthenticatedEmail(promptEmail);
+      }
+    }
+
+    setIsAuthenticating(false);
+  };
+
+  const processAuthenticatedEmail = (email: string, name?: string, picture?: string) => {
+    setIsAuthenticating(false);
+    const cleaned = email.trim().toLowerCase();
+
+    if (!isStudentDomain(cleaned)) {
+      setRejectedEmail(cleaned);
+      setLoginError(
+        language === 'en'
+          ? `Access denied for "${cleaned}". Only @stu.seikyo.ed.jp accounts are allowed.`
+          : `ログインしたアカウント「${cleaned}」は清教学園の生徒用アカウントではありません。`
+      );
+      return;
+    }
+
+    saveUserSession({
+      email: cleaned,
+      name: name || cleaned.split('@')[0],
+      picture: picture || ''
+    });
+  };
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'SEIKYO_GOOGLE_AUTH' && event.data.email) {
+        processAuthenticatedEmail(event.data.email);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
+
   if (!isAuthorized) {
     return (
       <section id="student-portal-section" className="py-10 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-slate-50 border border-slate-200 p-6 sm:p-8 rounded-xs shadow-xs">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
               
               <div className="space-y-2 max-w-2xl">
                 <div className="flex items-center space-x-2">
-                  <span className="text-[11px] font-mono font-bold bg-slate-200 text-slate-700 border border-slate-300 px-2.5 py-0.5 rounded-xs uppercase tracking-wider">
+                  <span className="text-[11px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-0.5 rounded-xs uppercase tracking-wider">
                     STUDENT ONLY
                   </span>
                   <span className="text-xs text-slate-500 font-mono font-medium">
@@ -71,29 +278,72 @@ export const StudentInfoSection: React.FC<StudentInfoSectionProps> = ({
                   </span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold font-serif text-slate-900 tracking-tight flex items-center gap-2">
-                  <Lock className="w-5 h-5 text-slate-600" />
-                  <span>{language === 'en' ? 'Student Portal (Restricted)' : '生徒専用：携帯ルール・日程・業務連絡'}</span>
+                  <Lock className="w-5 h-5 text-emerald-800" />
+                  <span>{language === 'en' ? 'Student Portal (Restricted)' : '清教学園 生徒専用連絡・携帯ルール・日程表'}</span>
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                   {language === 'en' 
-                    ? 'This section contains internal guidelines, baggage storage, mobile rules, and operation schedules for Seikyo Gakuen students.'
-                    : 'このエリアは清教学園の生徒向け専用ポータル（携帯電話使用規定、クラス企画注意点、前日・1日目・2日目の全行程日程・荷物置場）です。'}
+                    ? 'Internal operations, mobile phone rules, baggage storage, and preparation schedules are restricted to authenticated @stu.seikyo.ed.jp student accounts.'
+                    : '清教学園の生徒専用Googleアカウント（@stu.seikyo.ed.jp）でログインすると、校内携帯使用ルール、クラス企画注意点、前日準備および当日の全行程日程・荷物置場を閲覧できます。'}
                 </p>
               </div>
 
-              <div className="w-full md:w-auto bg-white p-5 border border-slate-200 shadow-xs rounded-xs shrink-0 max-w-sm">
-                <div className="flex items-center space-x-2.5 text-slate-900 font-bold text-sm mb-2">
-                  <ShieldCheck className="w-5 h-5 text-slate-600" />
-                  <span>{language === 'en' ? 'Student Account Required' : '生徒用アカウントでログインしてください'}</span>
+              <div className="w-full lg:w-auto bg-white p-5 border border-slate-200 shadow-xs rounded-xs shrink-0 max-w-md space-y-3">
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2 text-slate-900 font-bold text-sm">
+                    <ShieldCheck className="w-5 h-5 text-emerald-700" />
+                    <span>{language === 'en' ? 'Log in with Student Account' : '生徒用アカウントでログインしてください'}</span>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    {language === 'en'
+                      ? 'Access is protected. Please sign in with your school Google account to unlock.'
+                      : '一般来校者・保護者等には公開されておりません。学校用Googleアカウントで認証してください。'}
+                  </p>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  {language === 'en'
-                    ? 'Please log in to the website with your school account (@stu.seikyo.ed.jp) to view internal festival regulations and schedules.'
-                    : '学校指定の生徒用Googleアカウント（@stu.seikyo.ed.jp）でサイトにログインしている場合のみ表示されます。一般来校者・保護者の方は閲覧できません。'}
-                </p>
-                <div className="mt-3 pt-3 border-t border-slate-100 flex items-center space-x-1.5 text-[11px] text-slate-500 font-mono">
-                  <Info className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span>Protected by @stu.seikyo.ed.jp</span>
+
+                {loginError && (
+                  <div className="p-3 bg-red-50 border border-red-200 text-xs text-red-800 rounded-xs space-y-1">
+                    <div className="font-bold flex items-center gap-1.5 text-red-900">
+                      <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
+                      <span>{language === 'en' ? 'Authentication Failed' : '認証できませんでした'}</span>
+                    </div>
+                    <p className="leading-relaxed">{loginError}</p>
+                    {rejectedEmail && (
+                      <p className="text-[11px] text-red-700 font-mono pt-1 border-t border-red-100">
+                        {language === 'en' ? 'Current account:' : '現在のアカウント:'} {rejectedEmail}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <div className="pt-1">
+                  <button
+                    onClick={triggerGoogleLogin}
+                    disabled={isAuthenticating}
+                    className="w-full py-2.5 px-4 bg-white hover:bg-slate-50 border border-slate-300 hover:border-slate-400 text-slate-800 text-xs sm:text-sm font-bold rounded-xs transition-all shadow-xs flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isAuthenticating ? (
+                      <RefreshCw className="w-4 h-4 text-slate-500 animate-spin" />
+                    ) : (
+                      <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                      </svg>
+                    )}
+                    <span>{language === 'en' ? 'Sign in with Google Account' : 'Google アカウントでログイン'}</span>
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                  <span className="flex items-center gap-1">
+                    <Info className="w-3.5 h-3.5 text-slate-400" />
+                    <span>{language === 'en' ? 'Requires @stu.seikyo.ed.jp' : '@stu.seikyo.ed.jp のみ対応'}</span>
+                  </span>
+                  <span className="font-mono text-emerald-700 font-bold">
+                    Seikyo SSO
+                  </span>
                 </div>
               </div>
 
@@ -113,10 +363,11 @@ export const StudentInfoSection: React.FC<StudentInfoSectionProps> = ({
             <div className="flex items-center space-x-2.5 flex-wrap gap-y-1">
               <span className="inline-flex items-center space-x-1 text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-xs uppercase tracking-wider">
                 <ShieldCheck className="w-3 h-3 text-emerald-700" />
-                <span>STUDENT PORTAL (@stu.seikyo.ed.jp)</span>
+                <span>STUDENT AUTHENTICATED</span>
               </span>
-              <span className="text-xs text-emerald-900 font-mono font-bold bg-white px-2 py-0.5 border border-emerald-200 rounded-xs truncate max-w-[220px] sm:max-w-xs">
-                {studentEmail}
+              <span className="text-xs text-emerald-900 font-mono font-bold bg-white px-2.5 py-0.5 border border-emerald-200 rounded-xs truncate max-w-[240px] sm:max-w-xs flex items-center gap-1.5">
+                <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>{currentUser?.email}</span>
               </span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold font-serif text-slate-900 tracking-tight flex items-center gap-2">
