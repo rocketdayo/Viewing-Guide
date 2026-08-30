@@ -27,6 +27,7 @@ import { AlumniSection } from './AlumniSection';
 import { AnnouncementsSection } from './AnnouncementsSection';
 import { BloodDonationSection } from './BloodDonationSection';
 import { CampusTourSection } from './CampusTourSection';
+import { StudentInfoSection } from './StudentInfoSection';
 import { useI18n, translateCategory } from '../utils/i18n';
 
 interface HomeViewProps {
@@ -404,6 +405,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
         announcements={appData?.announcements || []} 
         onOpenPwaModal={onOpenPwaModal}
       />
+
+      <StudentInfoSection />
 
       <AlumniSection />
 

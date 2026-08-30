@@ -19,7 +19,8 @@ import {
   Sparkles,
   HelpCircle,
   Smartphone,
-  Globe
+  Globe,
+  ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AppDataState } from '../types';
@@ -167,6 +168,13 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
       icon: Radio,
       color: 'text-emerald-800 bg-emerald-50/80 border-emerald-200',
       action: () => handleJump('home', 'announcements-section'),
+    },
+    {
+      title: language === 'en' ? 'Student Portal (@stu.seikyo.ed.jp)' : '生徒専用：携帯ルール・日程・業務連絡',
+      desc: language === 'en' ? 'Internal operations, mobile guidelines, and grade timelines' : '【@stu.seikyo.ed.jp専用】携帯電話使用ルール、前日・1日目・2日目の全行程連絡',
+      icon: ShieldCheck,
+      color: 'text-emerald-800 bg-emerald-100/70 border-emerald-300',
+      action: () => handleJump('home', 'student-portal-section'),
     },
     {
       title: language === 'en' ? 'Alumni Association Special Features' : '清教学園同窓会 特別企画',
