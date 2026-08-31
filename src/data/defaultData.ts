@@ -42,7 +42,7 @@ export function getClassCongestionInputUrl(classCode: string): string {
 export const INITIAL_APP_DATA: AppDataState = {
   festivalTitle: "2026 清教学園 中高合同文化祭 SG fes",
   festivalTheme: "清教エナジー！～1度しかない学園生活を楽しもう～",
-  dates: "2026年9月19日(土)・9月20日(日)",
+  dates: "2026年9月18日(金)・9月19日(土)",
   gasCongestionUrl: INITIAL_GAS_URL,
   gasAnnouncementUrl: INITIAL_ANNOUNCEMENT_URL,
   greetings: [

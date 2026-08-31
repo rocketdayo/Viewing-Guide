@@ -1,7 +1,7 @@
 import { AppDataState } from '../types';
 import { INITIAL_APP_DATA } from '../data/defaultData';
 
-const STORAGE_KEY = 'seikyo_fes_2026_data_v13';
+const STORAGE_KEY = 'seikyo_fes_2026_data_v14';
 const BOOKMARKS_KEY = 'seikyo_fes_2026_bookmarks';
 
 export function sanitizeAppData(parsed: any): AppDataState {
@@ -9,7 +9,6 @@ export function sanitizeAppData(parsed: any): AppDataState {
     return { ...INITIAL_APP_DATA };
   }
 
-  // Filter projects to only active class projects (filter out any alumni- ids if previously cached)
   let mergedProjects = Array.isArray(parsed.projects)
     ? parsed.projects.filter((p: any) => p && typeof p === 'object' && !p.id?.startsWith('alumni-'))
     : INITIAL_APP_DATA.projects;
@@ -18,7 +17,6 @@ export function sanitizeAppData(parsed: any): AppDataState {
     mergedProjects = INITIAL_APP_DATA.projects;
   }
 
-  // Filter announcements
   let cleanAnnouncements = parsed.announcements;
   if (Array.isArray(cleanAnnouncements)) {
     cleanAnnouncements = cleanAnnouncements.filter((a: any) => 
@@ -45,10 +43,10 @@ export function sanitizeAppData(parsed: any): AppDataState {
     ...parsed,
     festivalTitle: INITIAL_APP_DATA.festivalTitle,
     festivalTheme: INITIAL_APP_DATA.festivalTheme,
+    dates: INITIAL_APP_DATA.dates,
     gasCongestionUrl: isOldCongestionUrl ? INITIAL_APP_DATA.gasCongestionUrl : parsed.gasCongestionUrl,
     gasAnnouncementUrl: isOldAnnouncementUrl ? INITIAL_APP_DATA.gasAnnouncementUrl : parsed.gasAnnouncementUrl,
     projects: mergedProjects || INITIAL_APP_DATA.projects,
-    // Always use official greetings and schedules
     greetings: INITIAL_APP_DATA.greetings,
     schedules: Array.isArray(parsed.schedules) && parsed.schedules.length > 0 ? parsed.schedules : INITIAL_APP_DATA.schedules,
     announcements: cleanAnnouncements || INITIAL_APP_DATA.announcements,
@@ -73,7 +71,6 @@ export function saveAppData(data: AppDataState): void {
     const sanitized = sanitizeAppData(data);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
     
-    // Skip backend server sync if running on static hosts like GitHub Pages
     const isStaticHost = typeof window !== 'undefined' && (
       window.location.hostname.includes('github.io') ||
       window.location.protocol === 'file:'
@@ -82,13 +79,11 @@ export function saveAppData(data: AppDataState): void {
       return;
     }
 
-    // Also sync to server for cross-user online persistence if backend exists
     fetch('/api/app-data', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(sanitized),
     }).catch(() => {
-      // Quietly ignore if backend is unavailable
     });
   } catch (e) {
     console.error('Failed to save app data:', e);
@@ -96,7 +91,6 @@ export function saveAppData(data: AppDataState): void {
 }
 
 export async function fetchServerAppData(): Promise<AppDataState | null> {
-  // Skip on static hosts like GitHub Pages
   const isStaticHost = typeof window !== 'undefined' && (
     window.location.hostname.includes('github.io') ||
     window.location.protocol === 'file:'
@@ -119,7 +113,6 @@ export async function fetchServerAppData(): Promise<AppDataState | null> {
       return sanitizeAppData(json.data);
     }
   } catch {
-    // Quietly ignore backend fetch errors
   }
   return null;
 }
@@ -128,7 +121,6 @@ export function saveBookmarks(bookmarks: string[]): void {
   try {
     localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(bookmarks));
   } catch {
-    // ignore
   }
 }
 
