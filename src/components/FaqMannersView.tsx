@@ -138,8 +138,8 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
       category: 'safety',
       question: '体調が悪くなった場合や怪我をした場合はどうすればいいですか？',
       questionEn: 'What should I do if I feel unwell or get injured?',
-      answer: '本館1階の「保健室（救護所）」に養護教諭および救護スタッフが常駐しています。また、お近くの教職員にお声がけいただければ、迅速に救護室へご案内・手配いたします。',
-      answerEn: 'A first-aid station is located in the Health Room (Main Building 1F) with medical staff. You can also alert any nearby faculty member.',
+      answer: '本館1階の「保健室（救護所）」に養護教諭が常駐しています。また、お近くの教職員にお声がけいただければ、迅速に救護室へご案内・手配いたします。',
+      answerEn: 'A first-aid station is located in the Health Room (Main Building 1F) with a school nurse on duty. You can also alert any nearby faculty member.',
       tag: '救護室・体調不良'
     },
     {
