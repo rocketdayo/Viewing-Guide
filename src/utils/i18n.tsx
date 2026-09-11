@@ -247,7 +247,7 @@ const translations: Record<Language, I18nTranslations> = {
 
     schoolName: '清教学園高等学校',
     academicYear: '2026年度',
-    guideTitle: 'SGfesonline',
+    guideTitle: 'SGfes公式サイト',
     themeLabel: '清教エナジー！～1度しかない学園生活を楽しもう～',
 
     statusSmooth: '空きあり',
@@ -265,7 +265,7 @@ const translations: Record<Language, I18nTranslations> = {
     liveBadge: 'LIVE',
 
     heroPortalBadge: '2026年度 清教学園高等学校 文化祭',
-    heroTitle: 'SGfesonline',
+    heroTitle: 'SGfes公式サイト',
     heroTheme: '清教エナジー！～1度しかない学園生活を楽しもう～',
     heroLead: '2026年度 清教学園中高合同文化祭の公式鑑賞ガイドです。9月18日・19日の2日間にわたり清教学園にて開催されます。全21クラス企画のリアルタイム混雑・待機時間や整理券情報、ステージタイムテーブル、校内マップなどを確認できます。',
     heroInfoLabel: '開催案内',
@@ -476,7 +476,7 @@ const translations: Record<Language, I18nTranslations> = {
 
     schoolName: 'Seikyo Gakuen High School',
     academicYear: '2026',
-    guideTitle: 'SGfesonline',
+    guideTitle: 'SGfes Official Site',
     themeLabel: 'Seikyo Energy! Enjoy your one-and-only school life',
 
     statusSmooth: 'Smooth',
@@ -494,7 +494,7 @@ const translations: Record<Language, I18nTranslations> = {
     liveBadge: 'LIVE',
 
     heroPortalBadge: '2026 Seikyo Gakuen High School Festival',
-    heroTitle: 'SGfesonline',
+    heroTitle: 'SGfes Official Site',
     heroTheme: 'Seikyo Energy! Enjoy your one-and-only school life',
     heroLead: 'Official guide for the 2026 Seikyo Gakuen Culture Festival, held across 2 days on September 18 & 19 at Seikyo Gakuen. Explore 21 class exhibits with real-time queue times, stage schedules, and campus map.',
     heroInfoLabel: 'Event Details',

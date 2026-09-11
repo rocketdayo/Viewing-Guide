@@ -119,8 +119,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <h1 className="font-cormorant font-bold tracking-wide text-5xl sm:text-7xl text-slate-950 leading-tight">
-                    SGfesonline
+                  <h1 className="font-cormorant font-bold tracking-wide text-4xl sm:text-6xl text-slate-950 leading-tight">
+                    SGfes公式サイト
                   </h1>
                   <p className="text-lg sm:text-2xl font-serif text-emerald-850 font-medium tracking-wide">
                     {t.heroTheme}

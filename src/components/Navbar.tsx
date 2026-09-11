@@ -97,9 +97,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {t.schoolName}
                 </span>
               </div>
-              <h1 className="flex items-baseline gap-2 leading-none">
+              <h1 className="hidden sm:flex items-baseline gap-2 leading-none">
                 <span className="font-cormorant font-bold tracking-wide text-xl sm:text-2xl text-slate-900 group-hover:text-emerald-900 transition-colors">
-                  SGfesonline
+                  SGfes公式サイト
                 </span>
                 <span className="text-[11px] font-normal text-slate-400 hidden md:inline truncate max-w-xs">
                   「{appData?.festivalTheme ? appData.festivalTheme.replace(/^「|」$/g, '') : t.themeLabel}」

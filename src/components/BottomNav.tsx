@@ -1,27 +1,26 @@
 import React from 'react';
-import { Home, Calendar, Layers, Activity, MapPin, Bookmark } from 'lucide-react';
+import { Home, Calendar, Layers, MapPin, HelpCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useI18n } from '../utils/i18n';
 
 interface BottomNavProps {
   currentPage: string;
   setCurrentPage: (page: string) => void;
-  bookmarksCount: number;
+  bookmarksCount?: number;
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({
   currentPage,
   setCurrentPage,
-  bookmarksCount,
 }) => {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
 
   const navItems = [
     { id: 'home', label: t.navHome, icon: Home },
+    { id: 'schedule', label: t.navSchedule, icon: Calendar },
     { id: 'classes', label: t.navClasses, icon: Layers },
-    { id: 'congestion', label: t.navCongestion, icon: Activity },
-    { id: 'bookmarks', label: t.navBookmarks, icon: Bookmark },
     { id: 'map', label: t.navMap, icon: MapPin },
+    { id: 'faq', label: language === 'en' ? 'Q&A' : 'Q＆A', icon: HelpCircle },
   ];
 
   return (
