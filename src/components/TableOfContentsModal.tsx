@@ -190,13 +190,6 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
       color: 'text-teal-900 bg-teal-50 border-teal-200',
       action: () => handleJump('home', 'campus-tour-section'),
     },
-    {
-      title: language === 'en' ? 'Festival Blood Donation Drive' : '文化祭 献血コーナー（食堂前）',
-      desc: language === 'en' ? 'In front of cafeteria, Online tickets accepted' : '食堂前にて実施・オンライン整理券受付のご案内',
-      icon: Heart,
-      color: 'text-rose-800 bg-rose-50 border-rose-200',
-      action: () => handleJump('home', 'blood-donation-section'),
-    },
   ];
 
   return (

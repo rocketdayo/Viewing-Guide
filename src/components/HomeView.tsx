@@ -25,7 +25,6 @@ import { motion } from 'motion/react';
 import { AppDataState, ClassProject } from '../types';
 import { AlumniSection } from './AlumniSection';
 import { AnnouncementsSection } from './AnnouncementsSection';
-import { BloodDonationSection } from './BloodDonationSection';
 import { CampusTourSection } from './CampusTourSection';
 import { StudentInfoSection } from './StudentInfoSection';
 import { useI18n, translateCategory } from '../utils/i18n';
@@ -118,12 +117,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </span>
               </div>
 
-              <div className="space-y-3">
-                <h1 className="text-3xl sm:text-5xl font-serif font-normal tracking-tight text-slate-900 leading-[1.2]">
-                  {t.heroTitle}<br />
-                  <span className="text-emerald-800 font-medium">{t.heroTheme}</span>
-                </h1>
-                <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed max-w-2xl pt-1">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h1 className="font-cormorant font-bold tracking-wide text-5xl sm:text-7xl text-slate-950 leading-tight">
+                    SGfesonline
+                  </h1>
+                  <p className="text-lg sm:text-2xl font-serif text-emerald-850 font-medium tracking-wide">
+                    {t.heroTheme}
+                  </p>
+                </div>
+                <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed max-w-2xl">
                   {t.heroLead}
                 </p>
               </div>
@@ -411,8 +414,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <AlumniSection />
 
       <CampusTourSection />
-
-      <BloodDonationSection />
 
       <section className="py-14 bg-white opacity-95 transition-opacity duration-1000">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">

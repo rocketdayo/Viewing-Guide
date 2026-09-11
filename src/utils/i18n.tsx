@@ -197,19 +197,6 @@ export interface I18nTranslations {
   tourOpenPdf: string;
   tourZoomFlyer: string;
 
-  bloodTitle: string;
-  bloodSubtitle: string;
-  bloodDonationTitle: string;
-  bloodDonationSubtitle: string;
-  bloodDonationTicket: string;
-  bloodAgeBadge: string;
-  bloodLocation: string;
-  bloodHours: string;
-  bloodTicketNote: string;
-  bloodOnlineTicketBtn: string;
-  bloodOpenPdf: string;
-  bloodZoomPoster: string;
-
   alumniBadge: string;
   alumniTitle: string;
   alumniSubtitle: string;
@@ -260,7 +247,7 @@ const translations: Record<Language, I18nTranslations> = {
 
     schoolName: '清教学園高等学校',
     academicYear: '2026年度',
-    guideTitle: '文化祭鑑賞ガイド',
+    guideTitle: 'SGfesonline',
     themeLabel: '清教エナジー！～1度しかない学園生活を楽しもう～',
 
     statusSmooth: '空きあり',
@@ -278,7 +265,7 @@ const translations: Record<Language, I18nTranslations> = {
     liveBadge: 'LIVE',
 
     heroPortalBadge: '2026年度 清教学園高等学校 文化祭',
-    heroTitle: 'SG fes 鑑賞ガイド',
+    heroTitle: 'SGfesonline',
     heroTheme: '清教エナジー！～1度しかない学園生活を楽しもう～',
     heroLead: '2026年度 清教学園中高合同文化祭の公式鑑賞ガイドです。9月18日・19日の2日間にわたり清教学園にて開催されます。全21クラス企画のリアルタイム混雑・待機時間や整理券情報、ステージタイムテーブル、校内マップなどを確認できます。',
     heroInfoLabel: '開催案内',
@@ -441,19 +428,6 @@ const translations: Record<Language, I18nTranslations> = {
     tourOpenPdf: 'PDFチラシをダウンロード・表示',
     tourZoomFlyer: 'チラシを拡大表示',
 
-    bloodTitle: '文化祭 献血コーナー',
-    bloodSubtitle: '食堂前特設会場にて実施。命をつなぐ献血へのご協力をお願いいたします。',
-    bloodDonationTitle: '文化祭 献血コーナー',
-    bloodDonationSubtitle: '食堂前特設会場にて実施。命をつなぐ献血へのご協力をお願いいたします。',
-    bloodDonationTicket: '整理券配布中',
-    bloodAgeBadge: '16歳以上対象（体重等基準あり）',
-    bloodLocation: '食堂前 特設スペース',
-    bloodHours: '10:00〜16:00',
-    bloodTicketNote: 'オンライン整理券でスムーズにご案内可能です。',
-    bloodOnlineTicketBtn: '献血オンライン整理券を取得',
-    bloodOpenPdf: '献血案内ポスターPDFを開く',
-    bloodZoomPoster: 'ポスターを拡大表示',
-
     alumniBadge: '清教学園同窓会（清教会）特別企画',
     alumniTitle: '同窓会特別企画・未来の仕事図鑑 ＆ 先輩グルメ',
     alumniSubtitle: '卒業生によるキャリアガイドと特製グルメ企画！先輩たちの熱いメッセージをお届けします。',
@@ -502,7 +476,7 @@ const translations: Record<Language, I18nTranslations> = {
 
     schoolName: 'Seikyo Gakuen High School',
     academicYear: '2026',
-    guideTitle: 'Festival Guide',
+    guideTitle: 'SGfesonline',
     themeLabel: 'Seikyo Energy! Enjoy your one-and-only school life',
 
     statusSmooth: 'Smooth',
@@ -520,7 +494,7 @@ const translations: Record<Language, I18nTranslations> = {
     liveBadge: 'LIVE',
 
     heroPortalBadge: '2026 Seikyo Gakuen High School Festival',
-    heroTitle: 'SG fes Festival Guide',
+    heroTitle: 'SGfesonline',
     heroTheme: 'Seikyo Energy! Enjoy your one-and-only school life',
     heroLead: 'Official guide for the 2026 Seikyo Gakuen Culture Festival, held across 2 days on September 18 & 19 at Seikyo Gakuen. Explore 21 class exhibits with real-time queue times, stage schedules, and campus map.',
     heroInfoLabel: 'Event Details',
@@ -682,19 +656,6 @@ const translations: Record<Language, I18nTranslations> = {
     tourFlyerDesc: 'View and download the vertical tour flyer in PDF format.',
     tourOpenPdf: 'Download / View PDF Flyer',
     tourZoomFlyer: 'Zoom Flyer Image',
-
-    bloodTitle: 'Festival Blood Donation Drive',
-    bloodSubtitle: 'Located in front of the cafeteria. Join our community support initiative.',
-    bloodDonationTitle: 'Festival Blood Donation Drive',
-    bloodDonationSubtitle: 'Located in front of the cafeteria. Join our community support initiative.',
-    bloodDonationTicket: 'Ticket Distributed',
-    bloodAgeBadge: 'Ages 16+ (Standard criteria apply)',
-    bloodLocation: 'In front of Cafeteria',
-    bloodHours: '10:00 - 16:00',
-    bloodTicketNote: 'Digital tickets are available for fast check-in.',
-    bloodOnlineTicketBtn: 'Get Digital Queue Ticket',
-    bloodOpenPdf: 'Open Blood Donation PDF',
-    bloodZoomPoster: 'Zoom Poster Image',
 
     alumniBadge: 'Seikyo Alumni Association Special Project',
     alumniTitle: 'Alumni Project: Career Guidebook & Gourmet Corner',

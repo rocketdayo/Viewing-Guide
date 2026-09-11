@@ -80,15 +80,6 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         targetId: 'campus-tour-section'
       });
     }
-    if ('献血 けんけつ 食堂前 整理券 blood 血液 16歳 医療 社会貢献 donation'.toLowerCase().includes(q) || q.includes('献血') || q.includes('blood') || q.includes('けんけつ') || q.includes('食堂')) {
-      specialEvents.push({
-        id: 'special-blood-donation',
-        title: language === 'en' ? 'Festival Blood Donation Drive' : '文化祭 献血（食堂前）',
-        desc: language === 'en' ? 'In front of cafeteria, Online tickets accepted (Ages 16+)' : '食堂前にて実施・オンライン整理券受付中（16歳以上対象）',
-        tag: language === 'en' ? 'Community Drive' : '社会貢献企画',
-        targetId: 'blood-donation-section'
-      });
-    }
     if ('同窓会 清教会 未来の仕事図鑑 先輩グルメ 先輩 卒業生 フライヤー チラシ alumni'.toLowerCase().includes(q) || q.includes('同窓会') || q.includes('alumni') || q.includes('清教') || q.includes('グルメ') || q.includes('仕事図鑑')) {
       specialEvents.push({
         id: 'special-alumni',

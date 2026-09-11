@@ -16,7 +16,7 @@ import {
   Download,
   Smile
 } from 'lucide-react';
-import tourPosterPlaceholder from '../assets/images/blood_donation_poster.png';
+import tourPosterPlaceholder from '../assets/images/festival_logo_1787656698252.jpg';
 import { useI18n } from '../utils/i18n';
 
 export const CampusTourSection: React.FC = () => {
@@ -72,17 +72,8 @@ export const CampusTourSection: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2 pt-2 md:pt-0">
-            <a
-              href="./blooddonation.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-teal-950 border border-teal-300 text-xs font-bold rounded-xs shadow-2xs transition-colors cursor-pointer"
-            >
-              <FileText className="w-4 h-4 text-teal-800" />
-              <span>{language === 'en' ? 'Open PDF Flyer' : 'チラシPDFを開く'}</span>
-              <ExternalLink className="w-3 h-3 text-slate-400" />
-            </a>
             <button
+              type="button"
               onClick={() => setIsModalOpen(true)}
               className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold rounded-xs shadow-2xs transition-colors cursor-pointer"
             >
@@ -246,20 +237,18 @@ export const CampusTourSection: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <a
-                  href="./blooddonation.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(true)}
                   className="w-full inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs rounded-xs shadow-2xs transition-colors cursor-pointer"
                 >
-                  <Download className="w-4 h-4 text-teal-200" />
-                  <span>{t.tourOpenPdf}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-teal-300" />
-                </a>
+                  <ZoomIn className="w-4 h-4 text-teal-200" />
+                  <span>{t.tourZoomFlyer}</span>
+                </button>
 
                 <div className="bg-slate-50 p-3 rounded text-[11px] text-slate-500 border border-slate-200 leading-relaxed">
                   <span className="font-bold text-slate-700 block mb-0.5">💡 {language === 'en' ? 'About Flyer Data' : 'チラシデータについて'}</span>
-                  {language === 'en' ? 'The vertical flyer will update dynamically as official releases are finalized.' : '※チラシは献血ポスターと同じ縦型仕様です。完成版チラシが届き次第、本エリアのデータが順次自動更新されます。'}
+                  {language === 'en' ? 'The vertical flyer will update dynamically as official releases are finalized.' : '※完成版チラシが届き次第、本エリアの画像および詳細データが順次自動更新されます。'}
                 </div>
               </div>
             </div>
@@ -302,15 +291,13 @@ export const CampusTourSection: React.FC = () => {
 
             <div className="p-3 bg-slate-100 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
               <span>※{t.tourFlyerTitle}</span>
-              <a
-                href="./blooddonation.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-1.5 bg-teal-700 text-white font-bold rounded-xs flex items-center space-x-1 hover:bg-teal-800 transition-colors"
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="px-3 py-1.5 bg-slate-700 text-white font-bold rounded-xs flex items-center space-x-1 hover:bg-slate-800 transition-colors cursor-pointer"
               >
-                <span>{language === 'en' ? 'Open PDF' : 'PDFを開く'}</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
+                <span>{language === 'en' ? 'Close' : '閉じる'}</span>
+              </button>
             </div>
           </div>
         </div>

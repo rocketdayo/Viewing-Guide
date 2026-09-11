@@ -89,17 +89,19 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <LogoBadge className="w-10 h-10 group-hover:scale-105 transition-transform duration-200" size={40} />
             <div className="flex flex-col">
-              <div className="flex items-center space-x-1.5">
-                <span className="text-[10px] font-bold tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded">
+              <div className="flex items-center space-x-1.5 mb-0.5">
+                <span className="text-[9px] font-bold tracking-widest text-emerald-800 bg-emerald-100/80 px-1.5 py-0.5 rounded-xs font-brand">
                   {t.academicYear}
                 </span>
-                <span className="text-[11px] text-slate-500 font-medium hidden sm:inline">
+                <span className="text-[11px] text-slate-500 font-medium tracking-wide hidden sm:inline">
                   {t.schoolName}
                 </span>
               </div>
-              <h1 className="text-sm sm:text-base font-black text-slate-900 tracking-tight leading-tight flex items-center gap-1.5">
-                {t.guideTitle}
-                <span className="text-xs font-normal text-slate-500 hidden md:inline">
+              <h1 className="flex items-baseline gap-2 leading-none">
+                <span className="font-cormorant font-bold tracking-wide text-xl sm:text-2xl text-slate-900 group-hover:text-emerald-900 transition-colors">
+                  SGfesonline
+                </span>
+                <span className="text-[11px] font-normal text-slate-400 hidden md:inline truncate max-w-xs">
                   「{appData?.festivalTheme ? appData.festivalTheme.replace(/^「|」$/g, '') : t.themeLabel}」
                 </span>
               </h1>
