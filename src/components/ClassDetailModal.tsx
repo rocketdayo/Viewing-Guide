@@ -13,7 +13,10 @@ import {
   Info,
   ExternalLink,
   QrCode,
-  Check
+  Check,
+  Users,
+  Hourglass,
+  Utensils
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ClassProject, CongestionLevel } from '../types';
@@ -237,6 +240,47 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({
                 <span>{project.floor}</span>
                 <span>（{project.location}）</span>
               </div>
+
+              {(project.duration || project.capacity || project.ticketText || project.menuPrice) && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {project.duration && (
+                    <div className="p-3 rounded-xs bg-slate-50 border border-slate-200 space-y-1">
+                      <span className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
+                        <Hourglass className="w-3.5 h-3.5 text-indigo-500" />
+                        {language === 'en' ? 'Duration' : '体験時間'}
+                      </span>
+                      <p className="text-xs font-bold text-slate-800">{project.duration}</p>
+                    </div>
+                  )}
+                  {project.capacity && (
+                    <div className="p-3 rounded-xs bg-slate-50 border border-slate-200 space-y-1">
+                      <span className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
+                        <Users className="w-3.5 h-3.5 text-blue-500" />
+                        {language === 'en' ? 'Capacity' : '参加可能人数'}
+                      </span>
+                      <p className="text-xs font-bold text-slate-800">{project.capacity}</p>
+                    </div>
+                  )}
+                  {project.ticketText && (
+                    <div className="p-3 rounded-xs bg-slate-50 border border-slate-200 space-y-1">
+                      <span className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
+                        <Ticket className="w-3.5 h-3.5 text-purple-500" />
+                        {language === 'en' ? 'Ticket' : '整理券'}
+                      </span>
+                      <p className="text-xs font-bold text-slate-800">{project.ticketText}</p>
+                    </div>
+                  )}
+                  {project.menuPrice && (
+                    <div className="p-3 rounded-xs bg-slate-50 border border-slate-200 space-y-1">
+                      <span className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
+                        <Utensils className="w-3.5 h-3.5 text-amber-500" />
+                        {language === 'en' ? 'Price / Menu' : '価格・メニュー'}
+                      </span>
+                      <p className="text-xs font-bold text-slate-800">{project.menuPrice}</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="space-y-2">
                 <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">

@@ -390,9 +390,9 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
                             {proj.classNumber}
                           </span>
                           <span className="text-[11px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md font-medium">
-                            {translateCategory(proj.category, language)}
+                            {proj.rawCategory || translateCategory(proj.category, language)}
                           </span>
-                          {isOnlineTicket && (
+                          {(isOnlineTicket || proj.ticketText === 'あり' || proj.congestion?.ticketRequired) && (
                             <span className="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-0.5 border border-purple-200">
                               <Ticket className="w-3 h-3 text-purple-600" />
                               {language === 'en' ? 'Ticket' : '整理券'}

@@ -3,47 +3,52 @@ export type CongestionLevel = 'smooth' | 'moderate' | 'crowded' | 'ticket' | 'cl
 export interface ClassProject {
   id: string;
   grade: '1年' | '2年' | '3年' | 'クラブ・有志' | '同窓会・特別企画';
-  classNumber: string; // e.g. '1年A組', '2年C組', '吹奏楽部', '同窓会'
+  classNumber: string;
   title: string;
   catchphrase: string;
   category: '演劇・劇' | 'アトラクション・体験' | '展示・研究' | 'カフェ・飲食' | '縁日・ゲーム' | 'ステージ・音楽' | '特別企画・進路';
+  rawCategory?: string;
   location: string;
   building: '本館' | '新館' | '特別棟' | 'チャペル' | '体育館' | '中庭・屋外' | 'カフェテリア' | 'キャンパス前・屋外';
-  floor: string; // '1F', '2F', '3F', '4F', '屋外' etc.
+  floor: string;
   description: string;
   fullDetails: string;
   highlights: string[];
   imageUrl?: string;
-  organizer?: string; // e.g. '清教学園同窓会（清教会）'
-  targetAudience?: string; // e.g. '高校生・中学生・一般来場者・保護者'
-  timeSlot?: string; // e.g. '9月19日(土) ①10:00〜12:00 ②12:30〜14:30'
-  menuItems?: string[]; // e.g. グルメメニュー一覧
+  organizer?: string;
+  targetAudience?: string;
+  timeSlot?: string;
+  menuItems?: string[];
+  duration?: string;
+  capacity?: string;
+  menuPrice?: string;
+  ticketText?: string;
   congestion: {
     level: CongestionLevel;
-    waitTimeMinutes: number; // e.g. 5, 20, 45
+    waitTimeMinutes: number;
     ticketRequired: boolean;
     ticketDistributionTime?: string;
     lastUpdated?: string;
     statusNote?: string;
-    detailNote?: string; // 待ち時間の隣の詳細欄（GAS連携）
+    detailNote?: string;
   };
   scheduleNote?: string;
   rules?: string[];
-  onlineTicketUrl?: string; // オンライン整理券URL (1B, 1D, 2A, 2D, 2E, 2J 等)
-  onlineTicketNote?: string; // 整理券に関する案内・注意事項
+  onlineTicketUrl?: string;
+  onlineTicketNote?: string;
 }
 
 export interface ScheduleEvent {
   id: string;
   day: 'Day1' | 'Day2' | '両日';
-  programNumber?: number | string; // PN / 番号 e.g. 1, 2, '②'
-  startTime: string; // '09:00'
-  endTime: string;   // '09:30'
-  duration?: string; // '30分'
+  programNumber?: number | string;
+  startTime: string;
+  endTime: string;
+  duration?: string;
   title: string;
-  performer: string; // '吹奏楽部', '^_^☺(にこにこすまいる)', 'UNISON', 'That\'s brass'
+  performer: string;
   performerType?: '部活' | '有志' | 'クラス' | '一般' | '特別';
-  venue: string;     // '第一体育館', 'レクチャールーム'
+  venue: string;
   stagePosition?: '舞台上' | '舞台下' | '舞台上・下' | 'フロア' | string;
   category: 'ステージ' | 'セレモニー' | 'ライブ' | '特別企画' | 'コンテスト' | 'ダンス' | '音楽・演奏' | '演劇' | 'パフォーマンス';
   description: string;
@@ -52,7 +57,7 @@ export interface ScheduleEvent {
 
 export interface Greeting {
   id: string;
-  role: string;      // '学校長' | '生徒会長' | '文化祭実行委員長'
+  role: string;
   name: string;
   themeTitle: string;
   message: string;

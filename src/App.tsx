@@ -25,6 +25,7 @@ import {
 import { AppDataState } from './types';
 import { fetchLiveGasCongestion, applyGasSyncToProjects } from './utils/congestionSync';
 import { fetchLiveAnnouncements } from './utils/announcementSync';
+import { fetchLiveClassProjects, applyClassProjectsSync } from './utils/classProjectsSync';
 import { motion, AnimatePresence } from 'motion/react';
 
 export function getAppBasePath(): string {
@@ -169,6 +170,27 @@ export default function App() {
     }
   }, []);
 
+  const syncClassProjects = useCallback(async () => {
+    try {
+      const pResult = await fetchLiveClassProjects();
+      if (pResult.success && pResult.data && Object.keys(pResult.data).length > 0) {
+        const { updatedProjects, syncedCount: count } = applyClassProjectsSync(
+          appDataRef.current.projects || [],
+          pResult.data
+        );
+        if (count > 0) {
+          setAppData((prev) => {
+            const next = { ...prev, projects: updatedProjects };
+            saveAppData(next);
+            return next;
+          });
+        }
+      }
+    } catch (e: any) {
+      console.error('Class projects sync error:', e);
+    }
+  }, []);
+
   const syncNow = useCallback(async () => {
     if (isSyncingRef.current) return;
     isSyncingRef.current = true;
@@ -179,6 +201,7 @@ export default function App() {
       await Promise.allSettled([
         syncCongestion(),
         syncAnnouncements(),
+        syncClassProjects(),
       ]);
     } catch (e: any) {
       console.error('Background sync failed:', e);
@@ -187,7 +210,7 @@ export default function App() {
       isSyncingRef.current = false;
       setIsSyncing(false);
     }
-  }, [syncCongestion, syncAnnouncements]);
+  }, [syncCongestion, syncAnnouncements, syncClassProjects]);
 
   const pendingAnchorRef = useRef<string | null>(null);
 
@@ -363,11 +386,16 @@ export default function App() {
       syncAnnouncements();
     }, 45000);
 
+    const classProjectsTimer = setInterval(() => {
+      syncClassProjects();
+    }, 15 * 60 * 1000);
+
     return () => {
       clearInterval(congestionTimer);
       clearInterval(announcementTimer);
+      clearInterval(classProjectsTimer);
     };
-  }, [syncNow, syncCongestion, syncAnnouncements]);
+  }, [syncNow, syncCongestion, syncAnnouncements, syncClassProjects]);
 
   const handleDataUpdate = (newData: AppDataState) => {
     setAppData(newData);

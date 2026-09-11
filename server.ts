@@ -11,8 +11,9 @@ const DEFAULT_CONGESTION_URL =
   "https://docs.google.com/spreadsheets/d/154F3vcdcOSyMc55VbY9qPCey4JtL7mW1pCOWBrDVuZc/edit?gid=0#gid=0";
 const DEFAULT_ANNOUNCEMENT_URL =
   "https://docs.google.com/spreadsheets/d/1Ajv5ErGHjhIz740IaB-IqhywYkV66dREwOdk7G3EiEg/edit?gid=0#gid=0";
+const DEFAULT_CLASS_PROJECTS_URL =
+  "https://docs.google.com/spreadsheets/d/1RgOhPj3OjILxv1oGNzfDxLucK68WbX0T2eNGXpHjdjI/edit?gid=0#gid=0";
 
-// In-memory caches to guarantee fast response & protect against Google rate limits/slow responses
 let congestionCache: {
   timestamp: number;
   url: string;
@@ -23,6 +24,12 @@ let announcementCache: {
   timestamp: number;
   url: string;
   data: any[];
+} | null = null;
+
+let classProjectsCache: {
+  timestamp: number;
+  url: string;
+  data: Record<string, any>;
 } | null = null;
 
 // Convert Google Sheet edit/pub URLs to CSV export URLs
@@ -389,6 +396,54 @@ async function fetchAndParseAnnouncements(targetUrl: string) {
   return announcements;
 }
 
+async function fetchAndParseClassProjects(targetUrl: string) {
+  const fetchUrl = getGoogleSpreadsheetCsvUrl(targetUrl);
+  const res = await fetchWithRetry(fetchUrl, {
+    redirect: "follow",
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Data request failed with status: ${res.status}`);
+  }
+
+  const raw = await res.text();
+  const rows = parseFullCSV(raw);
+  const result: Record<string, any> = {};
+
+  let startRow = 0;
+  if (rows.length > 0 && rows[0][0] && rows[0][0].toLowerCase().includes("id")) {
+    startRow = 1;
+  }
+
+  for (let r = startRow; r < rows.length; r++) {
+    const row = rows[r];
+    if (!row || row.length === 0) continue;
+    const rawId = (row[0] || "").trim().toUpperCase().replace(/[\s\-_]/g, "");
+    if (!rawId) continue;
+
+    result[rawId] = {
+      classId: rawId,
+      className: (row[1] || "").trim(),
+      title: (row[2] || "").trim(),
+      catchphrase: (row[3] || "").trim(),
+      category: (row[4] || "").trim(),
+      location: (row[5] || "").trim(),
+      description: (row[6] || "").trim(),
+      duration: (row[7] || "").trim(),
+      capacity: (row[8] || "").trim(),
+      rules: (row[9] || "").trim(),
+      ticket: (row[10] || "").trim(),
+      menuPrice: (row[11] || "").trim(),
+    };
+  }
+
+  return result;
+}
+
 // API Routes
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
@@ -486,7 +541,57 @@ app.get("/api/announcements-live", async (req, res) => {
   }
 });
 
-// Server-side App Data Store for online synchronization across users
+app.get("/api/class-projects-live", async (req, res) => {
+  const targetUrl =
+    typeof req.query.url === "string" && req.query.url.startsWith("http")
+      ? req.query.url
+      : DEFAULT_CLASS_PROJECTS_URL;
+
+  const now = Date.now();
+  if (
+    classProjectsCache &&
+    classProjectsCache.url === targetUrl &&
+    now - classProjectsCache.timestamp < 30000
+  ) {
+    return res.json({
+      success: true,
+      timestamp: new Date(classProjectsCache.timestamp).toISOString(),
+      data: classProjectsCache.data,
+      cached: true,
+    });
+  }
+
+  try {
+    const data = await fetchAndParseClassProjects(targetUrl);
+    classProjectsCache = {
+      timestamp: now,
+      url: targetUrl,
+      data,
+    };
+
+    res.json({
+      success: true,
+      timestamp: new Date().toISOString(),
+      data,
+    });
+  } catch (error: any) {
+    console.error("Error fetching class projects data:", error);
+    if (classProjectsCache && classProjectsCache.url === targetUrl) {
+      return res.json({
+        success: true,
+        timestamp: new Date(classProjectsCache.timestamp).toISOString(),
+        data: classProjectsCache.data,
+        cachedFallback: true,
+      });
+    }
+    res.status(500).json({
+      success: false,
+      error: error.message || "Failed to fetch class projects live data",
+      data: {},
+    });
+  }
+});
+
 let serverAppDataStore: any = null;
 
 app.get("/api/app-data", (req, res) => {
