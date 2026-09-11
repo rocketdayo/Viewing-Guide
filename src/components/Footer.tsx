@@ -124,8 +124,8 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
             </h4>
             <p className="text-xs text-slate-400 leading-relaxed">
               {language === 'en'
-                ? 'Campus is strictly indoor shoes only (please bring slippers & shoe bags). Strictly non-smoking. Please respect the privacy of all students & visitors by avoiding social media photo/video posts.'
-                : '校内は原則土足禁止です（スリッパ・上履き・靴袋をご持参ください）。敷地内全面禁煙。生徒・来場者のプライバシー保護のためSNSへの写真・動画投稿はお控えください。'}
+                ? 'Outdoor shoes are permitted. The entire campus is strictly non-smoking. To protect student and visitor privacy, posting photos or videos to social media is strictly prohibited.'
+                : '校内は土足のままご入場いただけます。敷地内全面禁煙。生徒・来場者のプライバシー保護のため写真・動画のSNS投稿は絶対にやめてください。'}
             </p>
             
             <div className="pt-1 flex flex-col gap-2">

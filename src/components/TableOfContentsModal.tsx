@@ -134,7 +134,7 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
     { 
       id: 'faq', 
       label: t.navFaq, 
-      desc: language === 'en' ? 'Shoes policy, Tickets, Food, Privacy' : '土足禁止・整理券・飲食・プライバシー/撮影・職員室', 
+      desc: language === 'en' ? 'Access, Shoes, Tickets, SNS, Admin Office' : '通学路・土足・整理券・SNS・落とし物（事務室）', 
       icon: HelpCircle, 
       color: 'teal' 
     },
@@ -150,7 +150,7 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
   const specialSections = [
     {
       title: language === 'en' ? 'FAQ & Visitor Etiquette Guide' : 'よくある質問＆来場者マナーガイド',
-      desc: language === 'en' ? 'Indoor shoes, ticketing, food areas, photography rules, first aid' : '土足禁止・整理券・飲食エリア・撮影/SNSプライバシー・救護・落とし物（職員室）',
+      desc: language === 'en' ? 'Shirakashi path, shoes, ticketing, trash, SNS rules, first aid, lost items' : '通学路「しらかしの径」・土足入場・整理券・ゴミ分別・SNS禁止・救護・落とし物（事務室）',
       icon: HelpCircle,
       color: 'text-teal-800 bg-teal-50 border-teal-200',
       action: () => handleJump('faq'),
