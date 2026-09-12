@@ -53,7 +53,9 @@ export const Navbar: React.FC<NavbarProps> = ({
     setCurrentPage(id, anchor);
   };
 
-  const pinnedAnnouncement = appData?.announcements?.find((a) => a.isPinned);
+  const pinnedAnnouncement = appData?.announcements?.find(
+    (a) => a.isPinned && a.id !== 'ann-pwa-install-guide' && !a.title?.includes('ホーム画面')
+  );
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs">

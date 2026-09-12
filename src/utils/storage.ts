@@ -24,7 +24,9 @@ export function sanitizeAppData(parsed: any): AppDataState {
       !a.title?.includes("熱中症対策") && 
       !a.title?.includes("静かにして下さい") &&
       !a.title?.includes("同窓会特別企画") &&
-      a.id !== 'ann-alumni-special'
+      !a.title?.includes("ホーム画面") &&
+      a.id !== 'ann-alumni-special' &&
+      a.id !== 'ann-pwa-install-guide'
     );
     INITIAL_APP_DATA.announcements.forEach((initA) => {
       if (!cleanAnnouncements.some((a: any) => a.id === initA.id)) {
