@@ -400,7 +400,7 @@ export const MonitorSignageView: React.FC<MonitorSignageViewProps> = ({
           <div className="text-slate-200 text-xs truncate flex items-center space-x-6">
             <span>📢 {appData?.announcements?.[0]?.title || (language === 'en' ? 'Queue times are synchronized live via cloud GAS system.' : '各クラスの待機時間は自動集計システムによりリアルタイム同期されています。')}</span>
             <span className="text-slate-600">|</span>
-            <span>💧 {language === 'en' ? 'Water stations available in Main Bldg 1F & Cafeteria.' : '【熱中症対策】本館1Fおよびカフェテリアに冷水給水所を設置しています。こまめな水分補給をお願いいたします。'}</span>
+            <span>💧 {language === 'en' ? 'Water stations available in Main Bldg 1F & Dining Hall.' : '【熱中症対策】本館1Fおよび食堂に冷水給水所を設置しています。こまめな水分補給をお願いいたします。'}</span>
             <span className="text-slate-600">|</span>
             <span>🎭 {language === 'en' ? 'All 21 class exhibits open!' : '高1(A〜J組)・高2(A〜K組) 全21クラス企画開催中！'}</span>
           </div>

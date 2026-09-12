@@ -72,8 +72,33 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
     try {
       const saved = localStorage.getItem(CUSTOM_EVENTS_KEY);
       const parsed = saved ? JSON.parse(saved) : null;
-      return Array.isArray(parsed) ? parsed : [
-        { id: 'c-1', title: language === 'en' ? 'Lunch Break at Cafeteria' : 'お昼休憩・模擬店ランチ', startTime: '12:00', endTime: '12:45', note: language === 'en' ? 'Quick bite at cafeteria or courtyard' : 'カフェテリアまたは中庭で軽食', location: language === 'en' ? 'Cafeteria' : 'カフェテリア' },
+      if (Array.isArray(parsed)) {
+        return parsed.map((item) => {
+          if (item.id === 'c-1') {
+            let updatedNote = item.note || '';
+            let updatedLocation = item.location || '';
+            let updatedTitle = item.title || '';
+            if (updatedNote.includes('カフェテリア') || updatedNote.includes('中庭')) {
+              updatedNote = '食堂または模擬店で軽食';
+            }
+            if (updatedLocation.includes('カフェテリア') || updatedLocation.includes('中庭')) {
+              updatedLocation = '食堂・模擬店';
+            }
+            if (updatedTitle.includes('Cafeteria')) {
+              updatedTitle = language === 'en' ? 'Lunch Break & Food Booths' : 'お昼休憩・模擬店ランチ';
+            }
+            return {
+              ...item,
+              title: updatedTitle || (language === 'en' ? 'Lunch Break & Food Booths' : 'お昼休憩・模擬店ランチ'),
+              note: updatedNote || (language === 'en' ? 'Quick bite at dining hall or food booths' : '食堂または模擬店で軽食'),
+              location: updatedLocation || (language === 'en' ? 'Dining Hall / Food Booths' : '食堂・模擬店'),
+            };
+          }
+          return item;
+        });
+      }
+      return [
+        { id: 'c-1', title: language === 'en' ? 'Lunch Break & Food Booths' : 'お昼休憩・模擬店ランチ', startTime: '12:00', endTime: '12:45', note: language === 'en' ? 'Quick bite at dining hall or food booths' : '食堂または模擬店で軽食', location: language === 'en' ? 'Dining Hall / Food Booths' : '食堂・模擬店' },
       ];
     } catch {
       return [];
@@ -84,7 +109,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
   const [newTitle, setNewTitle] = useState('');
   const [newStartTime, setNewStartTime] = useState('13:00');
   const [newEndTime, setNewEndTime] = useState('13:30');
-  const [newLocation, setNewLocation] = useState('本館中庭');
+  const [newLocation, setNewLocation] = useState('食堂・模擬店');
   const [newNote, setNewNote] = useState('');
 
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
@@ -467,7 +492,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
               <input
                 type="text"
                 required
-                placeholder={language === 'en' ? 'e.g. Cafeteria Lunch, Meetup in courtyard' : '例: カフェテリアでランチ、中庭で友達と合流'}
+                placeholder={language === 'en' ? 'e.g. Dining Hall Lunch, Meetup at Food Booths' : '例: 食堂でランチ、模擬店で軽食'}
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 className="w-full px-3 py-2 rounded-xs border border-slate-300 text-xs font-bold"

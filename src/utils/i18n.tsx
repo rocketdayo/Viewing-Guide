@@ -401,7 +401,7 @@ const translations: Record<Language, I18nTranslations> = {
     facilityRestroom: 'お手洗い',
     facilityFirstAid: '保健室・救護所',
     facilityFacultyOffice: '職員室・本部',
-    facilityCafeteria: '食堂・カフェテリア',
+    facilityCafeteria: '食堂',
     facilityTrash: 'エコステーション（ゴミ箱）',
     facilityWater: '給水機',
 
@@ -630,7 +630,7 @@ const translations: Record<Language, I18nTranslations> = {
     facilityRestroom: 'Restrooms',
     facilityFirstAid: 'First Aid Room',
     facilityFacultyOffice: 'Headquarters / Faculty',
-    facilityCafeteria: 'Cafeteria & Dining',
+    facilityCafeteria: 'Dining Hall',
     facilityTrash: 'Eco Trash Station',
     facilityWater: 'Water Station',
 
@@ -717,7 +717,8 @@ export const translateBuilding = (building: string, lang: Language): string => {
     'チャペル': 'Chapel',
     '体育館': 'Gymnasium',
     '中庭・屋外': 'Courtyard & Outdoor',
-    'カフェテリア': 'Cafeteria',
+    '食堂': 'Dining Hall',
+    'カフェテリア': 'Dining Hall',
     'キャンパス前・屋外': 'Outdoor Area',
     'all': 'All Buildings',
   };

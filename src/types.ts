@@ -9,7 +9,7 @@ export interface ClassProject {
   category: '演劇・劇' | 'アトラクション・体験' | '展示・研究' | 'カフェ・飲食' | '縁日・ゲーム' | 'ステージ・音楽' | '特別企画・進路';
   rawCategory?: string;
   location: string;
-  building: '本館' | '新館' | '特別棟' | 'チャペル' | '体育館' | '中庭・屋外' | 'カフェテリア' | 'キャンパス前・屋外';
+  building: '本館' | '新館' | '特別棟' | 'チャペル' | '体育館' | '中庭・屋外' | '食堂' | 'カフェテリア' | 'キャンパス前・屋外';
   floor: string;
   description: string;
   fullDetails: string;
