@@ -127,31 +127,31 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
       {!isInstalled && !isStandalone && !isDismissed && (deferredPrompt || isIOS) && (
         <aside 
           aria-label={t.pwaInstallTitle}
-          className="fixed bottom-16 sm:bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-md z-40 bg-emerald-950/95 backdrop-blur-md text-white p-3.5 rounded-xs border border-emerald-700/60 shadow-xl"
+          className="fixed bottom-16 sm:bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-md z-40 bg-emerald-50/95 backdrop-blur-md text-slate-800 p-3.5 rounded-lg border border-emerald-200 shadow-lg shadow-emerald-900/5"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start space-x-3">
-              <div className="p-2 rounded-xs bg-emerald-700/80 text-emerald-100 shrink-0">
+              <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700 shrink-0 border border-emerald-200/80">
                 <Smartphone className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-black text-emerald-100">
+                <p className="text-xs font-bold text-emerald-950">
                   {t.pwaInstallTitle}
                 </p>
-                <p className="text-[11px] text-emerald-300 leading-snug">
+                <p className="text-[11px] text-emerald-800/85 leading-snug">
                   {t.pwaInstallDesc}
                 </p>
                 <div className="pt-1.5 flex items-center space-x-2">
                   <button
                     onClick={handleInstallClick}
-                    className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xs bg-emerald-500 hover:bg-emerald-400 text-emerald-950 text-xs font-black shadow-md cursor-pointer transition-colors"
+                    className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs cursor-pointer transition-colors"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>{t.installBtn}</span>
                   </button>
                   <button
                     onClick={handleDismiss}
-                    className="px-2.5 py-1.5 text-[11px] text-emerald-300 hover:text-white transition-colors cursor-pointer"
+                    className="px-2.5 py-1.5 text-[11px] font-medium text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
                   >
                     {language === 'en' ? 'Later' : 'あとで'}
                   </button>
@@ -160,7 +160,7 @@ export const PwaInstallBanner: React.FC<PwaInstallBannerProps> = ({
             </div>
             <button
               onClick={handleDismiss}
-              className="text-emerald-400 hover:text-white p-1 rounded-xs cursor-pointer"
+              className="text-slate-400 hover:text-slate-600 p-1 rounded-md cursor-pointer transition-colors"
               title={t.close}
             >
               <X className="w-4 h-4" />
