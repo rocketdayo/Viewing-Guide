@@ -187,8 +187,8 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
       </motion.div>
 
       <div className="p-4 sm:p-5 rounded-xs bg-white border border-slate-200 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
+        <div className="flex flex-col gap-3">
+          <div className="relative w-full">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               id="classes-search-input"
@@ -208,41 +208,45 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
             )}
           </div>
 
-          <div className="flex items-center space-x-2">
-            <select
-              id="sort-select"
-              value={sortBy}
-              onChange={(e: any) => setSortBy(e.target.value)}
-              className="px-3 py-2 rounded-xs border border-slate-200 text-xs font-medium text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
-            >
-              <option value="default">{t.sortByDefault}</option>
-              <option value="waitTime">{t.sortByWaitTime}</option>
-              <option value="title">{t.sortByTitle}</option>
-            </select>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3">
+            <div className="w-full sm:w-auto">
+              <select
+                id="sort-select"
+                value={sortBy}
+                onChange={(e: any) => setSortBy(e.target.value)}
+                className="w-full sm:w-auto px-3 py-2 rounded-xs border border-slate-200 text-xs font-medium text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+              >
+                <option value="default">{t.sortByDefault}</option>
+                <option value="waitTime">{t.sortByWaitTime}</option>
+                <option value="title">{t.sortByTitle}</option>
+              </select>
+            </div>
 
-            <button
-              onClick={() => setOnlyOnlineTickets(!onlyOnlineTickets)}
-              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xs text-xs font-medium border transition-colors shrink-0 cursor-pointer ${
-                onlyOnlineTickets
-                  ? 'bg-purple-50 border-purple-300 text-purple-900 font-bold'
-                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              <Ticket className={`w-3.5 h-3.5 ${onlyOnlineTickets ? 'text-purple-600' : 'text-slate-400'}`} />
-              <span>{t.onlineTicketsOnly}</span>
-            </button>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <button
+                onClick={() => setOnlyOnlineTickets(!onlyOnlineTickets)}
+                className={`flex-1 sm:flex-initial flex items-center justify-center space-x-1.5 px-3 py-2 rounded-xs text-xs font-medium border transition-colors cursor-pointer ${
+                  onlyOnlineTickets
+                    ? 'bg-purple-50 border-purple-300 text-purple-900 font-bold'
+                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                <Ticket className={`w-3.5 h-3.5 ${onlyOnlineTickets ? 'text-purple-600' : 'text-slate-400'}`} />
+                <span>{t.onlineTicketsOnly}</span>
+              </button>
 
-            <button
-              onClick={() => setOnlyBookmarks(!onlyBookmarks)}
-              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xs text-xs font-medium border transition-colors shrink-0 cursor-pointer ${
-                onlyBookmarks
-                  ? 'bg-amber-50 border-amber-300 text-amber-900 font-bold'
-                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              <Bookmark className={`w-3.5 h-3.5 ${onlyBookmarks ? 'fill-amber-500 text-amber-500' : 'text-slate-400'}`} />
-              <span>{t.bookmarksOnly}</span>
-            </button>
+              <button
+                onClick={() => setOnlyBookmarks(!onlyBookmarks)}
+                className={`flex-1 sm:flex-initial flex items-center justify-center space-x-1.5 px-3 py-2 rounded-xs text-xs font-medium border transition-colors cursor-pointer ${
+                  onlyBookmarks
+                    ? 'bg-amber-50 border-amber-300 text-amber-900 font-bold'
+                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                <Bookmark className={`w-3.5 h-3.5 ${onlyBookmarks ? 'fill-amber-500 text-amber-500' : 'text-slate-400'}`} />
+                <span>{t.bookmarksOnly}</span>
+              </button>
+            </div>
           </div>
         </div>
 
