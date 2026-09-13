@@ -156,8 +156,8 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
       action: () => handleJump('faq'),
     },
     {
-      title: language === 'en' ? 'Official Greetings' : 'ご挨拶（学校長・生徒会・実行委員長）',
-      desc: language === 'en' ? 'Messages from Principal and Student Council' : '文化祭開催にあたってのメッセージとテーマ発表',
+      title: language === 'en' ? 'Official Greetings' : 'ご挨拶（理事長・学校長・生徒会・実行委員長）',
+      desc: language === 'en' ? 'Messages from Board Chairman, Principal and Student Council' : '文化祭開催にあたってのメッセージとテーマ発表',
       icon: MessageSquare,
       color: 'text-emerald-700 bg-emerald-50 border-emerald-200',
       action: () => handleJump('home', 'greetings-section'),
