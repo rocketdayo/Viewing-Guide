@@ -183,13 +183,6 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
       color: 'text-amber-800 bg-amber-50 border-amber-200',
       action: () => handleJump('home', 'alumni-section'),
     },
-    {
-      title: language === 'en' ? 'School Tour for Alumni & Prospective Students' : 'OB・入試希望者向け 校内ツアー',
-      desc: language === 'en' ? '10:00 / 12:00 / 14:00 Meet at Gym 1 Entrance' : '10:00〜 / 12:00〜 / 14:00〜 集合：第一体育館前（景品あり）',
-      icon: Compass,
-      color: 'text-teal-900 bg-teal-50 border-teal-200',
-      action: () => handleJump('home', 'campus-tour-section'),
-    },
   ];
 
   return (

@@ -25,7 +25,6 @@ import { motion } from 'motion/react';
 import { AppDataState, ClassProject } from '../types';
 import { AlumniSection } from './AlumniSection';
 import { AnnouncementsSection } from './AnnouncementsSection';
-import { CampusTourSection } from './CampusTourSection';
 import { StudentInfoSection } from './StudentInfoSection';
 import { useI18n, translateCategory } from '../utils/i18n';
 
@@ -434,8 +433,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <StudentInfoSection />
 
       <AlumniSection />
-
-      <CampusTourSection />
 
       <section className="py-14 bg-white opacity-95 transition-opacity duration-1000">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">

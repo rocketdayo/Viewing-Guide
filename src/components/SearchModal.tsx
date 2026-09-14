@@ -71,15 +71,6 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     );
 
     const specialEvents = [];
-    if ('ツアー 校内ツアー tour ob 入試 受験 景品 案内 ポスター チラシ 10時 12時 14時 ガイド 校内 体育館'.toLowerCase().includes(q) || q.includes('ツアー') || q.includes('tour') || q.includes('景品') || q.includes('ob') || q.includes('入試') || q.includes('受験') || q.includes('体育館')) {
-      specialEvents.push({
-        id: 'special-campus-tour',
-        title: language === 'en' ? 'School Tour for Alumni & Prospective Students' : 'OB・入試希望者向け 校内ツアー',
-        desc: language === 'en' ? '10:00 / 12:00 / 14:00 Meet at Gym 1 Entrance (Free gifts available)' : '10:00〜 / 12:00〜 / 14:00〜 集合：第一体育館前（景品プレゼントあり）',
-        tag: language === 'en' ? 'School Tour' : '校内ツアー',
-        targetId: 'campus-tour-section'
-      });
-    }
     if ('同窓会 清教会 未来の仕事図鑑 先輩グルメ 先輩 卒業生 フライヤー チラシ alumni'.toLowerCase().includes(q) || q.includes('同窓会') || q.includes('alumni') || q.includes('清教') || q.includes('グルメ') || q.includes('仕事図鑑')) {
       specialEvents.push({
         id: 'special-alumni',
