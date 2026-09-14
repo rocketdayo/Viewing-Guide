@@ -87,30 +87,28 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div 
             id="brand-logo-btn"
             onClick={() => handleNav('home')}
-            className="flex items-center space-x-3 cursor-pointer group"
+            className="flex items-center space-x-3 cursor-pointer group shrink-0"
           >
             <LogoBadge className="w-10 h-10 group-hover:scale-105 transition-transform duration-200" size={40} />
-            <div className="flex flex-col">
-              <div className="flex items-center space-x-1.5 mb-0.5">
-                <span className="text-[9px] font-bold tracking-widest text-emerald-800 bg-emerald-100/80 px-1.5 py-0.5 rounded-xs font-brand">
+            <div className="flex flex-col justify-center">
+              <div className="flex items-center space-x-1.5">
+                <span className="text-[9px] font-bold tracking-widest text-emerald-800 bg-emerald-100/80 px-1.5 py-0.5 rounded-xs font-brand shrink-0">
                   {t.academicYear}
                 </span>
-                <span className="text-[11px] text-slate-500 font-medium tracking-wide hidden sm:inline">
+                <span className="text-[11px] text-slate-500 font-medium tracking-wide hidden sm:inline shrink-0">
                   {t.schoolName}
                 </span>
-              </div>
-              <h1 className="hidden sm:flex items-baseline gap-2 leading-none">
-                <span className="font-cormorant font-bold tracking-wide text-xl sm:text-2xl text-slate-900 group-hover:text-emerald-900 transition-colors">
+                <h1 className="font-cormorant font-bold tracking-wide text-lg sm:text-xl text-slate-900 group-hover:text-emerald-900 transition-colors leading-none">
                   SGfes公式サイト
-                </span>
-                <span className="text-[11px] font-normal text-slate-400 hidden md:inline truncate max-w-xs">
-                  「{appData?.festivalTheme ? appData.festivalTheme.replace(/^「|」$/g, '') : t.themeLabel}」
-                </span>
-              </h1>
+                </h1>
+              </div>
+              <p className="text-[11px] text-slate-500 font-medium hidden md:block truncate max-w-xs lg:max-w-md mt-1">
+                {appData?.festivalTheme ? appData.festivalTheme : t.themeLabel}
+              </p>
             </div>
           </div>
 
-          <nav className="hidden lg:flex items-center space-x-1">
+          <nav className="hidden lg:flex items-center space-x-1 bg-slate-100/80 p-1 rounded-full border border-slate-200/60">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentPage === item.id;
@@ -118,26 +116,22 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => handleNav(item.id)}
-                  className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-xs transition-all relative text-xs font-bold cursor-pointer ${
+                  title={item.label}
+                  aria-label={item.label}
+                  className={`relative p-2 rounded-full transition-all cursor-pointer group ${
                     isActive 
-                      ? 'text-emerald-900 bg-emerald-50' 
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      ? 'text-emerald-900 bg-white shadow-2xs' 
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'scale-110' : ''}`} />
-                  <span>{item.label}</span>
+                  <Icon className={`w-4 h-4 ${isActive ? 'scale-110 text-emerald-700' : ''}`} />
                   {item.isDraft && (
-                    <span className="text-[9px] bg-amber-100 text-amber-800 font-semibold px-1 py-0.2 rounded-xs ml-0.5">
-                      {language === 'en' ? 'Draft' : '制作中'}
-                    </span>
+                    <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white" />
                   )}
-                  {isActive && (
-                    <motion.div
-                      layoutId="navbarIndicator"
-                      className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-emerald-600"
-                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                    />
-                  )}
+                  <span className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1 bg-slate-900 text-white text-[10px] font-bold rounded-xs shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                    {item.label}
+                    {item.isDraft && ` (${language === 'en' ? 'Draft' : '制作中'})`}
+                  </span>
                 </button>
               );
             })}
