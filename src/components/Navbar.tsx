@@ -90,7 +90,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="flex items-center space-x-3 cursor-pointer group shrink-0"
           >
             <LogoBadge className="w-10 h-10 group-hover:scale-105 transition-transform duration-200" size={40} />
-            <div className="flex flex-col justify-center">
+            <div className="hidden sm:flex flex-col justify-center">
               <div className="flex items-center space-x-1.5">
                 <span className="text-[9px] font-bold tracking-widest text-emerald-800 bg-emerald-100/80 px-1.5 py-0.5 rounded-xs font-brand shrink-0">
                   {t.academicYear}
