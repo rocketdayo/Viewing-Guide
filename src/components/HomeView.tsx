@@ -110,11 +110,33 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center space-x-2.5 bg-white px-3 py-1.5 border border-slate-300/80 shadow-2xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
-                <span className="text-[11px] font-mono font-bold tracking-widest text-slate-700 uppercase">
-                  {t.heroPortalBadge}
-                </span>
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <div className="inline-flex items-center space-x-2.5 bg-white px-3 py-1.5 border border-slate-300/80 shadow-2xs">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+                    <span className="text-[11px] font-mono font-bold tracking-widest text-slate-700 uppercase">
+                      {t.heroJhPortalBadge}
+                    </span>
+                  </div>
+                  <div>
+                    <a
+                      href="https://drive.google.com/file/d/11xl-XJWXqGntX65Mu7l8D2PxbjUuyX3u/view?usp=drive_link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center space-x-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-950 underline decoration-emerald-600 underline-offset-4 hover:decoration-2 transition-colors cursor-pointer group ml-0.5"
+                    >
+                      <span>{t.heroJhGuideLink}</span>
+                      <ExternalLink className="w-3.5 h-3.5 text-emerald-700 group-hover:translate-x-0.5 transition-transform" />
+                    </a>
+                  </div>
+                </div>
+
+                <div className="inline-flex items-center space-x-2.5 bg-white px-3 py-1.5 border border-slate-300/80 shadow-2xs">
+                  <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+                  <span className="text-[11px] font-mono font-bold tracking-widest text-slate-700 uppercase">
+                    {t.heroPortalBadge}
+                  </span>
+                </div>
               </div>
 
               <div className="space-y-4">

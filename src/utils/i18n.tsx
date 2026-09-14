@@ -33,6 +33,8 @@ export interface I18nTranslations {
   lastUpdated: string;
   liveBadge: string;
 
+  heroJhPortalBadge: string;
+  heroJhGuideLink: string;
   heroPortalBadge: string;
   heroTitle: string;
   heroTheme: string;
@@ -264,6 +266,8 @@ const translations: Record<Language, I18nTranslations> = {
     lastUpdated: '最終更新',
     liveBadge: 'LIVE',
 
+    heroJhPortalBadge: '2026年度 清教学園中学校 文化祭',
+    heroJhGuideLink: '清教学園中学校の鑑賞ガイドはこちら',
     heroPortalBadge: '2026年度 清教学園高等学校 文化祭',
     heroTitle: 'SGfes公式サイト',
     heroTheme: '清教エナジー！～1度しかない学園生活を楽しもう～',
@@ -493,6 +497,8 @@ const translations: Record<Language, I18nTranslations> = {
     lastUpdated: 'Last Updated',
     liveBadge: 'LIVE',
 
+    heroJhPortalBadge: '2026 Seikyo Gakuen Junior High School Festival',
+    heroJhGuideLink: 'Click here for Junior High School Guide',
     heroPortalBadge: '2026 Seikyo Gakuen High School Festival',
     heroTitle: 'SGfes Official Site',
     heroTheme: 'Seikyo Energy! Enjoy your one-and-only school life',
