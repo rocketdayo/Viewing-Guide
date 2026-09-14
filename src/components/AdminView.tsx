@@ -6,8 +6,6 @@ import {
   Layers, 
   Calendar, 
   Settings, 
-  Plus, 
-  Trash2, 
   Check, 
   AlertCircle, 
   Activity,
@@ -16,11 +14,10 @@ import {
   KeyRound,
   Copy,
   Send,
-  Pin,
   Radio
 } from 'lucide-react';
-import { AppDataState, Announcement, Greeting, ClassProject, ScheduleEvent, CongestionLevel } from '../types';
-import { ANNOUNCEMENT_PORTAL_URL, getClassCongestionInputUrl, CLASS_CONGESTION_TOKENS } from '../data/defaultData';
+import { AppDataState } from '../types';
+import { ANNOUNCEMENT_PORTAL_URL, getClassCongestionInputUrl } from '../data/defaultData';
 import { useI18n } from '../utils/i18n';
 
 interface AdminViewProps {
@@ -38,7 +35,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   isAdminLoggedIn,
   setIsAdminLoggedIn,
 }) => {
-  const { language, t } = useI18n();
+  const { language } = useI18n();
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(false);
   const [activeTab, setActiveTab] = useState<'announcements' | 'projects' | 'schedules' | 'settings'>('announcements');
@@ -51,21 +48,9 @@ export const AdminView: React.FC<AdminViewProps> = ({
     setFormData(appData);
   }, [appData]);
 
-  const [newAnn, setNewAnn] = useState<{
-    category: '重要' | '混雑情報' | 'プログラム変更' | '一般案内';
-    title: string;
-    content: string;
-    isPinned: boolean;
-  }>({
-    category: '重要',
-    title: '',
-    content: '',
-    isPinned: false,
-  });
-
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.trim().toLowerCase() === 'seikyo2026' || password === 'admin') {
+    if (password === 'SeikyoAdmin2026') {
       setIsAdminLoggedIn(true);
       setLoginError(false);
       setPassword('');
@@ -78,61 +63,6 @@ export const AdminView: React.FC<AdminViewProps> = ({
   const showNotification = (msg: string) => {
     setSaveSuccessMsg(msg);
     setTimeout(() => setSaveSuccessMsg(null), 3000);
-  };
-
-  const handleSaveAll = (updated: AppDataState) => {
-    setFormData(updated);
-    onUpdateAppData(updated);
-    showNotification(language === 'en' ? 'Changes saved successfully!' : '変更内容を正常に保存・更新しました！');
-  };
-
-  const handleAddAnnouncement = () => {
-    if (!newAnn.title.trim() || !newAnn.content.trim()) return;
-    const now = new Date();
-    const timeStr = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    
-    const created: Announcement = {
-      id: `ann-${Date.now()}`,
-      timestamp: timeStr,
-      category: newAnn.category,
-      title: newAnn.title,
-      content: newAnn.content,
-      isPinned: newAnn.isPinned,
-    };
-
-    const updated: AppDataState = {
-      ...formData,
-      announcements: [created, ...formData.announcements],
-    };
-    handleSaveAll(updated);
-    setNewAnn({ category: '重要', title: '', content: '', isPinned: false });
-  };
-
-  const handleDeleteAnnouncement = (id: string) => {
-    const updated: AppDataState = {
-      ...formData,
-      announcements: formData.announcements.filter((a) => a.id !== id),
-    };
-    handleSaveAll(updated);
-  };
-
-  const handleTogglePinAnnouncement = (id: string) => {
-    const updated: AppDataState = {
-      ...formData,
-      announcements: formData.announcements.map((a) =>
-        a.id === id ? { ...a, isPinned: !a.isPinned } : a
-      ),
-    };
-    handleSaveAll(updated);
-  };
-
-  const handleSaveGasUrl = (url: string, announcementUrl?: string) => {
-    const updated: AppDataState = {
-      ...formData,
-      gasCongestionUrl: url,
-      gasAnnouncementUrl: announcementUrl !== undefined ? announcementUrl : appData.gasAnnouncementUrl,
-    };
-    handleSaveAll(updated);
   };
 
   if (!isAdminLoggedIn) {
@@ -179,30 +109,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
             </div>
           )}
 
-          <div className="p-3 bg-emerald-50/60 rounded-xs border border-emerald-100 text-xs text-emerald-900">
-            <p className="font-bold mb-0.5">{language === 'en' ? '※ Demo initial password:' : '※ デモ用初期パスワード:'}</p>
-            <code className="bg-white px-2 py-0.5 rounded border border-emerald-200 font-mono font-bold text-emerald-700">
-              seikyo2026
-            </code>
-          </div>
-
-          <div className="flex gap-2 pt-1">
+          <div className="pt-1">
             <button
               id="admin-login-submit-btn"
               type="submit"
-              className="flex-1 py-2.5 rounded-xs bg-emerald-900 hover:bg-emerald-950 text-white font-bold text-sm transition-colors shadow-xs"
+              className="w-full py-2.5 rounded-xs bg-emerald-900 hover:bg-emerald-950 text-white font-bold text-sm transition-colors shadow-xs cursor-pointer"
             >
               {language === 'en' ? 'Login' : 'ログイン'}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setPassword('seikyo2026');
-                setIsAdminLoggedIn(true);
-              }}
-              className="px-3 py-2.5 rounded-xs bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
-            >
-              {language === 'en' ? '1-Click Fill' : 'ワンクリック入力'}
             </button>
           </div>
         </form>
@@ -229,7 +142,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setIsAdminLoggedIn(false)}
-            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xs bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-colors border border-white/20"
+            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xs bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-colors border border-white/20 cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>{language === 'en' ? 'Logout' : 'ログアウト'}</span>
@@ -246,10 +159,10 @@ export const AdminView: React.FC<AdminViewProps> = ({
 
       <div className="flex p-1.5 bg-slate-100 rounded-xs space-x-1 overflow-x-auto text-xs font-bold">
         {[
-          { id: 'announcements', label: language === 'en' ? 'Announcements & Alerts' : 'お知らせ・緊急速報', icon: Megaphone },
-          { id: 'projects', label: language === 'en' ? 'Class Projects & GAS Links' : 'クラス企画・混雑手動更新', icon: Layers },
+          { id: 'announcements', label: language === 'en' ? 'Announcements Portal' : 'お知らせ配信ポータル', icon: Megaphone },
+          { id: 'projects', label: language === 'en' ? 'Class Projects & GAS Links' : 'クラス企画・混雑入力リンク', icon: Layers },
           { id: 'schedules', label: language === 'en' ? 'Schedule Overview' : 'スケジュール', icon: Calendar },
-          { id: 'settings', label: language === 'en' ? 'GAS Integration & Settings' : 'GAS連携 & システム設定', icon: Settings },
+          { id: 'settings', label: language === 'en' ? 'System Reset' : 'システム設定・初期化', icon: Settings },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -257,7 +170,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-3.5 py-2 rounded-xs flex items-center space-x-1.5 shrink-0 transition-all ${
+              className={`px-3.5 py-2 rounded-xs flex items-center space-x-1.5 shrink-0 transition-all cursor-pointer ${
                 isActive
                   ? 'bg-white text-emerald-950 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -362,7 +275,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
 
             {(formData?.announcements || []).length === 0 ? (
               <div className="p-6 rounded-xs bg-slate-50 border border-slate-200 text-center text-xs text-slate-500">
-                {language === 'en' ? 'No active announcements.' : '現在配信中のお知らせはありません。上の配信ポータルから送信するか、下の手動フォームから追加してください。'}
+                {language === 'en' ? 'No active announcements.' : '現在配信中のお知らせはありません。上の配信ポータルから送信してください。'}
               </div>
             ) : (
               <div className="space-y-3">
@@ -390,29 +303,10 @@ export const AdminView: React.FC<AdminViewProps> = ({
                         </span>
                         <span className="text-xs text-slate-500">{ann.timestamp}</span>
                         {ann.isPinned && (
-                          <span className="text-[10px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <Pin className="w-3 h-3 fill-current" />
+                          <span className="text-[10px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">
                             {language === 'en' ? 'Pinned' : '最上部固定中'}
                           </span>
                         )}
-                      </div>
-
-                      <div className="flex items-center space-x-2">
-                        <button
-                          type="button"
-                          onClick={() => handleTogglePinAnnouncement(ann.id)}
-                          className="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-medium cursor-pointer"
-                        >
-                          {ann.isPinned ? (language === 'en' ? 'Unpin' : '固定解除') : (language === 'en' ? 'Pin to top' : '最上部に固定')}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteAnnouncement(ann.id)}
-                          className="p-1 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                          title={language === 'en' ? 'Delete' : '削除'}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
                       </div>
                     </div>
 
@@ -424,82 +318,6 @@ export const AdminView: React.FC<AdminViewProps> = ({
                 ))}
               </div>
             )}
-          </div>
-
-          <div className="p-6 rounded-xs bg-white border border-slate-200 shadow-xs space-y-4">
-            <div className="flex items-center space-x-2">
-              <Plus className="w-5 h-5 text-emerald-600" />
-              <h3 className="text-sm font-bold text-slate-900">
-                {language === 'en' ? 'Fallback Manual Announcement' : '緊急用 手動お知らせ即時追加'}
-              </h3>
-            </div>
-            <p className="text-xs text-slate-500">
-              {language === 'en' 
-                ? 'Create an announcement directly if the GAS portal is temporarily unreachable.' 
-                : 'GASポータルが開けない場合の予備として、管理画面から直接即時投稿も可能です。'}
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">{language === 'en' ? 'Category' : 'カテゴリ'}</label>
-                <select
-                  value={newAnn.category}
-                  onChange={(e) =>
-                    setNewAnn({ ...newAnn, category: e.target.value as any })
-                  }
-                  className="w-full px-3 py-2 rounded-xs border border-slate-300 text-xs font-bold bg-white"
-                >
-                  <option value="重要">{language === 'en' ? 'Important (Red)' : '重要（赤バッジ）'}</option>
-                  <option value="混雑情報">{language === 'en' ? 'Congestion (Orange)' : '混雑情報（オレンジバッジ）'}</option>
-                  <option value="プログラム変更">{language === 'en' ? 'Program Change (Blue)' : 'プログラム変更（青バッジ）'}</option>
-                  <option value="一般案内">{language === 'en' ? 'General Notice' : '一般案内（通常）'}</option>
-                </select>
-              </div>
-
-              <div className="flex items-center pt-6">
-                <label className="flex items-center space-x-2 text-xs font-bold text-slate-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={newAnn.isPinned}
-                    onChange={(e) => setNewAnn({ ...newAnn, isPinned: e.target.checked })}
-                    className="w-4 h-4 text-emerald-600 rounded"
-                  />
-                  <span>{language === 'en' ? 'Pin to top' : '最上部に固定表示する'}</span>
-                </label>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">{language === 'en' ? 'Title' : 'タイトル'}</label>
-              <input
-                type="text"
-                placeholder={language === 'en' ? 'e.g. [Important] Schedule change for stage program' : '例: 【重要】本日のステージプログラム順序の変更について'}
-                value={newAnn.title}
-                onChange={(e) => setNewAnn({ ...newAnn, title: e.target.value })}
-                className="w-full px-3 py-2 rounded-xs border border-slate-300 text-xs font-bold"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">{language === 'en' ? 'Content' : '内容'}</label>
-              <textarea
-                rows={3}
-                placeholder={language === 'en' ? 'Enter announcement details...' : 'お知らせの詳細内容を入力してください...'}
-                value={newAnn.content}
-                onChange={(e) => setNewAnn({ ...newAnn, content: e.target.value })}
-                className="w-full px-3 py-2 rounded-xs border border-slate-300 text-xs leading-relaxed"
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={handleAddAnnouncement}
-              disabled={!newAnn.title.trim() || !newAnn.content.trim()}
-              className="px-5 py-2.5 rounded-xs bg-emerald-900 hover:bg-emerald-950 disabled:bg-slate-300 text-white font-bold text-xs shadow-xs transition-colors flex items-center space-x-2 cursor-pointer disabled:cursor-not-allowed"
-            >
-              <Plus className="w-4 h-4" />
-              <span>{language === 'en' ? 'Publish Announcement' : 'お知らせを即時配信'}</span>
-            </button>
           </div>
         </div>
       )}
@@ -548,7 +366,6 @@ export const AdminView: React.FC<AdminViewProps> = ({
                       classCode = `${gradeNum}${letter}`;
                     }
 
-                    const token = CLASS_CONGESTION_TOKENS[classCode] || '';
                     const gasUrl = getClassCongestionInputUrl(classCode);
 
                     return (
@@ -562,7 +379,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                               {proj.classNumber}
                             </span>
                             <span className="text-[10px] font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-600">
-                              {classCode} {token ? `(${token})` : ''}
+                              {classCode}
                             </span>
                           </div>
                           <h3 className="text-sm font-bold text-slate-900 line-clamp-1">{proj.title}</h3>
@@ -623,53 +440,8 @@ export const AdminView: React.FC<AdminViewProps> = ({
       )}
 
       {activeTab === 'settings' && (
-        <div className="p-6 rounded-xs bg-white border border-slate-200 shadow-xs space-y-6">
-          <div>
-            <h3 className="text-base font-bold text-slate-900 mb-1">
-              {language === 'en' ? 'Realtime Data Sync Settings' : 'リアルタイム混雑・配信データ連携設定'}
-            </h3>
-            <p className="text-xs text-slate-500 mb-3">
-              {language === 'en' 
-                ? 'Source URLs for receiving live congestion and announcement updates.' 
-                : '文化祭の混雑状況およびお知らせデータを常時受信するデータソースURLです。'}
-            </p>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="block text-xs font-semibold text-slate-700">
-                  {language === 'en' ? 'Class Congestion Data URL:' : '各クラス混雑状況（データ配信URL）:'}
-                </label>
-                <input
-                  type="text"
-                  value={formData.gasCongestionUrl}
-                  onChange={(e) => setFormData({ ...formData, gasCongestionUrl: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xs border border-slate-300 font-mono text-xs text-slate-800"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-xs font-semibold text-slate-700">
-                  {language === 'en' ? 'General Announcement Data URL:' : '全校お知らせ配信（データ配信URL）:'}
-                </label>
-                <input
-                  type="text"
-                  value={formData.gasAnnouncementUrl}
-                  onChange={(e) => setFormData({ ...formData, gasAnnouncementUrl: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xs border border-slate-300 font-mono text-xs text-slate-800"
-                />
-              </div>
-
-              <button
-                onClick={() => handleSaveGasUrl(formData.gasCongestionUrl, formData.gasAnnouncementUrl)}
-                className="px-4 py-2 rounded-xs bg-emerald-900 text-white text-xs font-bold hover:bg-emerald-950 transition-colors cursor-pointer"
-              >
-                {language === 'en' ? 'Save URL Settings' : 'URL設定を保存'}
-              </button>
-            </div>
-
-          </div>
-
-          <div className="border-t border-slate-200 pt-5 space-y-3">
+        <div className="p-6 rounded-xs bg-white border border-slate-200 shadow-xs space-y-4">
+          <div className="space-y-3">
             <h3 className="text-sm font-bold text-slate-900">{language === 'en' ? 'Reset Data' : 'データ初期化'}</h3>
             <p className="text-xs text-slate-500">
               {language === 'en' 
