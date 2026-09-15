@@ -177,8 +177,8 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
       action: () => handleJump('home', 'student-portal-section'),
     },
     {
-      title: language === 'en' ? 'Alumni Association Special Features' : '清教学園同窓会 特別企画',
-      desc: language === 'en' ? 'Career Guidebook & Alumni Food Stall features' : '特設案内：『未来の仕事図鑑』＆『先輩グルメ』',
+      title: language === 'en' ? 'Alumni Features & Guide Dog Booth' : '清教学園同窓会 特別企画 ＆ 盲導犬訓練所',
+      desc: language === 'en' ? 'Career Guidebook, Alumni Food Stalls & Guide Dog Booth' : '特設案内：『未来の仕事図鑑』・『先輩グルメ』＆『日本ライトハウス盲導犬訓練所』',
       icon: GraduationCap,
       color: 'text-amber-800 bg-amber-50 border-amber-200',
       action: () => handleJump('home', 'alumni-section'),

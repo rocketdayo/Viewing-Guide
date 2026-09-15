@@ -74,11 +74,11 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     );
 
     const specialEvents = [];
-    if ('同窓会 清教会 未来の仕事図鑑 先輩グルメ 先輩 卒業生 フライヤー チラシ alumni'.toLowerCase().includes(q) || q.includes('同窓会') || q.includes('alumni') || q.includes('清教') || q.includes('グルメ') || q.includes('仕事図鑑')) {
+    if ('同窓会 清教会 未来の仕事図鑑 先輩グルメ 盲導犬 日本ライトハウス 訓練所 グッズ 先輩 卒業生 フライヤー チラシ alumni guide dog'.toLowerCase().includes(q) || q.includes('同窓会') || q.includes('alumni') || q.includes('清教') || q.includes('グルメ') || q.includes('仕事図鑑') || q.includes('盲導犬') || q.includes('ライトハウス') || q.includes('dog')) {
       specialEvents.push({
         id: 'special-alumni',
-        title: language === 'en' ? 'Alumni Association Special Events' : '清教学園同窓会 特別企画',
-        desc: language === 'en' ? 'Career Guidebook & Alumni Food Stall special features' : '『未来の仕事図鑑』＆『先輩グルメを食べつくせ！』特設案内',
+        title: language === 'en' ? 'Alumni Special Events & Guide Dog Booth' : '清教学園同窓会 特別企画 ＆ 盲導犬訓練所',
+        desc: language === 'en' ? 'Career Guide, Alumni Gourmet & Nippon Lighthouse Guide Dog Center' : '『未来の仕事図鑑』・『先輩グルメ』＆『日本ライトハウス盲導犬訓練所』特設案内',
         tag: language === 'en' ? 'Alumni' : '同窓会企画',
         targetId: 'alumni-section'
       });

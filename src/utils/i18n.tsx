@@ -304,8 +304,8 @@ const translations: Record<Language, I18nTranslations> = {
     congestionTitle: 'リアルタイム混雑・待機時間モニター',
     congestionSubtitle: '各クラスの混雑度と待ち時間をリアルタイムで配信中。空いている企画から効率よく回れます。',
     allBuildings: '全校舎一覧',
-    mainBuilding1F: '本館（高校1年）',
-    newBuilding2F: '新館（高校2年）',
+    mainBuilding1F: 'C棟（高校1年）',
+    newBuilding2F: 'M棟（高校2年）',
     filterSmooth: '空きあり（0〜15分）',
     filterModerate: 'やや混雑（16〜30分）',
     filterCrowded: '混雑中（31分〜）',
@@ -433,8 +433,8 @@ const translations: Record<Language, I18nTranslations> = {
     tourZoomFlyer: 'チラシを拡大表示',
 
     alumniBadge: '清教学園同窓会（清教会）特別企画',
-    alumniTitle: '同窓会特別企画・未来の仕事図鑑 ＆ 先輩グルメ',
-    alumniSubtitle: '卒業生によるキャリアガイドと特製グルメ企画！先輩たちの熱いメッセージをお届けします。',
+    alumniTitle: '同窓会特別企画・未来の仕事図鑑・先輩グルメ ＆ 盲導犬訓練所',
+    alumniSubtitle: '卒業生によるキャリアガイド、特製グルメ、日本ライトハウス盲導犬訓練所ブース！',
     alumniTab1: '1P: 未来の仕事図鑑',
     alumniTab2: '2P: 先輩グルメ',
     alumniCareerDesc: '様々な業界で活躍する清教OB・OGからのキャリアアドバイスと職業紹介',
@@ -664,8 +664,8 @@ const translations: Record<Language, I18nTranslations> = {
     tourZoomFlyer: 'Zoom Flyer Image',
 
     alumniBadge: 'Seikyo Alumni Association Special Project',
-    alumniTitle: 'Alumni Project: Career Guidebook & Gourmet Corner',
-    alumniSubtitle: 'Career guidance from experienced graduates and delicious special food stalls!',
+    alumniTitle: 'Alumni Features: Career Guide, Gourmet & Guide Dog Booth',
+    alumniSubtitle: 'Career guidance from experienced graduates, delicious food stalls, and Nippon Lighthouse Guide Dog Center!',
     alumniTab1: 'Page 1: Career Guidebook',
     alumniTab2: 'Page 2: Alumni Gourmet',
     alumniCareerDesc: 'Career advice and insights from graduates across various professional industries',
@@ -717,6 +717,8 @@ export const translateCategory = (category: string, lang: Language): string => {
 export const translateBuilding = (building: string, lang: Language): string => {
   if (lang !== 'en') return building;
   const map: Record<string, string> = {
+    'C棟': 'C Building',
+    'M棟': 'M Building',
     '本館': 'Main Building',
     '新館': 'New Building',
     '特別棟': 'Special Building',
@@ -751,6 +753,7 @@ export const translateVenue = (venue: string, lang: Language): string => {
     '中庭特設ステージ': 'Courtyard Stage',
     'グラウンド': 'School Ground',
     'ラーニングコモンズ': 'Learning Commons',
+    '校舎内': 'School Building',
     '清教学園ツアー': 'School Tour',
     'all': 'All Venues',
   };

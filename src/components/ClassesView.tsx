@@ -50,6 +50,8 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
 
   const buildings = [
     'all',
+    'C棟',
+    'M棟',
     '本館',
     '新館',
     '特別棟',

@@ -95,6 +95,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     { id: 'レクチャールーム', labelJa: 'レクチャールーム', labelEn: 'Lecture Room', icon: Radio },
     { id: 'グラウンド', labelJa: 'グラウンド・中庭', labelEn: 'Ground & Courtyard', icon: Shield },
     { id: 'ラーニングコモンズ', labelJa: 'ラーニングコモンズ', labelEn: 'Learning Commons', icon: BookOpen },
+    { id: '校舎内', labelJa: '校舎内', labelEn: 'School Building', icon: MapPin },
     { id: '清教学園ツアー', labelJa: '清教学園ツアー', labelEn: 'School Tour', icon: Compass },
   ];
 
@@ -415,12 +416,26 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
         <div className="bg-amber-50 border border-amber-200 rounded-sm p-4 text-xs text-amber-900 space-y-1">
           <div className="font-bold flex items-center space-x-1.5">
             <Award className="w-4 h-4 text-amber-700 shrink-0" />
-            <span>{language === 'en' ? 'Stamp Rally & Photo Spots' : 'SGfesスタンプラリー＆特設フォトスポット'}</span>
+            <span>{language === 'en' ? 'Learning Commons Special Exhibits & Photo Spots' : 'ラーニングコモンズ 展示企画＆フォトスポット'}</span>
           </div>
           <p className="leading-relaxed text-amber-800 pl-5">
             {language === 'en'
-              ? 'Collect 5 stamps placed at various school spots (Ground, Gym 1, Cafeteria, Library, Lecture Room, Learning Commons) and bring your sheet to Learning Commons for gifts! Photo spot & class T-shirt exhibits are also here.'
-              : '校内5箇所のスタンプを集めてラーニングコモンズへ持参すると景品をプレゼント！各クラスTシャツ展示や思い出に残せる特設フォトスポットも設置されています。'}
+              ? 'Exhibits by High School Art Club, Interact Club, International Exchange, Global Studies, and Home Economics. Includes photo spots & balloon gifts for kids!'
+              : '高校美術部、インターアクト部、国際交流、グローバルスタディーズ、家庭科の各種展示を実施中！写真撮影用フォトスポットや風船のプレゼント（小学生以下）もご用意しています。'}
+          </p>
+        </div>
+      )}
+
+      {selectedVenue === '校舎内' && (
+        <div className="bg-indigo-50 border border-indigo-200 rounded-sm p-4 text-xs text-indigo-900 space-y-1">
+          <div className="font-bold flex items-center space-x-1.5">
+            <MapPin className="w-4 h-4 text-indigo-700 shrink-0" />
+            <span>{language === 'en' ? 'SGfes Stamp Rally (School-wide Event)' : 'SGfesスタンプラリー（校内全域企画）'}</span>
+          </div>
+          <p className="leading-relaxed text-indigo-800 pl-5">
+            {language === 'en'
+              ? 'Collect 5 stamps placed around the school building and bring your completed sheet to Learning Commons to receive a gift!'
+              : '校内各所に設置された5箇所のスタンプを集めてラーニングコモンズへ持参すると景品をプレゼント！ぜひ校内を巡ってお楽しみください。'}
           </p>
         </div>
       )}
@@ -433,8 +448,8 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
           </div>
           <p className="leading-relaxed text-teal-800 pl-5">
             {language === 'en'
-              ? 'Day 2 (9/19) Tours start at 10:00, 12:00, and 14:00 (approx. 15 min). Meeting point is at the Gym 1 Entrance signpost. Free gifts available for participants!'
-              : '文化祭2日目(9/19) 10:00〜 / 12:00〜 / 14:00〜の計3回開催（約15分）。集合場所は受付通過後の第一体育館前看板前です。入試検討中の方もOB・OGも気軽にご参加ください！'}
+              ? 'Day 2 (9/19) Tours start at 10:00, 12:00, and 14:00 (approx. 15 min each). Assembly point: In front of Gym 1. Free gifts included!'
+              : '文化祭2日目(9/19) 10:00〜 / 12:00〜 / 14:00〜 のタイムテーブルで計3回開催（約15分）。集合場所は第一体育館前の看板前です。参加者には景品もございます！'}
           </p>
         </div>
       )}

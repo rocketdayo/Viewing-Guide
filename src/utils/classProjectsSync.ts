@@ -24,32 +24,32 @@ const CLASS_METADATA_MAP: Record<
   {
     grade: '1年' | '2年';
     classNumber: string;
-    building: '本館' | '新館';
+    building: 'C棟' | 'M棟' | '本館' | '新館';
     floor: string;
     defaultLocation: string;
   }
 > = {
-  '1A': { grade: '1年', classNumber: '1年A組', building: '本館', floor: '2F', defaultLocation: '本館 2F 1-A教室' },
-  '1B': { grade: '1年', classNumber: '1年B組', building: '本館', floor: '2F', defaultLocation: '本館 2F 1-B教室' },
-  '1C': { grade: '1年', classNumber: '1年C組', building: '本館', floor: '2F', defaultLocation: '本館 2F 1-C教室' },
-  '1D': { grade: '1年', classNumber: '1年D組', building: '本館', floor: '2F', defaultLocation: '本館 2F 1-D教室' },
-  '1E': { grade: '1年', classNumber: '1年E組', building: '本館', floor: '2F', defaultLocation: '本館 2F 1-E教室' },
-  '1F': { grade: '1年', classNumber: '1年F組', building: '本館', floor: '3F', defaultLocation: '本館 3F 1-F教室' },
-  '1G': { grade: '1年', classNumber: '1年G組', building: '本館', floor: '3F', defaultLocation: '本館 3F 1-G教室' },
-  '1H': { grade: '1年', classNumber: '1年H組', building: '本館', floor: '3F', defaultLocation: '本館 3F 1-H教室' },
-  '1I': { grade: '1年', classNumber: '1年I組', building: '本館', floor: '3F', defaultLocation: '本館 3F 1-I教室' },
-  '1J': { grade: '1年', classNumber: '1年J組', building: '本館', floor: '3F', defaultLocation: '本館 3F 1-J教室' },
-  '2A': { grade: '2年', classNumber: '2年A組', building: '新館', floor: '3F', defaultLocation: '新館 3F 2-A教室' },
-  '2B': { grade: '2年', classNumber: '2年B組', building: '新館', floor: '3F', defaultLocation: '新館 3F 2-B教室' },
-  '2C': { grade: '2年', classNumber: '2年C組', building: '新館', floor: '3F', defaultLocation: '新館 3F 2-C教室' },
-  '2D': { grade: '2年', classNumber: '2年D組', building: '新館', floor: '3F', defaultLocation: '新館 3F 2-D教室' },
-  '2E': { grade: '2年', classNumber: '2年E組', building: '新館', floor: '4F', defaultLocation: '新館 4F 2-E教室' },
-  '2F': { grade: '2年', classNumber: '2年F組', building: '新館', floor: '4F', defaultLocation: '新館 4F 2-F教室' },
-  '2G': { grade: '2年', classNumber: '2年G組', building: '新館', floor: '4F', defaultLocation: '新館 4F 2-G教室' },
-  '2H': { grade: '2年', classNumber: '2年H組', building: '新館', floor: '4F', defaultLocation: '新館 4F 2-H教室' },
-  '2I': { grade: '2年', classNumber: '2年I組', building: '新館', floor: '4F', defaultLocation: '新館 4F 2-I教室' },
-  '2J': { grade: '2年', classNumber: '2年J組', building: '新館', floor: '2F', defaultLocation: '新館 2F 2-J教室' },
-  '2K': { grade: '2年', classNumber: '2年K組', building: '新館', floor: '2F', defaultLocation: '新館 2F 2-K教室' },
+  '1A': { grade: '1年', classNumber: '1年A組', building: 'C棟', floor: '3F', defaultLocation: 'C棟 3F 1-A教室' },
+  '1B': { grade: '1年', classNumber: '1年B組', building: 'C棟', floor: '3F', defaultLocation: 'C棟 3F 1-B教室' },
+  '1C': { grade: '1年', classNumber: '1年C組', building: 'C棟', floor: '3F', defaultLocation: 'C棟 3F 1-C教室' },
+  '1D': { grade: '1年', classNumber: '1年D組', building: 'C棟', floor: '3F', defaultLocation: 'C棟 3F 1-D教室' },
+  '1E': { grade: '1年', classNumber: '1年E組', building: 'C棟', floor: '2F', defaultLocation: 'C棟 2F 1-E教室' },
+  '1F': { grade: '1年', classNumber: '1年F組', building: 'C棟', floor: '2F', defaultLocation: 'C棟 2F 1-F教室' },
+  '1G': { grade: '1年', classNumber: '1年G組', building: 'C棟', floor: '2F', defaultLocation: 'C棟 2F 1-G教室' },
+  '1H': { grade: '1年', classNumber: '1年H組', building: 'C棟', floor: '2F', defaultLocation: 'C棟 2F 1-H教室' },
+  '1I': { grade: '1年', classNumber: '1年I組', building: 'C棟', floor: '2F', defaultLocation: 'C棟 2F 1-I教室' },
+  '1J': { grade: '1年', classNumber: '1年J組', building: 'C棟', floor: '2F', defaultLocation: 'C棟 2F 1-J教室' },
+  '2A': { grade: '2年', classNumber: '2年A組', building: 'M棟', floor: 'B2F', defaultLocation: 'M棟 B2F 2-A教室' },
+  '2B': { grade: '2年', classNumber: '2年B組', building: 'M棟', floor: 'B2F', defaultLocation: 'M棟 B2F 2-B教室' },
+  '2C': { grade: '2年', classNumber: '2年C組', building: 'M棟', floor: 'B2F', defaultLocation: 'M棟 B2F 2-C教室' },
+  '2D': { grade: '2年', classNumber: '2年D組', building: 'M棟', floor: 'B1F', defaultLocation: 'M棟 B1F 2-D教室' },
+  '2E': { grade: '2年', classNumber: '2年E組', building: 'M棟', floor: 'B1F', defaultLocation: 'M棟 B1F 2-E教室' },
+  '2F': { grade: '2年', classNumber: '2年F組', building: 'M棟', floor: 'B1F', defaultLocation: 'M棟 B1F 2-F教室' },
+  '2G': { grade: '2年', classNumber: '2年G組', building: 'M棟', floor: '1F', defaultLocation: 'M棟 1F 2-G教室' },
+  '2H': { grade: '2年', classNumber: '2年H組', building: 'M棟', floor: '1F', defaultLocation: 'M棟 1F 2-H教室' },
+  '2I': { grade: '2年', classNumber: '2年I組', building: 'M棟', floor: '1F', defaultLocation: 'M棟 1F 2-I教室' },
+  '2J': { grade: '2年', classNumber: '2年J組', building: 'M棟', floor: 'B1F', defaultLocation: 'M棟 B1F 2-J教室' },
+  '2K': { grade: '2年', classNumber: '2年K組', building: 'M棟', floor: '1F', defaultLocation: 'M棟 1F 2-K教室' },
 };
 
 function normalizeStandardCategory(

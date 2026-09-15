@@ -202,7 +202,7 @@ export const MonitorSignageView: React.FC<MonitorSignageViewProps> = ({
                 displayMode === 'high1' ? 'bg-emerald-600 text-white font-black' : 'hover:text-white'
               }`}
             >
-              {language === 'en' ? 'Main Bldg / Gr.1 (10)' : '本館・高1（10組）'}
+              {language === 'en' ? 'C Bldg / Gr.1 (10)' : 'C棟・高1（10組）'}
             </button>
             <button
               onClick={() => setDisplayMode('high2')}
@@ -210,7 +210,7 @@ export const MonitorSignageView: React.FC<MonitorSignageViewProps> = ({
                 displayMode === 'high2' ? 'bg-emerald-600 text-white font-black' : 'hover:text-white'
               }`}
             >
-              {language === 'en' ? 'New Bldg / Gr.2 (11)' : '新館・高2（11組）'}
+              {language === 'en' ? 'M Bldg / Gr.2 (11)' : 'M棟・高2（11組）'}
             </button>
             <button
               onClick={() => setDisplayMode('ranking')}
@@ -270,7 +270,7 @@ export const MonitorSignageView: React.FC<MonitorSignageViewProps> = ({
                 <div className="flex items-center space-x-2">
                   <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
                   <h2 className="text-lg font-black text-white tracking-wide">
-                    {language === 'en' ? '[Main Bldg] Grade 1 (A-J / 10 classes)' : '【本館】高校1年 企画一覧（A〜J組 / 全10クラス）'}
+                    {language === 'en' ? '[C Bldg] Grade 1 (A-J / 10 classes)' : '【C棟】高校1年 企画一覧（A〜J組 / 全10クラス）'}
                   </h2>
                 </div>
                 <span className="text-xs text-emerald-300 font-mono">
@@ -290,7 +290,7 @@ export const MonitorSignageView: React.FC<MonitorSignageViewProps> = ({
                 <div className="flex items-center space-x-2">
                   <span className="w-3 h-3 rounded-full bg-sky-500"></span>
                   <h2 className="text-lg font-black text-white tracking-wide">
-                    {language === 'en' ? '[New Bldg] Grade 2 (A-K / 11 classes)' : '【新館】高校2年 企画一覧（A〜K組 / 全11クラス）'}
+                    {language === 'en' ? '[M Bldg] Grade 2 (A-K / 11 classes)' : '【M棟】高校2年 企画一覧（A〜K組 / 全11クラス）'}
                   </h2>
                 </div>
                 <span className="text-xs text-sky-300 font-mono">
@@ -331,7 +331,7 @@ export const MonitorSignageView: React.FC<MonitorSignageViewProps> = ({
           <div className="max-w-7xl mx-auto space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h2 className="text-2xl font-black text-white">
-                {language === 'en' ? 'Main Bldg / Grade 1 (A-J) Queue Monitor' : '本館・高校1年（A〜J組） 混雑・待機状況'}
+                {language === 'en' ? 'C Bldg / Grade 1 (A-J) Queue Monitor' : 'C棟・高校1年（A〜J組） 混雑・待機状況'}
               </h2>
               <span className="text-sm text-emerald-400 font-bold">{language === 'en' ? '10 Classes' : '10クラス'}</span>
             </div>
@@ -347,7 +347,7 @@ export const MonitorSignageView: React.FC<MonitorSignageViewProps> = ({
           <div className="max-w-7xl mx-auto space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h2 className="text-2xl font-black text-white">
-                {language === 'en' ? 'New Bldg / Grade 2 (A-K) Queue Monitor' : '新館・高校2年（A〜K組） 混雑・待機状況'}
+                {language === 'en' ? 'M Bldg / Grade 2 (A-K) Queue Monitor' : 'M棟・高校2年（A〜K組） 混雑・待機状況'}
               </h2>
               <span className="text-sm text-sky-400 font-bold">{language === 'en' ? '11 Classes' : '11クラス'}</span>
             </div>

@@ -9,7 +9,7 @@ export interface ClassProject {
   category: '演劇・劇' | 'アトラクション・体験' | '展示・研究' | 'カフェ・飲食' | '縁日・ゲーム' | 'ステージ・音楽' | '特別企画・進路';
   rawCategory?: string;
   location: string;
-  building: '本館' | '新館' | '特別棟' | 'チャペル' | '体育館' | '中庭・屋外' | '食堂' | 'カフェテリア' | 'キャンパス前・屋外';
+  building: 'C棟' | 'M棟' | '本館' | '新館' | '特別棟' | 'チャペル' | '体育館' | '中庭・屋外' | '食堂' | 'カフェテリア' | 'キャンパス前・屋外';
   floor: string;
   description: string;
   fullDetails: string;
@@ -47,10 +47,10 @@ export interface ScheduleEvent {
   duration?: string;
   title: string;
   performer: string;
-  performerType?: '部活' | '有志' | 'クラス' | '一般' | '特別';
+  performerType?: '部活' | '有志' | 'クラス' | '一般' | '特別' | '展示';
   venue: string;
   stagePosition?: '舞台上' | '舞台下' | '舞台上・下' | 'フロア' | string;
-  category: 'ステージ' | 'セレモニー' | 'ライブ' | '特別企画' | 'コンテスト' | 'ダンス' | '音楽・演奏' | '演劇' | 'パフォーマンス';
+  category: 'ステージ' | 'セレモニー' | 'ライブ' | '特別企画' | 'コンテスト' | 'ダンス' | '音楽・演奏' | '演劇' | 'パフォーマンス' | '展示';
   description: string;
   isImportant?: boolean;
   image?: string;

@@ -11,7 +11,10 @@ import {
   Info,
   X,
   ZoomIn,
-  CheckCircle2
+  CheckCircle2,
+  Dog,
+  Heart,
+  BookOpen
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -20,6 +23,7 @@ import {
   CLASS_REUNION_PDF_BASE64,
 } from '../assets/alumniData';
 import { useI18n } from '../utils/i18n';
+import { WorkBookletViewer } from './WorkBookletViewer';
 
 interface AlumniSectionProps {
   onOpenClassDetail?: (projectId: string) => void;
@@ -27,8 +31,8 @@ interface AlumniSectionProps {
 
 export const AlumniSection: React.FC<AlumniSectionProps> = () => {
   const { language, t } = useI18n();
-  const [activeTab, setActiveTab] = useState<'both' | 'career' | 'gourmet'>('both');
-  const [modalPage, setModalPage] = useState<1 | 2 | null>(null);
+  const [activeTab, setActiveTab] = useState<'both' | 'career' | 'gourmet' | 'guideDog'>('both');
+  const [modalPage, setModalPage] = useState<1 | 2 | 3 | null>(null);
 
   const pdfUrl = CLASS_REUNION_PDF_BASE64;
 
@@ -118,6 +122,34 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
     ],
   };
 
+  const guideDogData = {
+    pageNumber: 3,
+    id: 'guideDog',
+    title: language === 'en' ? 'Nippon Lighthouse Guide Dog Training Center' : '日本ライトハウス盲導犬訓練所',
+    subheading: language === 'en' ? '~Guide Dog Training Support & Goods Sales~' : '～盲導犬育成事業のご紹介＆可愛いグッズ販売～',
+    catchphrase: language === 'en'
+      ? 'Meet cute guide dogs and support our walking assistance mission!'
+      : '視覚障碍者の安全で快適な歩行をサポート！可愛いワンちゃんたちも応援に来てくれます！',
+    date: language === 'en' ? 'Sep 19, 2026 (Sat)' : '2026年9月19日(土)',
+    timeSlot: '10:00〜14:30',
+    location: language === 'en' ? 'Alumni Special Feature Booth Area' : '同窓会特別企画ブースエリア',
+    organizer: language === 'en' ? 'Nippon Lighthouse Guide Dog Training Center' : '日本ライトハウス盲導犬訓練所',
+    target: language === 'en' ? 'All visitors & students' : '来場者の皆さま・生徒・保護者',
+    imageSrc: '/images/alumni/guide_dog.jpg',
+    messageBody: language === 'en'
+      ? 'Hello from the Nippon Lighthouse Guide Dog Training Center. We conduct guide dog training programs to support safe and comfortable walking for visually impaired individuals. Our operations are supported by your donations and merchandise proceeds. At our booth this time, we are selling cute original goods. The dogs will also come to cheer us on, so please come and meet them! Thank you for your support.'
+      : '日本ライトハウス盲導犬訓練所です。私達は視覚障碍者の安全で快適な歩行をサポートする、盲導犬育成事業を行っています。事業は皆さんのご寄付やグッズの収益金などで支えられています。今回のブースでは、可愛いグッズを販売しています。犬達も応援しに来てくれるので、どうぞ会いに来てくださいね。よろしくお願いします。',
+    features: language === 'en' ? [
+      'Original merchandise sales supporting guide dog training',
+      'Meet real PR guide dogs on-site',
+      'Learn about walking assistance and guide dog activities',
+    ] : [
+      '盲導犬育成事業を支える可愛いオリジナルグッズの販売',
+      'PR犬（盲導犬）たちが実際に会場を応援・ふれあい',
+      '視覚障害者歩行支援・育成活動の紹介コーナー',
+    ],
+  };
+
   return (
     <section id="alumni-section" className="border-b border-amber-200/90 bg-gradient-to-b from-amber-50/80 via-white to-amber-50/50 py-12 sm:py-16 scroll-mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -155,7 +187,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 bg-amber-100/60 p-1.5 rounded-xs border border-amber-200 max-w-xl">
+        <div className="flex flex-wrap items-center gap-2 bg-amber-100/60 p-1.5 rounded-xs border border-amber-200 max-w-3xl">
           <button
             onClick={() => setActiveTab('both')}
             className={`flex-1 min-w-[120px] py-2 px-3 text-xs font-bold rounded-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
@@ -164,22 +196,22 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
                 : 'text-amber-900/80 hover:text-amber-950 hover:bg-white/50'
             }`}
           >
-            <span>{language === 'en' ? '📑 View Both Events' : '📑 2企画を並べて見る'}</span>
+            <span>{language === 'en' ? '📑 View All Features' : '📑 全企画を並べて見る'}</span>
           </button>
           <button
             onClick={() => setActiveTab('career')}
-            className={`flex-1 min-w-[130px] py-2 px-3 text-xs font-bold rounded-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
+            className={`flex-1 min-w-[120px] py-2 px-3 text-xs font-bold rounded-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
               activeTab === 'career'
                 ? 'bg-white text-amber-950 shadow-2xs border border-amber-300'
                 : 'text-amber-900/80 hover:text-amber-950 hover:bg-white/50'
             }`}
           >
             <Briefcase className="w-3.5 h-3.5 text-sky-700" />
-            <span>{language === 'en' ? '① Career Guide' : '① 未来の仕事図鑑'}</span>
+            <span>{language === 'en' ? '① Career Guide (36 Alumni)' : '① 未来の仕事図鑑(36名)'}</span>
           </button>
           <button
             onClick={() => setActiveTab('gourmet')}
-            className={`flex-1 min-w-[130px] py-2 px-3 text-xs font-bold rounded-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
+            className={`flex-1 min-w-[120px] py-2 px-3 text-xs font-bold rounded-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
               activeTab === 'gourmet'
                 ? 'bg-white text-amber-950 shadow-2xs border border-amber-300'
                 : 'text-amber-900/80 hover:text-amber-950 hover:bg-white/50'
@@ -188,9 +220,30 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
             <UtensilsCrossed className="w-3.5 h-3.5 text-orange-700" />
             <span>{language === 'en' ? '② Alumni Gourmet' : '② 先輩グルメ'}</span>
           </button>
+          <button
+            onClick={() => setActiveTab('guideDog')}
+            className={`flex-1 min-w-[120px] py-2 px-3 text-xs font-bold rounded-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
+              activeTab === 'guideDog'
+                ? 'bg-white text-amber-950 shadow-2xs border border-amber-300'
+                : 'text-amber-900/80 hover:text-amber-950 hover:bg-white/50'
+            }`}
+          >
+            <Dog className="w-3.5 h-3.5 text-emerald-700" />
+            <span>{language === 'en' ? '③ Guide Dog Booth' : '③ 盲導犬訓練所'}</span>
+          </button>
         </div>
 
-        <div className={`grid gap-8 ${activeTab === 'both' ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1 max-w-4xl mx-auto'}`}>
+        {(activeTab === 'both' || activeTab === 'career') && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <WorkBookletViewer />
+          </motion.div>
+        )}
+
+        <div className={`grid gap-8 ${activeTab === 'both' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 max-w-4xl mx-auto'}`}>
           
           {(activeTab === 'both' || activeTab === 'career') && (
             <motion.div
@@ -390,6 +443,113 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
             </motion.div>
           )}
 
+          {(activeTab === 'both' || activeTab === 'guideDog') && (
+            <motion.div
+              layout
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+              className="bg-white border-2 border-emerald-200/90 rounded-xs shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col justify-between"
+            >
+              <div className="p-5 sm:p-6 border-b border-emerald-100 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="p-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xs">
+                      <Dog className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-mono font-bold text-emerald-800 tracking-wider">
+                        {language === 'en' ? 'Alumni Feature 3' : '同窓会 企画 3'}
+                      </span>
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+                        {guideDogData.title}
+                      </h3>
+                    </div>
+                  </div>
+                  <span className="bg-emerald-100 text-emerald-900 text-xs font-bold font-mono px-2.5 py-1 rounded-xs border border-emerald-200">
+                    {language === 'en' ? 'Special Booth' : '特別出展'}
+                  </span>
+                </div>
+
+                <p className="text-xs font-bold text-emerald-800 bg-emerald-50/70 p-2.5 rounded-xs border border-emerald-100">
+                  {guideDogData.subheading} {guideDogData.catchphrase}
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
+                  <div className="flex items-center space-x-1.5 bg-slate-50 p-2 rounded-xs border border-slate-200/70">
+                    <Clock className="w-4 h-4 text-emerald-700 shrink-0" />
+                    <span><strong>{language === 'en' ? 'Time: ' : '時間：'}</strong>{guideDogData.timeSlot}</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5 bg-slate-50 p-2 rounded-xs border border-slate-200/70">
+                    <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
+                    <span><strong>{language === 'en' ? 'Location: ' : '場所：'}</strong>{guideDogData.location}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2 pt-2">
+                  <div className="flex items-center justify-between text-xs text-slate-500">
+                    <span className="font-bold text-slate-700">{language === 'en' ? 'Booth Photo' : 'ブース＆盲導犬のお写真'}</span>
+                    <span className="text-emerald-700 font-bold flex items-center gap-1">
+                      <ZoomIn className="w-3.5 h-3.5" /> {language === 'en' ? 'Tap to Zoom' : 'タップで拡大'}
+                    </span>
+                  </div>
+                  
+                  <div
+                    onClick={() => setModalPage(3)}
+                    className="relative group cursor-pointer overflow-hidden border border-slate-300 rounded-xs bg-slate-950/5 shadow-inner flex justify-center items-center min-h-[260px]"
+                  >
+                    <img
+                      src={guideDogData.imageSrc}
+                      alt={guideDogData.title}
+                      className="w-full h-auto max-h-[420px] object-contain transition-transform duration-300 group-hover:scale-[1.01]"
+                    />
+                    <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <span className="px-4 py-2 bg-slate-900/85 text-white text-xs font-bold rounded-xs shadow-md flex items-center gap-2 backdrop-blur-xs">
+                        <Maximize2 className="w-4 h-4 text-amber-400" />
+                        {language === 'en' ? 'View High-Res Photo' : '高画質写真を表示'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-emerald-50/60 rounded-xs border border-emerald-200 space-y-1">
+                  <div className="flex items-center space-x-1.5 text-xs font-bold text-emerald-900">
+                    <Heart className="w-4 h-4 text-emerald-700 shrink-0 fill-emerald-100" />
+                    <span>{language === 'en' ? 'Message from the Organization:' : '出展のご挨拶・メッセージ：'}</span>
+                  </div>
+                  <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line pl-5">
+                    {guideDogData.messageBody}
+                  </p>
+                </div>
+
+                <div className="space-y-1.5 pt-2">
+                  <span className="text-xs font-bold text-slate-700 block">
+                    {language === 'en' ? 'Highlights:' : '企画のポイント：'}
+                  </span>
+                  {guideDogData.features.map((feat, fIdx) => (
+                    <div key={fIdx} className="flex items-start space-x-2 text-xs text-slate-600">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
+                      <span>{feat}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-4 bg-emerald-50/50 border-t border-emerald-100 flex items-center justify-between">
+                <span className="text-xs text-emerald-900 font-medium">
+                  {language === 'en' ? 'Organizer: ' : '主催：'}{guideDogData.organizer}
+                </span>
+                <button
+                  onClick={() => setModalPage(3)}
+                  className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <Maximize2 className="w-3.5 h-3.5" />
+                  <span>{language === 'en' ? 'Enlarge Photo' : '写真を拡大表示'}</span>
+                </button>
+              </div>
+            </motion.div>
+          )}
+
         </div>
 
       </div>
@@ -409,10 +569,14 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
             >
               <div className="flex items-center space-x-3">
                 <span className="bg-amber-500 text-slate-950 text-xs font-bold px-2 py-0.5 rounded-xs">
-                  {modalPage === 1 ? (language === 'en' ? 'Feature 1' : '企画 1') : (language === 'en' ? 'Feature 2' : '企画 2')}
+                  {modalPage === 1 
+                    ? (language === 'en' ? 'Feature 1' : '企画 1') 
+                    : modalPage === 2 
+                    ? (language === 'en' ? 'Feature 2' : '企画 2') 
+                    : (language === 'en' ? 'Feature 3' : '企画 3')}
                 </span>
                 <h3 className="text-xs sm:text-sm font-bold text-white truncate max-w-[200px] sm:max-w-md">
-                  {modalPage === 1 ? careerData.title : gourmetData.title}
+                  {modalPage === 1 ? careerData.title : modalPage === 2 ? gourmetData.title : guideDogData.title}
                 </h3>
               </div>
 
@@ -432,6 +596,14 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
                   }`}
                 >
                   {language === 'en' ? '2. Gourmet' : '2. 先輩グルメ'}
+                </button>
+                <button
+                  onClick={() => setModalPage(3)}
+                  className={`px-2.5 py-1 rounded-xs text-xs font-bold cursor-pointer transition-colors ${
+                    modalPage === 3 ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-300 hover:text-white'
+                  }`}
+                >
+                  {language === 'en' ? '3. Guide Dog' : '3. 盲導犬訓練所'}
                 </button>
 
                 <a
@@ -458,8 +630,8 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <img
-                src={modalPage === 1 ? careerData.imageSrc : gourmetData.imageSrc}
-                alt={modalPage === 1 ? careerData.title : gourmetData.title}
+                src={modalPage === 1 ? careerData.imageSrc : modalPage === 2 ? gourmetData.imageSrc : guideDogData.imageSrc}
+                alt={modalPage === 1 ? careerData.title : modalPage === 2 ? gourmetData.title : guideDogData.title}
                 className="max-h-[80vh] w-auto max-w-full object-contain rounded-xs shadow-2xl border border-slate-700 bg-white"
               />
             </div>
@@ -473,7 +645,9 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
                 <span>
                   {modalPage === 1
                     ? (language === 'en' ? 'Sep 19 (Sat) ①10:00-12:00 / ②12:30-14:30 (Main Bldg 3F)' : '9月19日(土) ①10:00〜12:00 / ②12:30〜14:30（本館 高3E・F・G教室）')
-                    : (language === 'en' ? 'Sep 19 (Sat) 10:00-14:30 (In front of Campus & Int. Room)' : '9月19日(土) 10:00〜14:30（清教キャンパス前＆国際交流室前）')}
+                    : modalPage === 2
+                    ? (language === 'en' ? 'Sep 19 (Sat) 10:00-14:30 (In front of Campus & Int. Room)' : '9月19日(土) 10:00〜14:30（清教キャンパス前＆国際交流室前）')
+                    : (language === 'en' ? 'Sep 19 (Sat) 10:00-14:30 (Alumni Special Feature Booth Area)' : '9月19日(土) 10:00〜14:30（同窓会特別企画ブースエリア）')}
                 </span>
               </div>
 
@@ -499,3 +673,4 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
     </section>
   );
 };
+
