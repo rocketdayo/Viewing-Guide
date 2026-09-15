@@ -377,8 +377,8 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
           </div>
           <p className="leading-relaxed text-sky-800 pl-5">
             {language === 'en'
-              ? 'Outdoor shoes are strictly prohibited inside the gym. Please use indoor slippers/shoe bags at the entrance. "Floor" indicates the arena floor, and "Stage" indicates the elevated stage. Night Fes 2026 will also take place here on Day 1 (16:00~).'
-              : '会場内は土足厳禁です。入口にてスリッパ・靴袋をご利用ください。「舞台下」はアリーナフロア面、「舞台上」はメインステージ上となります。9/18(金)16:00〜の後夜祭 (Seikyo Night Fes) も第一体育館で開催されます！'}
+              ? 'Outdoor shoes are permitted inside the venue (no need to change into slippers). "Floor" indicates the arena floor, and "Stage" indicates the main elevated stage. Night Fes 2026 will also take place here on Day 1 (16:00~).'
+              : '会場内は土足のままご入場いただけます（上履き・スリッパへの履き替えは不要です）。「舞台下」はアリーナフロア面、「舞台上」はメインステージ上となります。9/18(金)16:00〜の後夜祭 (Seikyo Night Fes) も第一体育館で開催されます！'}
           </p>
         </div>
       )}
