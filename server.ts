@@ -1,11 +1,105 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 
 const app = express();
 const PORT = 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+app.use('/images/schedule', express.static(path.join(process.cwd(), 'public/images/schedule')));
+app.use('/images/projects', express.static(path.join(process.cwd(), 'public/images/projects')));
+app.use('/images/classes', express.static(path.join(process.cwd(), 'public/images/classes')));
+app.use('/images', express.static(path.join(process.cwd(), 'public/images')));
+app.use('/SGfes', express.static(path.join(process.cwd(), 'public/SGfes')));
+app.use('/SGfes', express.static(path.join(process.cwd(), 'SGfes')));
+
+const searchDirs = [
+  path.join(process.cwd(), 'public/images/schedule'),
+  path.join(process.cwd(), 'public/images/projects'),
+  path.join(process.cwd(), 'public/images/classes'),
+  path.join(process.cwd(), 'public/images'),
+  path.join(process.cwd(), 'public/SGfes'),
+  path.join(process.cwd(), 'SGfes'),
+  path.join(process.cwd(), 'public')
+];
+
+app.get(['/images/schedule/:file', '/images/projects/:file', '/images/classes/:file', '/images/:file', '/SGfes/:file'], (req, res, next) => {
+  const rawFile = req.params.file;
+  let decoded = rawFile;
+  try {
+    decoded = decodeURIComponent(rawFile);
+  } catch {}
+
+  const variants = [
+    rawFile,
+    decoded,
+    decoded.normalize('NFC'),
+    decoded.normalize('NFD'),
+    rawFile.normalize('NFC'),
+    rawFile.normalize('NFD')
+  ];
+
+  for (const dir of searchDirs) {
+    if (!fs.existsSync(dir)) continue;
+    for (const v of variants) {
+      const target = path.join(dir, v);
+      if (fs.existsSync(target) && fs.statSync(target).isFile()) {
+        return res.sendFile(target);
+      }
+    }
+  }
+  next();
+});
+
+app.get("/api/poster-list", (req, res) => {
+  const fileSet = new Set<string>();
+  for (const dir of searchDirs) {
+    if (fs.existsSync(dir)) {
+      try {
+        const files = fs.readdirSync(dir);
+        files.forEach(f => fileSet.add(f));
+      } catch {}
+    }
+  }
+  res.json({ success: true, files: Array.from(fileSet) });
+});
+
+app.post("/api/upload-poster", (req, res) => {
+  try {
+    const { fileName, dataBase64, folder = 'schedule' } = req.body;
+    if (!fileName || !dataBase64) {
+      return res.status(400).json({ success: false, error: "fileName and dataBase64 required" });
+    }
+
+    const cleanBase64 = dataBase64.replace(/^data:image\/[a-z0-9+]+;base64,/, '');
+    const buffer = Buffer.from(cleanBase64, 'base64');
+    
+    const targetDir = folder === 'projects' 
+      ? path.join(process.cwd(), 'public/images/projects')
+      : path.join(process.cwd(), 'public/images/schedule');
+    
+    const sgfesDir = path.join(process.cwd(), 'public/SGfes');
+
+    if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+    if (!fs.existsSync(sgfesDir)) fs.mkdirSync(sgfesDir, { recursive: true });
+
+    const safeName = path.basename(fileName);
+    fs.writeFileSync(path.join(targetDir, safeName), buffer);
+    fs.writeFileSync(path.join(sgfesDir, safeName), buffer);
+
+    res.json({
+      success: true,
+      url: `/images/${folder}/${safeName}`,
+      sgfesUrl: `/SGfes/${safeName}`,
+      fileName: safeName
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message || "Failed to save poster" });
+  }
+});
 
 const DEFAULT_CONGESTION_URL =
   "https://docs.google.com/spreadsheets/d/154F3vcdcOSyMc55VbY9qPCey4JtL7mW1pCOWBrDVuZc/edit?gid=0#gid=0";
@@ -32,7 +126,6 @@ let classProjectsCache: {
   data: Record<string, any>;
 } | null = null;
 
-// Convert Google Sheet edit/pub URLs to CSV export URLs
 function getGoogleSpreadsheetCsvUrl(targetUrl: string): string {
   let fetchUrl = targetUrl.trim();
   if (!fetchUrl.includes("docs.google.com/spreadsheets")) {
@@ -50,7 +143,6 @@ function getGoogleSpreadsheetCsvUrl(targetUrl: string): string {
   return fetchUrl;
 }
 
-// Robust RFC-4180 compliant CSV parser to handle quotes, commas, and MULTILINE cells
 function parseFullCSV(text: string): string[][] {
   if (!text || typeof text !== 'string') return [];
   const rows: string[][] = [];
@@ -65,7 +157,7 @@ function parseFullCSV(text: string): string[][] {
     if (inQuotes) {
       if (char === '"' && nextChar === '"') {
         currentField += '"';
-        i++; // Skip the second quote
+        i++;
       } else if (char === '"') {
         inQuotes = false;
       } else {
@@ -79,7 +171,7 @@ function parseFullCSV(text: string): string[][] {
         currentField = '';
       } else if (char === '\r') {
         if (nextChar === '\n') {
-          i++; // Skip \n
+          i++;
         }
         currentRow.push(currentField.trim());
         rows.push(currentRow);
@@ -96,7 +188,6 @@ function parseFullCSV(text: string): string[][] {
     }
   }
 
-  // Push last field and row if any remaining
   if (currentField.length > 0 || currentRow.length > 0) {
     currentRow.push(currentField.trim());
     rows.push(currentRow);
@@ -105,7 +196,6 @@ function parseFullCSV(text: string): string[][] {
   return rows;
 }
 
-// Simple CSV line parser to handle quotes and commas inside cells
 function parseCSVLine(text: string): string[] {
   const result: string[] = [];
   let current = "";
@@ -152,29 +242,25 @@ function checkIsPinned(val: any): boolean {
   );
 }
 
-// Fetch with retry and timeout (12s per try, max 2 tries)
 async function fetchWithRetry(url: string, options: RequestInit, retries = 2, backoff = 800, timeout = 12000): Promise<Response> {
-  for (let i = 0; i < retries; i++) {
+  for (let i = 0; i <= retries; i++) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    const timer = setTimeout(() => controller.abort(), timeout);
     try {
       const response = await fetch(url, { ...options, signal: controller.signal });
-      clearTimeout(timeoutId);
+      clearTimeout(timer);
       if (response.ok) return response;
-      if (response.status >= 500 && i < retries - 1) {
-        throw new Error(`Status ${response.status}`);
-      }
-      return response;
-    } catch (e) {
-      clearTimeout(timeoutId);
-      if (i === retries - 1) throw e;
-      await new Promise(resolve => setTimeout(resolve, backoff * (i + 1)));
+    } catch (e: any) {
+      clearTimeout(timer);
+      if (i === retries) throw e;
+    }
+    if (i < retries) {
+      await new Promise((resolve) => setTimeout(resolve, backoff * (i + 1)));
     }
   }
-  throw new Error("Max retries reached");
+  throw new Error(`Failed to fetch from ${url} after ${retries + 1} attempts`);
 }
 
-// Parse Spreadsheet CSV to extract class congestion data
 async function fetchAndParseGas(targetUrl: string) {
   const fetchUrl = getGoogleSpreadsheetCsvUrl(targetUrl);
 
@@ -183,27 +269,14 @@ async function fetchAndParseGas(targetUrl: string) {
     headers: {
       "User-Agent":
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      Accept: "text/csv,text/plain;q=0.9,*/*;q=0.8",
     },
   });
-
-  if (!res.ok) {
-    throw new Error(`Data request failed with status: ${res.status}`);
-  }
 
   const raw = await res.text();
   const rows = parseFullCSV(raw);
 
-  const results: Record<
-    string,
-    {
-      classCode: string;
-      statusText: string;
-      waitTimeMinutes: number;
-      detailText: string;
-      level: "smooth" | "moderate" | "crowded" | "ticket" | "closed";
-      rawWait: string;
-    }
-  > = {};
+  const results: Record<string, any> = {};
 
   for (let i = 0; i < rows.length; i++) {
     const parts = rows[i];
@@ -232,7 +305,7 @@ async function fetchAndParseGas(targetUrl: string) {
     const waitNumMatch = waitRaw.match(/(\d+)/);
     const waitMinutes = waitNumMatch ? parseInt(waitNumMatch[1], 10) : 0;
 
-    let level: "smooth" | "moderate" | "crowded" | "ticket" | "closed" = "smooth";
+    let level = "smooth";
     if (
       statusText.includes("休") ||
       statusText.includes("終了") ||
@@ -264,7 +337,6 @@ async function fetchAndParseGas(targetUrl: string) {
   return results;
 }
 
-// Parse Spreadsheet CSV or GAS Web App JSON to extract announcement data
 async function fetchAndParseAnnouncements(targetUrl: string) {
   const fetchUrl = getGoogleSpreadsheetCsvUrl(targetUrl);
 
@@ -273,24 +345,20 @@ async function fetchAndParseAnnouncements(targetUrl: string) {
     headers: {
       "User-Agent":
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      Accept: "application/json,text/csv,text/plain;q=0.9,*/*;q=0.8",
     },
   });
-
-  if (!res.ok) {
-    throw new Error(`Data request failed with status: ${res.status}`);
-  }
 
   const raw = await res.text();
   const trimmed = raw.trim();
 
-  // Try parsing JSON if GAS Web App returns JSON
   if (trimmed.startsWith("[") || (trimmed.startsWith("{") && !trimmed.startsWith("<!DOCTYPE"))) {
     try {
       const parsed = JSON.parse(trimmed);
       const items = Array.isArray(parsed) ? parsed : (parsed.announcements || parsed.data || []);
       if (Array.isArray(items)) {
         const list = items.map((item: any, i: number) => {
-          let cat: "重要" | "混雑情報" | "プログラム変更" | "一般案内" = "一般案内";
+          let cat = "一般案内";
           const catStr = (item.category || item.type || "").toString();
           if (catStr.includes("重要")) cat = "重要";
           else if (catStr.includes("混雑")) cat = "混雑情報";
@@ -313,14 +381,12 @@ async function fetchAndParseAnnouncements(targetUrl: string) {
         });
       }
     } catch {
-      // Not JSON, continue to CSV parsing
     }
   }
 
   const rows = parseFullCSV(raw);
   if (rows.length === 0) return [];
 
-  // Inspect Header Row (Row 0) to detect column indices if available
   let dateCol = 0;
   let categoryCol = 1;
   let titleCol = 2;
@@ -331,69 +397,65 @@ async function fetchAndParseAnnouncements(targetUrl: string) {
   if (rows.length > 0) {
     const headerRow = rows[0].map(h => (h || "").toLowerCase().replace(/\s+/g, ""));
     let foundHeaders = false;
-
-    headerRow.forEach((h, idx) => {
-      if (h.includes("日時") || h.includes("日付") || h.includes("時間") || h.includes("date") || h.includes("time") || h.includes("timestamp")) {
-        dateCol = idx;
+    for (let c = 0; c < headerRow.length; c++) {
+      const val = headerRow[c];
+      if (val.includes("日") || val.includes("時") || val.includes("date") || val.includes("time")) {
+        dateCol = c;
         foundHeaders = true;
-      } else if (h.includes("カテゴリ") || h.includes("種別") || h.includes("区分") || h.includes("category") || h.includes("type")) {
-        categoryCol = idx;
+      } else if (val.includes("種") || val.includes("区分") || val.includes("カテゴリ") || val.includes("category")) {
+        categoryCol = c;
         foundHeaders = true;
-      } else if (h.includes("タイトル") || h.includes("件名") || h.includes("題名") || h.includes("title")) {
-        titleCol = idx;
+      } else if (val.includes("題") || val.includes("タイトル") || val.includes("件名") || val.includes("title")) {
+        titleCol = c;
         foundHeaders = true;
-      } else if (h.includes("本文") || h.includes("内容") || h.includes("詳細") || h.includes("content") || h.includes("body") || h.includes("detail")) {
-        contentCol = idx;
+      } else if (val.includes("内") || val.includes("本文") || val.includes("詳細") || val.includes("content") || val.includes("body")) {
+        contentCol = c;
         foundHeaders = true;
-      } else if (h.includes("ピン") || h.includes("固定") || h.includes("重要") || h.includes("pin") || h.includes("pinned") || h.includes("top")) {
-        pinCol = idx;
+      } else if (val.includes("ピン") || val.includes("固定") || val.includes("pin") || val.includes("優先")) {
+        pinCol = c;
         foundHeaders = true;
       }
-    });
-
-    if (!foundHeaders && rows[0].length >= 3 && !rows[0][0].includes("日時") && !rows[0][2].includes("タイトル")) {
+    }
+    if (!foundHeaders) {
       startRow = 0;
     }
   }
 
-  const announcements = [];
+  const announcements: any[] = [];
   for (let i = startRow; i < rows.length; i++) {
-    const row = rows[i];
-    if (!row || row.length === 0) continue;
+    const parts = rows[i];
+    if (!parts || parts.length < 2) continue;
 
-    const dateRaw = row[dateCol]?.trim();
-    const categoryRaw = row[categoryCol]?.trim();
-    const titleRaw = row[titleCol]?.trim();
-    const contentRaw = row[contentCol]?.trim();
-    const isPinnedRaw = row[pinCol];
+    const rawTitle = (parts[titleCol] || "").trim();
+    if (!rawTitle) continue;
 
-    if (!titleRaw) continue;
+    const rawDate = (parts[dateCol] || "").trim();
+    const rawCategory = (parts[categoryCol] || "").trim();
+    const rawContent = (parts[contentCol] || "").trim();
+    const rawPin = pinCol < parts.length ? parts[pinCol] : false;
 
-    let category: "重要" | "混雑情報" | "プログラム変更" | "一般案内" = "一般案内";
-    if (categoryRaw && categoryRaw.includes("重要")) category = "重要";
-    else if (categoryRaw && categoryRaw.includes("混雑")) category = "混雑情報";
-    else if (categoryRaw && categoryRaw.includes("プログラム")) category = "プログラム変更";
+    let cat = "一般案内";
+    if (rawCategory.includes("重要")) cat = "重要";
+    else if (rawCategory.includes("混雑")) cat = "混雑情報";
+    else if (rawCategory.includes("プログラム")) cat = "プログラム変更";
 
-    const isPinned = checkIsPinned(isPinnedRaw);
+    const isPinned = checkIsPinned(rawPin);
 
     announcements.push({
-      id: `ann-${i}`,
-      timestamp: dateRaw || new Date().toLocaleString("ja-JP"),
-      category,
-      title: titleRaw,
-      content: contentRaw || "",
+      id: `ann-live-${i}`,
+      timestamp: rawDate || new Date().toLocaleString("ja-JP"),
+      category: cat,
+      title: rawTitle,
+      content: rawContent,
       isPinned,
     });
   }
 
-  // Sort pinned announcements to top
-  announcements.sort((a, b) => {
+  return announcements.sort((a, b) => {
     if (a.isPinned && !b.isPinned) return -1;
     if (!a.isPinned && b.isPinned) return 1;
     return 0;
   });
-
-  return announcements;
 }
 
 async function fetchAndParseClassProjects(targetUrl: string) {
@@ -403,53 +465,109 @@ async function fetchAndParseClassProjects(targetUrl: string) {
     headers: {
       "User-Agent":
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      Accept: "text/csv,text/plain;q=0.9,*/*;q=0.8",
     },
   });
 
-  if (!res.ok) {
-    throw new Error(`Data request failed with status: ${res.status}`);
-  }
-
   const raw = await res.text();
   const rows = parseFullCSV(raw);
-  const result: Record<string, any> = {};
+  if (rows.length === 0) return {};
 
-  let startRow = 0;
-  if (rows.length > 0 && rows[0][0] && rows[0][0].toLowerCase().includes("id")) {
-    startRow = 1;
+  let classCol = 0;
+  let titleCol = 1;
+  let catchCol = -1;
+  let categoryCol = -1;
+  let locationCol = -1;
+  let descCol = -1;
+  let durationCol = -1;
+  let capacityCol = -1;
+  let rulesCol = -1;
+  let ticketCol = -1;
+  let menuCol = -1;
+  let startRow = 1;
+
+  if (rows.length > 0) {
+    const headerRow = rows[0].map((h) => (h || '').toLowerCase().replace(/\s+/g, ''));
+    let foundHeaders = false;
+    for (let c = 0; c < headerRow.length; c++) {
+      const val = headerRow[c];
+      if (val.includes('クラス') || val.includes('組') || val.includes('class') || val.includes('団体')) {
+        classCol = c;
+        foundHeaders = true;
+      } else if (val.includes('タイトル') || val.includes('企画名') || val.includes('title') || val.includes('演目')) {
+        titleCol = c;
+        foundHeaders = true;
+      } else if (val.includes('キャッチ') || val.includes('見出し') || val.includes('一言') || val.includes('catch')) {
+        catchCol = c;
+        foundHeaders = true;
+      } else if (val.includes('カテゴリ') || val.includes('ジャンル') || val.includes('種別') || val.includes('category')) {
+        categoryCol = c;
+        foundHeaders = true;
+      } else if (val.includes('場所') || val.includes('教室') || val.includes('会場') || val.includes('location')) {
+        locationCol = c;
+        foundHeaders = true;
+      } else if (val.includes('説明') || val.includes('詳細') || val.includes('紹介') || val.includes('内容') || val.includes('desc')) {
+        descCol = c;
+        foundHeaders = true;
+      } else if (val.includes('所要') || val.includes('時間') || val.includes('公演') || val.includes('duration')) {
+        durationCol = c;
+        foundHeaders = true;
+      } else if (val.includes('定員') || val.includes('人数') || val.includes('capacity')) {
+        capacityCol = c;
+        foundHeaders = true;
+      } else if (val.includes('注意') || val.includes('ルール') || val.includes('制限') || val.includes('rule')) {
+        rulesCol = c;
+        foundHeaders = true;
+      } else if (val.includes('整理券') || val.includes('チケット') || val.includes('ticket')) {
+        ticketCol = c;
+        foundHeaders = true;
+      } else if (val.includes('料金') || val.includes('メニュー') || val.includes('価格') || val.includes('値段') || val.includes('price')) {
+        menuCol = c;
+        foundHeaders = true;
+      }
+    }
+    if (!foundHeaders) {
+      startRow = 0;
+    }
   }
 
-  for (let r = startRow; r < rows.length; r++) {
-    const row = rows[r];
-    if (!row || row.length === 0) continue;
-    const rawId = (row[0] || "").trim().toUpperCase().replace(/[\s\-_]/g, "");
-    if (!rawId) continue;
+  const results: Record<string, any> = {};
 
-    result[rawId] = {
-      classId: rawId,
-      className: (row[1] || "").trim(),
-      title: (row[2] || "").trim(),
-      catchphrase: (row[3] || "").trim(),
-      category: (row[4] || "").trim(),
-      location: (row[5] || "").trim(),
-      description: (row[6] || "").trim(),
-      duration: (row[7] || "").trim(),
-      capacity: (row[8] || "").trim(),
-      rules: (row[9] || "").trim(),
-      ticket: (row[10] || "").trim(),
-      menuPrice: (row[11] || "").trim(),
+  for (let i = startRow; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row || row.length === 0) continue;
+
+    const rawClass = row[classCol]?.trim() || '';
+    const cleaned = rawClass.replace(/[\s\-_]/g, '').toUpperCase();
+    const classMatch = cleaned.match(/^([0-9])(?:年)?([A-Z])(?:組)?$/);
+    if (!classMatch) continue;
+
+    const classCode = `${classMatch[1]}${classMatch[2]}`;
+    const rawTitle = titleCol >= 0 ? (row[titleCol]?.trim() || '') : '';
+    if (!rawTitle) continue;
+
+    results[classCode] = {
+      classCode,
+      title: rawTitle,
+      catchphrase: catchCol >= 0 ? (row[catchCol]?.trim() || '') : '',
+      category: categoryCol >= 0 ? (row[categoryCol]?.trim() || '') : '',
+      location: locationCol >= 0 ? (row[locationCol]?.trim() || '') : '',
+      description: descCol >= 0 ? (row[descCol]?.trim() || '') : '',
+      duration: durationCol >= 0 ? (row[durationCol]?.trim() || '') : '',
+      capacity: capacityCol >= 0 ? (row[capacityCol]?.trim() || '') : '',
+      rules: rulesCol >= 0 ? (row[rulesCol]?.trim() || '') : '',
+      ticket: ticketCol >= 0 ? (row[ticketCol]?.trim() || '') : '',
+      menuPrice: menuCol >= 0 ? (row[menuCol]?.trim() || '') : '',
     };
   }
 
-  return result;
+  return results;
 }
 
-// API Routes
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Live Congestion Endpoint with 5s cache
 app.get("/api/congestion-live", async (req, res) => {
   const targetUrl =
     typeof req.query.url === "string" && req.query.url.startsWith("http")
@@ -501,7 +619,6 @@ app.get("/api/congestion-live", async (req, res) => {
   }
 });
 
-// Live Announcements Endpoint with 5s cache
 app.get("/api/announcements-live", async (req, res) => {
   const targetUrl =
     typeof req.query.url === "string" && req.query.url.startsWith("http")
@@ -605,7 +722,9 @@ app.post("/api/app-data", (req, res) => {
   try {
     const newData = req.body;
     if (newData && typeof newData === 'object') {
-      serverAppDataStore = newData;
+      const sanitized = { ...newData };
+      delete sanitized.schedules;
+      serverAppDataStore = sanitized;
       res.json({ success: true, message: "App data updated successfully on server" });
     } else {
       res.status(400).json({ success: false, error: "Invalid data format" });
@@ -616,7 +735,6 @@ app.post("/api/app-data", (req, res) => {
 });
 
 async function startServer() {
-  // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },

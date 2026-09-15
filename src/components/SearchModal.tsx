@@ -59,7 +59,10 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         s.title.toLowerCase().includes(q) ||
         s.performer.toLowerCase().includes(q) ||
         s.venue.toLowerCase().includes(q) ||
-        s.description.toLowerCase().includes(q)
+        s.description.toLowerCase().includes(q) ||
+        (s.category && s.category.toLowerCase().includes(q)) ||
+        (s.stagePosition && s.stagePosition.toLowerCase().includes(q)) ||
+        (s.locationDetail && s.locationDetail.toLowerCase().includes(q))
     );
 
     const matchedGreetings = (appData?.greetings || []).filter(
@@ -259,7 +262,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                           <div
                             key={s.id}
                             onClick={() => {
-                              onNavigate('schedule');
+                              onNavigate('schedule', s.id);
                               onClose();
                             }}
                             className="p-3 rounded-xs bg-white hover:bg-sky-50/60 border border-slate-200/80 hover:border-sky-200 transition-all cursor-pointer flex items-center justify-between group"
@@ -274,7 +277,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                                 </span>
                               </div>
                               <p className="text-xs text-slate-500 mt-0.5">
-                                {language === 'en' ? 'Performer:' : '出演:'} {s.performer} | 📍 {s.venue}
+                                {language === 'en' ? 'Performer:' : '出演:'} {s.performer} | 📍 {s.venue} {s.locationDetail ? `(${s.locationDetail})` : ''}
                               </p>
                             </div>
                             <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-sky-600 group-hover:translate-x-1 transition-all shrink-0 ml-2" />

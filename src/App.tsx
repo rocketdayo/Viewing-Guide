@@ -23,6 +23,7 @@ import {
   fetchServerAppData
 } from './utils/storage';
 import { AppDataState } from './types';
+import { INITIAL_APP_DATA } from './data/defaultData';
 import { fetchLiveGasCongestion, applyGasSyncToProjects } from './utils/congestionSync';
 import { fetchLiveAnnouncements } from './utils/announcementSync';
 import { fetchLiveClassProjects, applyClassProjectsSync } from './utils/classProjectsSync';
@@ -459,7 +460,7 @@ export default function App() {
               
               {currentPage === 'schedule' && (
                 <ScheduleView 
-                  schedules={appData?.schedules || []}
+                  schedules={appData?.schedules?.length ? appData.schedules : INITIAL_APP_DATA.schedules}
                   onNavigate={handleNavigate}
                 />
               )}

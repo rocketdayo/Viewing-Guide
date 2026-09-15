@@ -16,14 +16,14 @@ export function useAnnouncementSync(
   gasUrl: string | undefined,
   currentAnnouncements: Announcement[],
   onUpdateAnnouncements: (updated: Announcement[]) => void,
-  intervalSeconds: number = 45 // 45 seconds fixed
+  intervalSeconds: number = 45
 ) {
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
   
   const performSync = useCallback(async () => {
-    if (!gasUrl) return; // Do nothing if URL is not configured
+    if (!gasUrl) return;
     
     setIsSyncing(true);
     setSyncError(null);

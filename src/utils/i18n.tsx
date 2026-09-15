@@ -749,6 +749,9 @@ export const translateVenue = (venue: string, lang: Language): string => {
     'レクチャールーム': 'Lecture Room',
     'チャペル': 'Chapel',
     '中庭特設ステージ': 'Courtyard Stage',
+    'グラウンド': 'School Ground',
+    'ラーニングコモンズ': 'Learning Commons',
+    '清教学園ツアー': 'School Tour',
     'all': 'All Venues',
   };
   return map[venue] || venue;
@@ -760,6 +763,8 @@ export const translatePerformerType = (type: string, lang: Language): string => 
     '部活': 'Club',
     '有志': 'Volunteer',
     'クラス': 'Class',
+    '特別': 'Special Project',
+    '一般': 'General',
     'all': 'All Types',
   };
   return map[type] || type;

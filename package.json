@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
-    "build:pages": "vite build",
+    "build": "vite build && node -e \"const fs=require('fs'); if(fs.existsSync('SGfes')){fs.mkdirSync('dist/SGfes',{recursive:true}); fs.cpSync('SGfes','dist/SGfes',{recursive:true}); fs.mkdirSync('dist/images/schedule',{recursive:true}); fs.cpSync('SGfes','dist/images/schedule',{recursive:true});} if(fs.existsSync('public/SGfes')){fs.mkdirSync('dist/SGfes',{recursive:true}); fs.cpSync('public/SGfes','dist/SGfes',{recursive:true});}\" && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
+    "build:pages": "vite build && node -e \"const fs=require('fs'); if(fs.existsSync('SGfes')){fs.mkdirSync('dist/SGfes',{recursive:true}); fs.cpSync('SGfes','dist/SGfes',{recursive:true}); fs.mkdirSync('dist/images/schedule',{recursive:true}); fs.cpSync('SGfes','dist/images/schedule',{recursive:true});} if(fs.existsSync('public/SGfes')){fs.mkdirSync('dist/SGfes',{recursive:true}); fs.cpSync('public/SGfes','dist/SGfes',{recursive:true});}\"",
     "start": "node dist/server.cjs",
     "preview": "vite preview",
     "clean": "rm -rf dist server.cjs server.js",

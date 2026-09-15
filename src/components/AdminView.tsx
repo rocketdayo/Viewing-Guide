@@ -17,7 +17,7 @@ import {
   Radio
 } from 'lucide-react';
 import { AppDataState } from '../types';
-import { ANNOUNCEMENT_PORTAL_URL, getClassCongestionInputUrl } from '../data/defaultData';
+import { ANNOUNCEMENT_PORTAL_URL, getClassCongestionInputUrl, INITIAL_APP_DATA } from '../data/defaultData';
 import { useI18n } from '../utils/i18n';
 
 interface AdminViewProps {
@@ -414,7 +414,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
             {language === 'en' ? 'Registered Timetable Schedule' : '登録済みスケジュール一覧'}
           </h3>
           <div className="space-y-2.5">
-            {formData.schedules.map((sch) => (
+            {(formData?.schedules?.length ? formData.schedules : INITIAL_APP_DATA.schedules).map((sch) => (
               <div
                 key={sch.id}
                 className="p-3.5 rounded-xs bg-white border border-slate-200 flex items-center justify-between gap-3 text-xs"

@@ -53,6 +53,18 @@ export interface ScheduleEvent {
   category: 'ステージ' | 'セレモニー' | 'ライブ' | '特別企画' | 'コンテスト' | 'ダンス' | '音楽・演奏' | '演劇' | 'パフォーマンス';
   description: string;
   isImportant?: boolean;
+  image?: string;
+  posterImage?: string;
+  posterFile?: string;
+  experienceTime?: string;
+  locationDetail?: string;
+  department?: string;
+  officialTitle?: string;
+  officialDates?: string;
+  officialLocation?: string;
+  activityContent?: string;
+  needsPoster?: boolean;
+  published?: boolean;
 }
 
 export interface Greeting {

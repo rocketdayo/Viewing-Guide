@@ -1,7 +1,7 @@
 import { AppDataState } from '../types';
 import { INITIAL_APP_DATA } from '../data/defaultData';
 
-const STORAGE_KEY = 'seikyo_fes_2026_data_v14';
+const STORAGE_KEY = 'seikyo_fes_2026_data_v15';
 const BOOKMARKS_KEY = 'seikyo_fes_2026_bookmarks';
 
 export function sanitizeAppData(parsed: any): AppDataState {
@@ -50,7 +50,7 @@ export function sanitizeAppData(parsed: any): AppDataState {
     gasAnnouncementUrl: isOldAnnouncementUrl ? INITIAL_APP_DATA.gasAnnouncementUrl : parsed.gasAnnouncementUrl,
     projects: mergedProjects || INITIAL_APP_DATA.projects,
     greetings: INITIAL_APP_DATA.greetings,
-    schedules: Array.isArray(parsed.schedules) && parsed.schedules.length > 0 ? parsed.schedules : INITIAL_APP_DATA.schedules,
+    schedules: INITIAL_APP_DATA.schedules,
     announcements: cleanAnnouncements || INITIAL_APP_DATA.announcements,
   };
 }
