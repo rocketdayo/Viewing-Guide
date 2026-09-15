@@ -3,6 +3,8 @@ import {
   BookOpen,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Download,
   ExternalLink,
   Maximize2,
@@ -35,6 +37,7 @@ export const WorkBookletViewer: React.FC = () => {
   const [timeFilter, setTimeFilter] = useState<'all' | '午前' | '午後'>('all');
   const [roomFilter, setRoomFilter] = useState<'all' | '高3E' | '高3F' | '高3G'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
 
   const activePageObj = WORK_PDF_PAGES.find((p) => p.page === currentPage) || WORK_PDF_PAGES[0];
 
@@ -74,8 +77,28 @@ export const WorkBookletViewer: React.FC = () => {
     return true;
   });
 
+  const toggleExpand = (id: number) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const expandAll = () => {
+    setExpandedIds(new Set(filteredProfiles.map((p) => p.id)));
+  };
+
+  const collapseAll = () => {
+    setExpandedIds(new Set());
+  };
+
   return (
-    <div className="bg-gradient-to-br from-amber-500/10 via-amber-50/70 to-orange-50/60 border-2 border-amber-300 rounded-sm shadow-md p-4 sm:p-6 space-y-6">
+    <div className="bg-gradient-to-br from-amber-500/10 via-amber-50/70 to-orange-50/60 border-2 border-amber-300 rounded-sm shadow-md p-3.5 sm:p-6 space-y-5 max-w-full overflow-hidden">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-amber-200/90 pb-4">
         <div className="space-y-1">
           <div className="inline-flex items-center space-x-1.5 text-xs font-bold text-amber-900 bg-amber-200/80 px-2.5 py-0.5 rounded-xs border border-amber-300">
@@ -214,10 +237,10 @@ export const WorkBookletViewer: React.FC = () => {
       )}
 
       {viewMode === 'roster' && (
-        <div className="space-y-4">
-          <div className="bg-white p-3.5 rounded-xs border border-amber-200 shadow-2xs space-y-3">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-              <div className="relative flex-1">
+        <div className="space-y-4 max-w-full">
+          <div className="bg-white p-3 sm:p-4 rounded-xs border border-amber-200 shadow-2xs space-y-3 max-w-full overflow-hidden">
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 w-full">
+              <div className="relative flex-1 min-w-0 w-full">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
@@ -225,140 +248,202 @@ export const WorkBookletViewer: React.FC = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={
                     language === 'en'
-                      ? 'Search occupation, keyword (e.g., Lawyer, Engineer, Nurse...)'
-                      : '職種やキーワードで検索（例: 弁護士, エンジニア, 獣医師, 看護師, 高3E...）'
+                      ? 'Search occupation, keyword...'
+                      : '職種やキーワードで検索（例: 弁護士, エンジニア, 獣医師, 高3E...）'
                   }
                   className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-300 rounded-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
                 />
               </div>
 
-              <div className="flex items-center space-x-2 text-xs">
-                <span className="text-slate-500 font-bold shrink-0">{language === 'en' ? 'Time:' : '時間：'}</span>
-                <select
-                  value={timeFilter}
-                  onChange={(e) => setTimeFilter(e.target.value as any)}
-                  className="px-2 py-1 border border-slate-300 rounded-xs bg-slate-50 font-bold text-slate-700 cursor-pointer"
-                >
-                  <option value="all">{language === 'en' ? 'All Times' : 'すべての時間'}</option>
-                  <option value="午前">{language === 'en' ? 'Morning (10:00-12:00)' : '午前 (10:00~12:00)'}</option>
-                  <option value="午後">{language === 'en' ? 'Afternoon (12:30-14:30)' : '午後 (12:30~14:30)'}</option>
-                </select>
+              <div className="flex flex-wrap items-center gap-2 text-xs w-full lg:w-auto min-w-0">
+                <div className="flex items-center space-x-1.5 flex-1 sm:flex-none min-w-0">
+                  <span className="text-slate-500 font-bold shrink-0">{language === 'en' ? 'Time:' : '時間：'}</span>
+                  <select
+                    value={timeFilter}
+                    onChange={(e) => setTimeFilter(e.target.value as any)}
+                    className="w-full sm:w-auto px-2 py-1 border border-slate-300 rounded-xs bg-slate-50 font-bold text-slate-700 cursor-pointer min-w-0 focus:ring-1 focus:ring-amber-500"
+                  >
+                    <option value="all">{language === 'en' ? 'All Times' : 'すべての時間'}</option>
+                    <option value="午前">{language === 'en' ? 'Morning (10:00-12:00)' : '午前 (10:00~12:00)'}</option>
+                    <option value="午後">{language === 'en' ? 'Afternoon (12:30-14:30)' : '午後 (12:30~14:30)'}</option>
+                  </select>
+                </div>
 
-                <span className="text-slate-500 font-bold shrink-0">{language === 'en' ? 'Room:' : '場所：'}</span>
-                <select
-                  value={roomFilter}
-                  onChange={(e) => setRoomFilter(e.target.value as any)}
-                  className="px-2 py-1 border border-slate-300 rounded-xs bg-slate-50 font-bold text-slate-700 cursor-pointer"
-                >
-                  <option value="all">{language === 'en' ? 'All Rooms' : 'すべての教室'}</option>
-                  <option value="高3E">高3E</option>
-                  <option value="高3F">高3F</option>
-                  <option value="高3G">高3G</option>
-                </select>
+                <div className="flex items-center space-x-1.5 flex-1 sm:flex-none min-w-0">
+                  <span className="text-slate-500 font-bold shrink-0">{language === 'en' ? 'Room:' : '場所：'}</span>
+                  <select
+                    value={roomFilter}
+                    onChange={(e) => setRoomFilter(e.target.value as any)}
+                    className="w-full sm:w-auto px-2 py-1 border border-slate-300 rounded-xs bg-slate-50 font-bold text-slate-700 cursor-pointer min-w-0 focus:ring-1 focus:ring-amber-500"
+                  >
+                    <option value="all">{language === 'en' ? 'All Rooms' : 'すべての教室'}</option>
+                    <option value="高3E">高3E</option>
+                    <option value="高3F">高3F</option>
+                    <option value="高3G">高3G</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-xs text-slate-600 pt-1 border-t border-slate-100">
-              <span>
-                {language === 'en' ? 'Showing ' : '該当件数：'}
-                <strong className="text-amber-800 font-mono text-sm">{filteredProfiles.length}</strong>
-                {language === 'en' ? ' / 36 graduates' : ' 名 / 全36名'}
-              </span>
-              {(timeFilter !== 'all' || roomFilter !== 'all' || searchQuery) && (
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
+              <div className="flex items-center space-x-2">
+                <span>
+                  {language === 'en' ? 'Showing ' : '該当件数：'}
+                  <strong className="text-amber-800 font-mono text-sm">{filteredProfiles.length}</strong>
+                  {language === 'en' ? ' / 36 graduates' : ' 名 / 全36名'}
+                </span>
+                {(timeFilter !== 'all' || roomFilter !== 'all' || searchQuery) && (
+                  <button
+                    onClick={() => {
+                      setTimeFilter('all');
+                      setRoomFilter('all');
+                      setSearchQuery('');
+                    }}
+                    className="text-amber-700 hover:text-amber-900 underline font-bold cursor-pointer ml-1"
+                  >
+                    {language === 'en' ? 'Reset Filters' : 'フィルターを解除'}
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => {
-                    setTimeFilter('all');
-                    setRoomFilter('all');
-                    setSearchQuery('');
-                  }}
-                  className="text-amber-700 hover:text-amber-900 underline font-bold cursor-pointer"
+                  onClick={expandAll}
+                  className="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-xs transition-colors cursor-pointer border border-amber-300"
                 >
-                  {language === 'en' ? 'Reset Filters' : 'フィルターを解除'}
+                  {language === 'en' ? 'Expand All' : 'すべて開く'}
                 </button>
-              )}
+                <button
+                  onClick={collapseAll}
+                  className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded-xs transition-colors cursor-pointer border border-slate-300"
+                >
+                  {language === 'en' ? 'Collapse All' : 'すべて閉じる'}
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredProfiles.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white border border-amber-200 rounded-xs p-4 shadow-2xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-3"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-start justify-between gap-2 border-b border-amber-100 pb-2">
-                    <div>
-                      <span className="text-[10px] font-mono font-bold text-amber-700 block">
-                        No.{item.id} ・ {item.gradInfo}
+          <div className="space-y-2.5">
+            {filteredProfiles.map((item) => {
+              const isExpanded = expandedIds.has(item.id);
+              return (
+                <div
+                  key={item.id}
+                  className="bg-white border border-amber-200/90 rounded-xs shadow-2xs hover:border-amber-400 transition-all overflow-hidden"
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleExpand(item.id)}
+                    className="w-full text-left p-3.5 bg-gradient-to-r from-white via-amber-50/20 to-orange-50/30 hover:bg-amber-100/30 transition-colors flex items-center justify-between gap-2.5 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      <span className="shrink-0 text-[11px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-xs">
+                        No.{item.id}
                       </span>
-                      <h4 className="text-base font-bold text-slate-900 leading-snug">
-                        {item.jobTitle}
-                      </h4>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                          <h4 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
+                            {item.jobTitle}
+                          </h4>
+                          <span className="text-xs text-slate-500 font-medium shrink-0">
+                            ({item.gradInfo})
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="flex flex-col items-end gap-1">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-xs ${
-                        item.timeSlot === '午前'
-                          ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                          : 'bg-indigo-100 text-indigo-900 border border-indigo-300'
-                      }`}>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-xs ${
+                          item.timeSlot === '午前'
+                            ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                            : 'bg-indigo-100 text-indigo-900 border border-indigo-300'
+                        }`}
+                      >
                         {item.timeSlot}
                       </span>
                       <span className="text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-300 px-1.5 py-0.5 rounded-xs">
                         {item.room}
                       </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5 text-xs text-slate-700">
-                    <div className="flex items-start gap-1.5 bg-slate-50 p-2 rounded-xs border border-slate-200/60">
-                      <Briefcase className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-slate-800 block">{language === 'en' ? 'Work Content:' : '仕事内容:'}</strong>
-                        <span>{item.content}</span>
+                      <div className="p-1 text-slate-400 hover:text-amber-800 transition-colors">
+                        {isExpanded ? (
+                          <ChevronUp className="w-4 h-4 text-amber-700" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-slate-400" />
+                        )}
                       </div>
                     </div>
+                  </button>
 
-                    {item.reason && (
-                      <div className="flex items-start gap-1.5 bg-rose-50/60 p-2 rounded-xs border border-rose-100">
-                        <Heart className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
-                        <div>
-                          <strong className="text-rose-900 block">{language === 'en' ? 'Reason Chosen:' : '選んだ理由:'}</strong>
-                          <span>{item.reason}</span>
-                        </div>
-                      </div>
-                    )}
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="border-t border-amber-100 p-3.5 sm:p-4 bg-amber-50/30 space-y-3"
+                      >
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700">
+                          <div className="flex items-start gap-2 bg-white p-2.5 rounded-xs border border-slate-200 shadow-2xs">
+                            <Briefcase className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+                            <div>
+                              <strong className="text-slate-800 block font-bold mb-0.5">
+                                {language === 'en' ? 'Work Content:' : '仕事内容:'}
+                              </strong>
+                              <span>{item.content}</span>
+                            </div>
+                          </div>
 
-                    {item.funAspect && (
-                      <div className="flex items-start gap-1.5 bg-amber-50/70 p-2 rounded-xs border border-amber-100">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
-                        <div>
-                          <strong className="text-amber-900 block">{language === 'en' ? 'Rewarding Aspect:' : '楽しいところ:'}</strong>
-                          <span>{item.funAspect}</span>
-                        </div>
-                      </div>
-                    )}
+                          {item.reason && (
+                            <div className="flex items-start gap-2 bg-white p-2.5 rounded-xs border border-rose-200/70 shadow-2xs">
+                              <Heart className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                              <div>
+                                <strong className="text-rose-900 block font-bold mb-0.5">
+                                  {language === 'en' ? 'Reason Chosen:' : '選んだ理由:'}
+                                </strong>
+                                <span>{item.reason}</span>
+                              </div>
+                            </div>
+                          )}
 
-                    {item.toughAspect && (
-                      <div className="flex items-start gap-1.5 bg-sky-50/70 p-2 rounded-xs border border-sky-100">
-                        <AlertTriangle className="w-3.5 h-3.5 text-sky-600 shrink-0 mt-0.5" />
-                        <div>
-                          <strong className="text-sky-900 block">{language === 'en' ? 'Challenging Aspect:' : '大変なところ:'}</strong>
-                          <span>{item.toughAspect}</span>
+                          {item.funAspect && (
+                            <div className="flex items-start gap-2 bg-white p-2.5 rounded-xs border border-amber-200/80 shadow-2xs">
+                              <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                              <div>
+                                <strong className="text-amber-900 block font-bold mb-0.5">
+                                  {language === 'en' ? 'Rewarding Aspect:' : '楽しいところ:'}
+                                </strong>
+                                <span>{item.funAspect}</span>
+                              </div>
+                            </div>
+                          )}
+
+                          {item.toughAspect && (
+                            <div className="flex items-start gap-2 bg-white p-2.5 rounded-xs border border-sky-200/80 shadow-2xs">
+                              <AlertTriangle className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
+                              <div>
+                                <strong className="text-sky-900 block font-bold mb-0.5">
+                                  {language === 'en' ? 'Challenging Aspect:' : '大変なところ:'}
+                                </strong>
+                                <span>{item.toughAspect}</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      </div>
+
+                        {item.message && (
+                          <div className="p-3 bg-amber-100/70 rounded-xs border border-amber-300/80 text-xs text-amber-950 font-bold flex items-start gap-2">
+                            <MessageSquare className="w-4 h-4 text-amber-800 shrink-0 mt-0.5" />
+                            <p className="leading-relaxed">「{item.message}」</p>
+                          </div>
+                        )}
+                      </motion.div>
                     )}
-                  </div>
+                  </AnimatePresence>
                 </div>
-
-                {item.message && (
-                  <div className="p-2.5 bg-amber-100/60 rounded-xs border border-amber-200 text-xs text-amber-950 font-bold flex items-start gap-1.5">
-                    <MessageSquare className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
-                    <p className="leading-tight">「{item.message}」</p>
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

@@ -41,7 +41,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const navItems = [
     { id: 'home', label: t.navHome, icon: Home },
-    { id: 'schedule', label: t.navSchedule, icon: Calendar, isDraft: true },
+    { id: 'schedule', label: t.navSchedule, icon: Calendar },
     { id: 'classes', label: t.navClasses, icon: Layers },
     { id: 'congestion', label: t.navCongestion, icon: Activity },
     { id: 'map', label: t.navMap, icon: MapPin, isDraft: true },

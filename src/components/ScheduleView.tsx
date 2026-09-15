@@ -93,7 +93,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     { id: 'all', labelJa: 'すべての会場', labelEn: 'All Venues', icon: Building },
     { id: '第一体育館', labelJa: '第一体育館', labelEn: 'Gym 1 (Arena)', icon: Music },
     { id: 'レクチャールーム', labelJa: 'レクチャールーム', labelEn: 'Lecture Room', icon: Radio },
-    { id: 'グラウンド', labelJa: 'グラウンド・中庭', labelEn: 'Ground & Courtyard', icon: Shield },
+    { id: 'グラウンド', labelJa: 'グラウンド', labelEn: 'Ground', icon: Shield },
     { id: 'ラーニングコモンズ', labelJa: 'ラーニングコモンズ', labelEn: 'Learning Commons', icon: BookOpen },
     { id: '校舎内', labelJa: '校舎内', labelEn: 'School Building', icon: MapPin },
     { id: '清教学園ツアー', labelJa: '清教学園ツアー', labelEn: 'School Tour', icon: Compass },
@@ -402,7 +402,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
         <div className="bg-emerald-50 border border-emerald-200 rounded-sm p-4 text-xs text-emerald-900 space-y-1">
           <div className="font-bold flex items-center space-x-1.5">
             <Shield className="w-4 h-4 text-emerald-700 shrink-0" />
-            <span>{language === 'en' ? 'Ground Special Event & Food Trucks' : 'グラウンド・中庭エリアのご案内'}</span>
+            <span>{language === 'en' ? 'Ground Special Event & Food Trucks' : 'グラウンドエリアのご案内'}</span>
           </div>
           <p className="leading-relaxed text-emerald-800 pl-5">
             {language === 'en'

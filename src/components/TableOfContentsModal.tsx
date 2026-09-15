@@ -99,7 +99,6 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
       label: t.navSchedule, 
       desc: language === 'en' ? 'Stage performances & Timetable' : 'チャペル・体育館・ステージ公演', 
       icon: Calendar, 
-      isDraft: true, 
       color: 'sky' 
     },
     { 
