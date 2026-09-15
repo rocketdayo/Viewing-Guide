@@ -149,15 +149,29 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
           </div>
         </div>
 
-        <div className="pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <p>© 2026 Seikyo Gakuen High School Culture Festival. All Rights Reserved.</p>
-          <button
-            onClick={scrollToTop}
-            className="flex items-center space-x-1 text-slate-400 hover:text-white transition-colors cursor-pointer"
-          >
-            <span>{language === 'en' ? 'Back to top' : 'ページ上部へ戻る'}</span>
-            <ChevronUp className="w-4 h-4" />
-          </button>
+        <div className="pt-6 border-t border-slate-800/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-slate-500">
+          <div className="space-y-1">
+            <div className="text-[11px] text-slate-400 font-normal pb-0.5">
+              {language === 'en' ? '※ For bug reports or issues: Contact Kuroda (2-E)' : '※ 不具合・バグが発生した場合は 2-E 黒田まで'}
+            </div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-slate-500 opacity-75 font-semibold">
+              SYSTEM PRODUCED BY
+            </div>
+            <div className="text-xs text-slate-500 opacity-75 font-medium tracking-wide">
+              {language === 'en' ? 'Culture Festival Core Member Online Guide Team' : '文化祭コアメンバーオンライン鑑賞ガイド担当'}
+            </div>
+          </div>
+
+          <div className="flex flex-col items-start md:items-end gap-2 shrink-0">
+            <p>© 2026 Seikyo Gakuen High School Culture Festival. All Rights Reserved.</p>
+            <button
+              onClick={scrollToTop}
+              className="flex items-center space-x-1 text-slate-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <span>{language === 'en' ? 'Back to top' : 'ページ上部へ戻る'}</span>
+              <ChevronUp className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </footer>
