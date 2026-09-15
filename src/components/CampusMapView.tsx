@@ -43,7 +43,7 @@ export const CampusMapView: React.FC<CampusMapViewProps> = () => {
         <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
           {language === 'en'
             ? 'The illustrated campus map and interactive classroom links are currently being prepared. Please check back soon.'
-            : 'クリスタ（CLIP STUDIO PAINT）等で作成したマップ画像の配置、および各クラスへのリンク設定作業を行っています。公開まで今しばらくお待ちください。'}
+            : '作成したマップ画像の配置、および各クラスへのリンク設定作業を行っています。公開まで今しばらくお待ちください。'}
         </p>
       </div>
     </div>
