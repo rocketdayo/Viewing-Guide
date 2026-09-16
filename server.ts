@@ -12,22 +12,29 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use('/images/schedule', express.static(path.join(process.cwd(), 'public/images/schedule')));
 app.use('/images/projects', express.static(path.join(process.cwd(), 'public/images/projects')));
 app.use('/images/classes', express.static(path.join(process.cwd(), 'public/images/classes')));
+app.use('/images/alumni', express.static(path.join(process.cwd(), 'public/images/alumni')));
 app.use('/images', express.static(path.join(process.cwd(), 'public/images')));
+app.use('/alumni', express.static(path.join(process.cwd(), 'public/alumni')));
+app.use('/alumni', express.static(path.join(process.cwd(), 'dist/alumni')));
 app.use('/SGfes', express.static(path.join(process.cwd(), 'public/SGfes')));
 app.use('/SGfes', express.static(path.join(process.cwd(), 'SGfes')));
 
 const searchDirs = [
+  path.join(process.cwd(), 'public/alumni'),
+  path.join(process.cwd(), 'dist/alumni'),
   path.join(process.cwd(), 'public/images/schedule'),
   path.join(process.cwd(), 'public/images/projects'),
   path.join(process.cwd(), 'public/images/classes'),
+  path.join(process.cwd(), 'public/images/alumni'),
   path.join(process.cwd(), 'public/images'),
   path.join(process.cwd(), 'public/SGfes'),
   path.join(process.cwd(), 'SGfes'),
-  path.join(process.cwd(), 'public')
+  path.join(process.cwd(), 'public'),
+  path.join(process.cwd(), 'dist')
 ];
 
-app.get(['/images/schedule/:file', '/images/projects/:file', '/images/classes/:file', '/images/:file', '/SGfes/:file'], (req, res, next) => {
-  const rawFile = req.params.file;
+app.get(['/alumni/:file', '/images/schedule/:file', '/images/projects/:file', '/images/classes/:file', '/images/alumni/:file', '/images/:file', '/SGfes/:file', '/:file.pdf'], (req, res, next) => {
+  const rawFile = req.params.file || req.path.split('/').pop() || '';
   let decoded = rawFile;
   try {
     decoded = decodeURIComponent(rawFile);
@@ -47,6 +54,10 @@ app.get(['/images/schedule/:file', '/images/projects/:file', '/images/classes/:f
     for (const v of variants) {
       const target = path.join(dir, v);
       if (fs.existsSync(target) && fs.statSync(target).isFile()) {
+        if (target.endsWith('.pdf')) {
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Disposition', 'inline');
+        }
         return res.sendFile(target);
       }
     }

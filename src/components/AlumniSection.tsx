@@ -34,23 +34,11 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
   const [activeTab, setActiveTab] = useState<'both' | 'career' | 'gourmet' | 'guideDog'>('both');
   const [modalPage, setModalPage] = useState<1 | 2 | 3 | null>(null);
 
-  const pdfUrl = CLASS_REUNION_PDF_BASE64;
+  const pdfUrl = '/alumni/classreunion.pdf';
 
   const handleOpenPdf = (e: React.MouseEvent) => {
     e.preventDefault();
-    try {
-      const byteCharacters = atob(CLASS_REUNION_PDF_BASE64.split(',')[1]);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'application/pdf' });
-      const blobUrl = URL.createObjectURL(blob);
-      window.open(blobUrl, '_blank');
-    } catch {
-      window.open(CLASS_REUNION_PDF_BASE64, '_blank');
-    }
+    window.open('/alumni/classreunion.pdf', '_blank');
   };
 
   const careerData = {

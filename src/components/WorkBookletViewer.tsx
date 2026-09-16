@@ -141,14 +141,27 @@ export const WorkBookletViewer: React.FC = () => {
             </button>
           </div>
 
-          <a
-            href="/alumni/work_guide.pdf"
-            download="未来の仕事図鑑_全ページ.pdf"
-            className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold rounded-xs border border-amber-300 shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer"
-          >
-            <Download className="w-3.5 h-3.5 text-amber-700" />
-            <span>{language === 'en' ? 'PDF Download' : 'PDF保存'}</span>
-          </a>
+          <div className="flex items-center gap-2">
+            <a
+              href="/alumni/work_guide.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xs shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>{language === 'en' ? 'Open PDF in New Tab' : '別タブでPDFを開く'}</span>
+            </a>
+            <a
+              href="/alumni/work_guide.pdf"
+              download="未来の仕事図鑑_全ページ.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold rounded-xs border border-amber-300 shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5 text-amber-700" />
+              <span>{language === 'en' ? 'PDF Download' : 'PDF保存'}</span>
+            </a>
+          </div>
         </div>
       </div>
 
@@ -474,6 +487,8 @@ export const WorkBookletViewer: React.FC = () => {
                 <a
                   href="/alumni/work_guide.pdf"
                   download="未来の仕事図鑑_全ページ.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold rounded-xs flex items-center gap-1.5 transition-colors"
                 >
                   <Download className="w-4 h-4" />
