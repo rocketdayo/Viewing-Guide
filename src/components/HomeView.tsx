@@ -68,7 +68,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
     (appData?.greetings || []).find((g) => g.id === selectedGreetingTab) ||
     (appData?.greetings || [])[0];
 
-  const smoothCount = projects.filter((p) => p.congestion.level === 'smooth').length;
+  const smoothCount = projects.filter((p) => p.congestion.level === 'smooth' || p.congestion.level === 'ticket').length;
   const pinnedAnnouncement = appData?.announcements?.find((a) => a.isPinned);
 
   const renderFormattedMessage = (text: string) => {

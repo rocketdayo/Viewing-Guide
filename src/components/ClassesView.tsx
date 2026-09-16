@@ -79,7 +79,17 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
       if (selectedGrade !== 'all' && p.grade !== selectedGrade) return false;
       if (selectedCategory !== 'all' && p.category !== selectedCategory) return false;
       if (selectedBuilding !== 'all' && p.building !== selectedBuilding) return false;
-      if (selectedCongestion !== 'all' && p.congestion?.level !== selectedCongestion) return false;
+      if (selectedCongestion !== 'all') {
+        if (selectedCongestion === 'smooth') {
+          if (p.congestion?.level !== 'smooth' && p.congestion?.level !== 'ticket') return false;
+        } else if (selectedCongestion === 'ticket') {
+          if (p.congestion?.level !== 'ticket' && !onlineTicketClassIds.includes(p.id) && !p.onlineTicketUrl && !p.onlineTicketNote) {
+            return false;
+          }
+        } else {
+          if (p.congestion?.level !== selectedCongestion) return false;
+        }
+      }
       if (onlyBookmarks && !safeBookmarks.includes(p.id)) return false;
       if (onlyOnlineTickets && !onlineTicketClassIds.includes(p.id) && !p.onlineTicketUrl && !p.onlineTicketNote) {
         return false;

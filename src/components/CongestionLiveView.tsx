@@ -104,7 +104,7 @@ export const CongestionLiveView: React.FC<CongestionLiveViewProps> = ({
     safeProjects.forEach((p) => {
       if (isTicketProject(p)) ticket++;
       
-      if (p.congestion?.level === 'smooth') smooth++;
+      if (p.congestion?.level === 'smooth' || p.congestion?.level === 'ticket') smooth++;
       else if (p.congestion?.level === 'moderate') moderate++;
       else if (p.congestion?.level === 'crowded') crowded++;
       else if (p.congestion?.level === 'closed') closed++;
@@ -120,8 +120,10 @@ export const CongestionLiveView: React.FC<CongestionLiveViewProps> = ({
       if (selectedFloor === 'clubs' && p.grade !== 'クラブ・有志') return false;
 
       if (selectedStatusFilter !== 'all') {
-        if (selectedStatusFilter === 'ticket') {
-          if (!isTicketProject(p)) return false;
+        if (selectedStatusFilter === 'smooth') {
+          if (p.congestion.level !== 'smooth' && p.congestion.level !== 'ticket') return false;
+        } else if (selectedStatusFilter === 'ticket') {
+          if (!isTicketProject(p) && p.congestion.level !== 'ticket') return false;
         } else {
           if (p.congestion.level !== selectedStatusFilter) return false;
         }

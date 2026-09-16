@@ -115,71 +115,71 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({
             onClick={(e) => e.stopPropagation()}
             className="bg-white rounded-xs shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200"
           >
-            <div className="relative bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900 text-white p-5 sm:p-6">
+            <div className="relative bg-white border-b border-slate-200 text-slate-900 p-5 sm:p-6">
               <div className="flex items-start justify-between">
-                <div className="space-y-1.5 max-w-[85%]">
+                <div className="space-y-2 max-w-[85%]">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="bg-white text-emerald-950 font-black px-2.5 py-0.5 rounded-lg text-xs sm:text-sm tracking-wide shadow-xs">
+                    <span className="bg-emerald-100 text-emerald-950 border border-emerald-200 font-black px-2.5 py-0.5 rounded-lg text-xs sm:text-sm tracking-wide shadow-xs">
                       {project.classNumber}
                     </span>
-                    <span className="bg-white/20 text-white text-xs px-2.5 py-0.5 rounded-md font-medium">
+                    <span className="bg-slate-100 text-slate-700 border border-slate-200 text-xs px-2.5 py-0.5 rounded-md font-medium">
                       {translateGrade(project.grade, language)}
                     </span>
-                    <span className="bg-sky-500/80 text-white text-xs px-2.5 py-0.5 rounded-md font-medium">
+                    <span className="bg-sky-50 text-sky-800 border border-sky-200 text-xs px-2.5 py-0.5 rounded-md font-medium">
                       {translateCategory(project.category, language)}
                     </span>
                     {isOnlineTicketClass && (
-                      <span className="bg-purple-500 text-white text-xs px-2.5 py-0.5 rounded-md font-bold flex items-center gap-1 shadow-xs">
-                        <Ticket className="w-3.5 h-3.5" />
+                      <span className="bg-purple-100 text-purple-900 border border-purple-200 text-xs px-2.5 py-0.5 rounded-md font-bold flex items-center gap-1 shadow-xs">
+                        <Ticket className="w-3.5 h-3.5 text-purple-600" />
                         {language === 'en' ? 'Digital Ticket' : 'オンライン整理券対象'}
                       </span>
                     )}
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white mt-1">
+                  <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 mt-1">
                     {project.title}
                   </h2>
                 </div>
                 <button
                   id="close-class-detail-btn"
                   onClick={onClose}
-                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                  className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 transition-colors cursor-pointer"
                   aria-label={t.close}
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <p className="text-sky-200 text-xs sm:text-sm mt-3 font-medium flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-amber-300 shrink-0" />
+              <p className="text-emerald-800 text-xs sm:text-sm mt-2.5 font-medium flex items-center gap-1.5 bg-emerald-50/80 px-3 py-1.5 rounded-xs border border-emerald-100">
+                <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
                 <span>{project.catchphrase}</span>
               </p>
             </div>
 
             <div className="p-5 sm:p-6 overflow-y-auto space-y-5 text-slate-800">
               {isOnlineTicketClass && (
-                <div className="p-4 rounded-xs bg-gradient-to-r from-purple-900 to-emerald-900 text-white shadow-md border border-purple-700/50">
+                <div className="p-4 rounded-xs bg-purple-50 text-purple-950 border border-purple-200 shadow-xs">
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
                       <div className="flex items-center space-x-1.5">
-                        <span className="bg-purple-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1">
+                        <span className="bg-purple-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1">
                           <QrCode className="w-3 h-3" /> Online Ticket
                         </span>
-                        <span className="text-xs font-bold text-purple-200">
+                        <span className="text-xs font-bold text-purple-800">
                           {language === 'en' ? 'Digital Queue Ticket' : 'オンライン整理券受付'}
                         </span>
                       </div>
-                      <h4 className="text-sm font-bold text-white">
+                      <h4 className="text-sm font-bold text-purple-950">
                         {language === 'en' ? 'Digital tickets available for this project' : 'この企画はオンライン整理券を発行してご参加いただけます'}
                       </h4>
-                      <p className="text-xs text-purple-100/90 leading-relaxed mt-1">
+                      <p className="text-xs text-purple-900/90 leading-relaxed mt-1">
                         {project.onlineTicketNote || (language === 'en' ? 'Digital time slots are implemented to reduce wait times.' : '混雑緩和のため、オンライン整理券による時間帯指定入場を実施しています。')}
                       </p>
                     </div>
                   </div>
 
-                  <div className="mt-3.5 pt-3 border-t border-purple-700/50 flex flex-wrap items-center justify-between gap-2">
-                    <div className="text-[11px] text-purple-200 flex items-center gap-1.5">
-                      <Info className="w-3.5 h-3.5 text-purple-300" />
+                  <div className="mt-3.5 pt-3 border-t border-purple-200 flex flex-wrap items-center justify-between gap-2">
+                    <div className="text-[11px] text-purple-800 flex items-center gap-1.5">
+                      <Info className="w-3.5 h-3.5 text-purple-600" />
                       <span>{language === 'en' ? 'Proceed to ticket reservation to pick a time slot' : '整理券の取得画面へ進んで時間枠をご選択ください'}</span>
                     </div>
                     {project.onlineTicketUrl ? (
@@ -187,15 +187,15 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({
                         href={project.onlineTicketUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xs bg-purple-500 hover:bg-purple-400 text-white text-xs font-bold shadow-md transition-all cursor-pointer"
+                        className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xs bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
                       >
                         <Ticket className="w-4 h-4" />
                         <span>{t.detailGetOnlineTicket}</span>
                         <ExternalLink className="w-3.5 h-3.5 ml-0.5" />
                       </a>
                     ) : (
-                      <div className="inline-flex items-center space-x-1 px-3.5 py-1.5 rounded-xs bg-purple-800/80 text-purple-200 text-xs font-medium border border-purple-600/40">
-                        <Ticket className="w-3.5 h-3.5 text-purple-300" />
+                      <div className="inline-flex items-center space-x-1 px-3.5 py-1.5 rounded-xs bg-purple-100 text-purple-800 text-xs font-medium border border-purple-200">
+                        <Ticket className="w-3.5 h-3.5 text-purple-600" />
                         <span>{language === 'en' ? 'Ticket system coming soon' : '整理券システム準備中（順次受付開始）'}</span>
                       </div>
                     )}
