@@ -332,8 +332,8 @@ const translations: Record<Language, I18nTranslations> = {
     findProjects: 'クラス企画一覧から探す',
 
     faqTitle: 'よくある質問 ＆ 来場者マナーガイド',
-    faqSubtitle: '通学路「しらかしの径」、土足入場、整理券、ゴミ分別、SNSルール、AED・救護、落とし物（1階事務室）など、文化祭を快適に楽しむためのご案内です。',
-    faqSearchPlaceholder: '質問やキーワードを検索 (例: しらかし, 土足, 整理券, ゴミ, 事務室, SNS)...',
+    faqSubtitle: '通学路「しらかしの径」、土足入場、整理券、ゴミ分別、SNSルール、AED・救護、落とし物（B棟1階生活部）など、文化祭を快適に楽しむためのご案内です。',
+    faqSearchPlaceholder: '質問やキーワードを検索 (例: しらかし, 土足, 整理券, ゴミ, 生活部, SNS)...',
     mannersTitle: '来場者の皆様へのお願い・重要マナー',
     allCategories: 'すべて',
 

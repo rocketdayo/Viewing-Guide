@@ -65,9 +65,9 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
       category: 'admission',
       question: '駐車場や駐輪場はありますか？',
       questionEn: 'Is there parking for cars or bicycles?',
-      answer: '校内および周辺に一般来場者用の駐車場はございません。近隣住民の皆様のご迷惑となりますので、お車でのご来校は固くお断りいたします。公共交通機関（南海高野線・近鉄長野線 河内長野駅よりバスまたは徒歩）をご利用ください。なお、自転車用の臨時駐輪スペースは正門付近に設けております。',
-      answerEn: 'No visitor car parking is available on campus or nearby. Driving to the campus is strictly prohibited. Please use public transportation. Temporary bicycle parking is available near the main gate.',
-      tag: '駐車場・駐輪場'
+      answer: '校内および周辺に一般来場者用の駐車場・駐輪場は一切ございません。近隣住民の皆様のご迷惑となりますので、お車および自転車でのご来校は固くお断りいたします。公共交通機関（南海高野線・近鉄長野線 河内長野駅よりバスまたは徒歩）をご利用ください。',
+      answerEn: 'There is no visitor car or bicycle parking on campus or nearby. Visiting by car or bicycle is strictly prohibited. Please use public transportation.',
+      tag: '駐車場・駐輪場なし'
     },
     {
       id: 'faq-tickets-identify',
@@ -83,9 +83,9 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
       category: 'tickets',
       question: '整理券はどこで・何時に配られますか？',
       questionEn: 'Where and when are tickets distributed?',
-      answer: '整理券は「各クラスの教室前」または「オンライン整理券（指定クラス）」にて配布されます。午前の部と午後の部に分けて配布される場合が多いため、アプリ内の企画詳細や混雑状況の備考欄をご確認ください。',
-      answerEn: 'Tickets are distributed outside each classroom or via online ticketing links. Distribution typically occurs in morning and afternoon batches; please check the project details in the app.',
-      tag: '整理券配布'
+      answer: '整理券はオンライン整理券にて配布されます。午前の部と午後の部を分ける対応は行いません。なお、混雑時は一時発券が停止する場合があります。',
+      answerEn: 'Tickets are distributed via online digital tickets. There are no separate morning or afternoon distribution sessions. Please note that ticket issuance may be temporarily suspended during peak congestion.',
+      tag: 'オンライン整理券'
     },
     {
       id: 'faq-trash',
@@ -128,9 +128,9 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
       category: 'safety',
       question: '落とし物・忘れ物をした／拾った場合は？',
       questionEn: 'Where is the Lost and Found located?',
-      answer: '校内での落とし物・お忘れ物はすべて「本館1階の事務室」に集約・保管されます。お心当たりのある方や拾得された方は、1階の事務室またはお近くの教職員までお届け・お越しください。',
-      answerEn: 'All lost and found items on campus are collected and kept at the 1F Administrative Office (Main Building). Please visit the 1F Administrative Office or notify nearby faculty.',
-      tag: '落とし物・事務室'
+      answer: '落とし物は、B棟1階の生活部までお願いします。校内での落とし物・お忘れ物はすべて「B棟1階の生活部」に集約・保管されます。お心当たりのある方や拾得された方は、B棟1階の生活部またはお近くの教職員までお届け・お越しください。',
+      answerEn: 'All lost and found items on campus are collected and kept at the Life Department on the 1st floor of Building B (B棟1階 生活部). Please visit B Building 1F Life Department or notify nearby faculty.',
+      tag: '落とし物・生活部'
     },
     {
       id: 'faq-offlimits',
