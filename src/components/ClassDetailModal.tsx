@@ -292,7 +292,7 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({
                 </p>
               </div>
 
-              {project.highlights && project.highlights.length > 0 && (
+              {false && project.highlights && project.highlights.length > 0 && (
                 <div className="space-y-2">
                   <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-amber-500" />
