@@ -127,9 +127,9 @@ export const initialSchedules: ScheduleEvent[] = [
     description: '舞台は、とある会社のオフィス。\n個性豊かでどうしようもない平社員たち、それに振り回されてしまう部長、どこか底の知れない社長の5人が織りなす、破壊と混沌三昧の大事件！彼らの運命やいかに...？\nその一部始終をご覧あれ！',
     activityContent: '舞台は、とある会社のオフィス。\n個性豊かでどうしようもない平社員たち、それに振り回されてしまう部長、どこか底の知れない社長の5人が織りなす、破壊と混沌三昧の大事件！彼らの運命やいかに...？\nその一部始終をご覧あれ！',
     needsPoster: true,
-    posterFile: '演劇部.jpg',
-    posterImage: '/images/schedule/演劇部.jpg',
-    image: '/images/schedule/演劇部.jpg',
+    posterFile: '演劇部.png',
+    posterImage: '/SGfes/演劇部.png',
+    image: '/SGfes/演劇部.png',
     published: true
   },
   {
@@ -788,9 +788,9 @@ export const initialSchedules: ScheduleEvent[] = [
     description: '舞台は、とある会社のオフィス。\n個性豊かでどうしようもない平社員たち、それに振り回されてしまう部長、どこか底の知れない社長の5人が織りなす、破壊と混沌三昧の大事件！彼らの運命やいかに...？\nその一部始終をご覧あれ！',
     activityContent: '舞台は、とある会社のオフィス。\n個性豊かでどうしようもない平社員たち、それに振り回されてしまう部長、どこか底の知れない社長の5人が織りなす、破壊と混沌三昧の大事件！彼らの運命やいかに...？\nその一部始終をご覧あれ！',
     needsPoster: true,
-    posterFile: '演劇部.jpg',
-    posterImage: '/images/schedule/演劇部.jpg',
-    image: '/images/schedule/演劇部.jpg',
+    posterFile: '演劇部.png',
+    posterImage: '/SGfes/演劇部.png',
+    image: '/SGfes/演劇部.png',
     published: true
   },
   {

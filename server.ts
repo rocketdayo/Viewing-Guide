@@ -49,6 +49,16 @@ app.get(['/alumni/:file', '/images/schedule/:file', '/images/projects/:file', '/
     rawFile.normalize('NFD')
   ];
 
+  const ext = path.extname(decoded);
+  const base = path.basename(decoded, ext);
+  if (base) {
+    for (const altExt of ['.png', '.jpg', '.jpeg', '.webp']) {
+      variants.push(`${base}${altExt}`);
+      variants.push(`${base}${altExt}`.normalize('NFC'));
+      variants.push(`${base}${altExt}`.normalize('NFD'));
+    }
+  }
+
   for (const dir of searchDirs) {
     if (!fs.existsSync(dir)) continue;
     for (const v of variants) {

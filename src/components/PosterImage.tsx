@@ -30,20 +30,41 @@ export const getPosterCandidateUrls = (src?: string, posterFile?: string, poster
     candidates.push(image);
   }
 
+  const baseNames: string[] = [];
   if (fileName) {
-    const encoded = encodeURIComponent(fileName);
-    const prefixes = [
-      '/images/schedule/',
-      '/images/projects/',
-      '/images/classes/',
-      '/SGfes/',
-      '/images/',
-      '/',
-      'images/schedule/',
-      'SGfes/'
-    ];
+    baseNames.push(fileName);
+    const withoutExt = fileName.replace(/\.[^/.]+$/, '');
+    if (withoutExt && withoutExt !== fileName) {
+      baseNames.push(`${withoutExt}.png`);
+      baseNames.push(`${withoutExt}.jpg`);
+      baseNames.push(`${withoutExt}.jpeg`);
+      baseNames.push(`${withoutExt}.webp`);
+    }
+  }
+  if (title) {
+    const cleanTitle = title.trim();
+    if (cleanTitle) {
+      baseNames.push(`${cleanTitle}.png`);
+      baseNames.push(`${cleanTitle}.jpg`);
+      baseNames.push(`${cleanTitle}.jpeg`);
+    }
+  }
+
+  const prefixes = [
+    '/SGfes/',
+    '/images/schedule/',
+    '/images/projects/',
+    '/images/classes/',
+    '/images/',
+    '/',
+    'SGfes/',
+    'images/schedule/'
+  ];
+
+  for (const name of baseNames) {
+    const encoded = encodeURIComponent(name);
     for (const prefix of prefixes) {
-      const p1 = `${prefix}${fileName}`;
+      const p1 = `${prefix}${name}`;
       if (!candidates.includes(p1)) candidates.push(p1);
       const p2 = `${prefix}${encoded}`;
       if (!candidates.includes(p2)) candidates.push(p2);
