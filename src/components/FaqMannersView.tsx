@@ -45,10 +45,10 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
     {
       id: 'faq-access',
       category: 'admission',
-      question: '登校用の通学路「しらかしの径」の来校者利用可能時間帯や案内について教えてください。',
-      questionEn: 'What are the visitor hours and guidance for the "Shirakashi-no-Michi" path?',
-      answer: '登校用の通学路 『しらかしの径』 の来校者利用可能時間帯は午前7時～午後4時30分です。通学路入り口付近と清教会館横で係員がご案内します。マイクロバスでの送迎はございません。',
-      answerEn: 'Visitor access hours for the school path "Shirakashi-no-Michi" are 7:00 AM – 4:30 PM. Staff will provide directions near the path entrance and beside Seikyo Kaikan. Please note that there is no minibus shuttle service.',
+      question: '登校用の通学路「しらかしの径」の来校者利用可能時間帯を教えてください。',
+      questionEn: 'What are the visitor hours for the "Shirakashi-no-Michi" path?',
+      answer: '登校用の通学路 『しらかしの径』 の来校者利用可能時間帯は午前7時～午後4時30分です。',
+      answerEn: 'Visitor access hours for the school path "Shirakashi-no-Michi" are 7:00 AM – 4:30 PM.',
       tag: 'アクセス・通学路'
     },
     {
@@ -65,8 +65,8 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
       category: 'admission',
       question: '駐車場や駐輪場はありますか？',
       questionEn: 'Is there parking for cars or bicycles?',
-      answer: '校内および周辺に一般来場者用の駐車場・駐輪場は一切ございません。近隣住民の皆様のご迷惑となりますので、お車および自転車でのご来校は固くお断りいたします。公共交通機関（南海高野線・近鉄長野線 河内長野駅よりバスまたは徒歩）をご利用ください。',
-      answerEn: 'There is no visitor car or bicycle parking on campus or nearby. Visiting by car or bicycle is strictly prohibited. Please use public transportation.',
+      answer: '校内および周辺に一般来場者用の駐車場・駐輪場は一切ございません。近隣住民の皆様のご迷惑となりますので、お車および自転車でのご来校は固くお断りいたします。公共交通機関（南海高野線・近鉄長野線 河内長野駅より徒歩）をご利用ください。',
+      answerEn: 'There is no visitor car or bicycle parking on campus or nearby. Visiting by car or bicycle is strictly prohibited. Please use public transportation (walking from Kawachinagano Station).',
       tag: '駐車場・駐輪場なし'
     },
     {
