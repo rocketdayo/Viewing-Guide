@@ -11,6 +11,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { AppDataState } from '../types';
 import { useI18n } from '../utils/i18n';
+import { matchProjectSearch } from '../utils/classSearch';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -41,17 +42,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     }
     const q = query.toLowerCase().trim();
 
-    const matchedProjects = (appData?.projects || []).filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) ||
-        p.classNumber.toLowerCase().includes(q) ||
-        p.catchphrase.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        p.location.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q) ||
-        (p.organizer && p.organizer.toLowerCase().includes(q)) ||
-        (p.menuItems && p.menuItems.some((m) => m.toLowerCase().includes(q))) ||
-        (p.fullDetails && p.fullDetails.toLowerCase().includes(q))
+    const matchedProjects = (appData?.projects || []).filter((p) =>
+      matchProjectSearch(p, query)
     );
 
     const matchedSchedules = (appData?.schedules || []).filter(

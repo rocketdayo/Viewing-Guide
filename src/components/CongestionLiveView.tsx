@@ -18,6 +18,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { ClassProject, CongestionLevel } from '../types';
 import { useI18n, translateCategory } from '../utils/i18n';
+import { matchProjectSearch } from '../utils/classSearch';
 
 interface CongestionLiveViewProps {
   gasUrl?: string;
@@ -129,15 +130,8 @@ export const CongestionLiveView: React.FC<CongestionLiveViewProps> = ({
         }
       }
 
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchTitle = p.title.toLowerCase().includes(q);
-        const matchClass = p.classNumber.toLowerCase().includes(q);
-        const matchCat = p.category.toLowerCase().includes(q);
-        const matchLoc = p.location.toLowerCase().includes(q);
-        const matchNote = p.congestion.statusNote?.toLowerCase().includes(q);
-        const matchDetail = p.congestion.detailNote?.toLowerCase().includes(q);
-        if (!matchTitle && !matchClass && !matchCat && !matchLoc && !matchNote && !matchDetail) return false;
+      if (searchQuery.trim() && !matchProjectSearch(p, searchQuery)) {
+        return false;
       }
 
       return true;

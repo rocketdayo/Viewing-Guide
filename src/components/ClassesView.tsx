@@ -12,6 +12,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { ClassProject, CongestionLevel } from '../types';
 import { useI18n, translateCategory, translateBuilding, translateGrade } from '../utils/i18n';
+import { matchProjectSearch } from '../utils/classSearch';
 
 interface ClassesViewProps {
   projects: ClassProject[];
@@ -94,15 +95,8 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
       if (onlyOnlineTickets && !onlineTicketClassIds.includes(p.id) && !p.onlineTicketUrl && !p.onlineTicketNote) {
         return false;
       }
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const matches =
-          (p.title || '').toLowerCase().includes(q) ||
-          (p.classNumber || '').toLowerCase().includes(q) ||
-          (p.catchphrase || '').toLowerCase().includes(q) ||
-          (p.description || '').toLowerCase().includes(q) ||
-          (p.location || '').toLowerCase().includes(q);
-        if (!matches) return false;
+      if (searchQuery.trim() && !matchProjectSearch(p, searchQuery)) {
+        return false;
       }
       return true;
     }).sort((a, b) => {
