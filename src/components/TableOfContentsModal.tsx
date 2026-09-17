@@ -93,7 +93,16 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
     }
   };
 
-  const primaryNavItems = [
+  interface PrimaryNavItem {
+    id: string;
+    label: string;
+    desc: string;
+    icon: React.ForwardRefExoticComponent<any>;
+    color: string;
+    isDraft?: boolean;
+  }
+
+  const primaryNavItems: PrimaryNavItem[] = [
     { 
       id: 'home', 
       label: t.navHome, 
@@ -127,7 +136,6 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
       label: t.navMap, 
       desc: language === 'en' ? 'Main & New building campus maps' : '本館・新館・特別棟・チャペル', 
       icon: MapPin, 
-      isDraft: true, 
       color: 'rose' 
     },
     { 

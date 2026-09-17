@@ -39,12 +39,19 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const { language, toggleLanguage, t } = useI18n();
 
-  const navItems = [
+  interface NavItem {
+    id: string;
+    label: string;
+    icon: React.ForwardRefExoticComponent<any>;
+    isDraft?: boolean;
+  }
+
+  const navItems: NavItem[] = [
     { id: 'home', label: t.navHome, icon: Home },
     { id: 'schedule', label: t.navSchedule, icon: Calendar },
     { id: 'classes', label: t.navClasses, icon: Layers },
     { id: 'congestion', label: t.navCongestion, icon: Activity },
-    { id: 'map', label: t.navMap, icon: MapPin, isDraft: true },
+    { id: 'map', label: t.navMap, icon: MapPin },
     { id: 'faq', label: language === 'en' ? 'FAQ & Manners' : 'FAQ・マナー', icon: HelpCircle },
   ];
 
