@@ -55,11 +55,6 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
     'all',
     'C棟',
     'M棟',
-    '本館',
-    '新館',
-    '特別棟',
-    'チャペル',
-    '体育館',
   ];
 
   const grades = ['all', '1年', '2年'];
