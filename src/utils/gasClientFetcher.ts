@@ -354,6 +354,8 @@ export async function fetchRawTextDirect(targetUrl: string): Promise<string> {
   throw new Error("スプレッドシート・GASからの直接取得に失敗しました");
 }
 
+let isProxyBackendSupported = true;
+
 export async function fetchLiveGasCongestionSmart(gasUrl?: string): Promise<GasSyncResult> {
   const targetUrl = gasUrl || DEFAULT_CONGESTION_URL;
 
@@ -362,7 +364,7 @@ export async function fetchLiveGasCongestionSmart(gasUrl?: string): Promise<GasS
     window.location.protocol === 'file:'
   );
 
-  if (!isStaticHost) {
+  if (!isStaticHost && isProxyBackendSupported) {
     try {
       const apiUrl = `/api/congestion-live?url=${encodeURIComponent(targetUrl)}`;
       const controller = new AbortController();
@@ -375,14 +377,21 @@ export async function fetchLiveGasCongestionSmart(gasUrl?: string): Promise<GasS
       });
       clearTimeout(timeoutId);
 
-      const contentType = response.headers.get('content-type') || '';
-      if (response.ok && contentType.includes('application/json')) {
-        const json: GasSyncResult = await response.json();
-        if (json.success && json.data) {
-          return json;
+      if (!response.ok || response.status === 404 || response.status === 405) {
+        isProxyBackendSupported = false;
+      } else {
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const json: GasSyncResult = await response.json();
+          if (json.success && json.data) {
+            return json;
+          }
+        } else {
+          isProxyBackendSupported = false;
         }
       }
     } catch {
+      isProxyBackendSupported = false;
     }
   }
 
@@ -412,7 +421,7 @@ export async function fetchLiveAnnouncementsSmart(gasUrl?: string): Promise<Anno
     window.location.protocol === 'file:'
   );
 
-  if (!isStaticHost) {
+  if (!isStaticHost && isProxyBackendSupported) {
     try {
       const apiUrl = `/api/announcements-live?url=${encodeURIComponent(targetUrl)}`;
       const controller = new AbortController();
@@ -425,14 +434,21 @@ export async function fetchLiveAnnouncementsSmart(gasUrl?: string): Promise<Anno
       });
       clearTimeout(timeoutId);
 
-      const contentType = response.headers.get('content-type') || '';
-      if (response.ok && contentType.includes('application/json')) {
-        const json: AnnouncementSyncResult = await response.json();
-        if (json.success && json.data !== undefined) {
-          return json;
+      if (!response.ok || response.status === 404 || response.status === 405) {
+        isProxyBackendSupported = false;
+      } else {
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const json: AnnouncementSyncResult = await response.json();
+          if (json.success && json.data !== undefined) {
+            return json;
+          }
+        } else {
+          isProxyBackendSupported = false;
         }
       }
     } catch {
+      isProxyBackendSupported = false;
     }
   }
 

@@ -17,69 +17,51 @@ interface PosterImageProps {
 
 export const getPosterCandidateUrls = (src?: string, posterFile?: string, posterImage?: string, image?: string, title?: string): string[] => {
   const candidates: string[] = [];
+  const add = (url?: string) => {
+    if (url && url.trim() && !candidates.includes(url)) {
+      candidates.push(url);
+    }
+  };
+
+  [src, posterImage, image].forEach((u) => {
+    if (u && (u.startsWith('http://') || u.startsWith('https://') || u.startsWith('data:'))) {
+      add(u);
+    }
+  });
+
   const rawTarget = posterFile || posterImage || image || src || '';
   const fileName = rawTarget.split('/').pop()?.split('\\').pop() || '';
-
-  if (src && (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:'))) {
-    candidates.push(src);
-  }
-  if (posterImage && (posterImage.startsWith('http://') || posterImage.startsWith('https://') || posterImage.startsWith('data:'))) {
-    candidates.push(posterImage);
-  }
-  if (image && (image.startsWith('http://') || image.startsWith('https://') || image.startsWith('data:'))) {
-    candidates.push(image);
-  }
+  const withoutExt = fileName.replace(/\.[^/.]+$/, '');
 
   const baseNames: string[] = [];
-  if (fileName) {
-    baseNames.push(fileName);
-    const withoutExt = fileName.replace(/\.[^/.]+$/, '');
-    if (withoutExt && withoutExt !== fileName) {
-      baseNames.push(`${withoutExt}.png`);
-      baseNames.push(`${withoutExt}.jpg`);
-      baseNames.push(`${withoutExt}.jpeg`);
-      baseNames.push(`${withoutExt}.webp`);
-    }
+  if (fileName) baseNames.push(fileName);
+  if (withoutExt && withoutExt !== fileName) {
+    baseNames.push(`${withoutExt}.png`);
+    baseNames.push(`${withoutExt}.jpg`);
   }
-  if (title) {
-    const cleanTitle = title.trim();
-    if (cleanTitle) {
-      baseNames.push(`${cleanTitle}.png`);
-      baseNames.push(`${cleanTitle}.jpg`);
-      baseNames.push(`${cleanTitle}.jpeg`);
-    }
+  if (title && title.trim()) {
+    baseNames.push(`${title.trim()}.png`);
   }
 
   const prefixes = [
     '/classposter/',
-    'classposter/',
-    '/SGfes/',
-    '/images/schedule/',
-    '/images/projects/',
     '/images/classes/',
+    '/images/projects/',
     '/images/alumni/',
-    '/alumni/',
-    '/images/',
-    '/',
-    'SGfes/',
-    'images/schedule/'
+    '/images/'
   ];
 
   for (const name of baseNames) {
-    const encoded = encodeURIComponent(name);
     for (const prefix of prefixes) {
-      const p1 = `${prefix}${name}`;
-      if (!candidates.includes(p1)) candidates.push(p1);
-      const p2 = `${prefix}${encoded}`;
-      if (!candidates.includes(p2)) candidates.push(p2);
+      add(`${prefix}${name}`);
     }
   }
 
-  if (posterImage && !candidates.includes(posterImage)) candidates.push(posterImage);
-  if (image && !candidates.includes(image)) candidates.push(image);
-  if (src && !candidates.includes(src)) candidates.push(src);
+  add(posterImage);
+  add(image);
+  add(src);
 
-  return candidates;
+  return candidates.slice(0, 8);
 };
 
 export const PosterImage: React.FC<PosterImageProps> = ({

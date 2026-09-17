@@ -289,6 +289,8 @@ export function applyClassProjectsSync(
   return { updatedProjects, syncedCount: count };
 }
 
+let isProxyBackendSupported = true;
+
 export async function fetchLiveClassProjects(
   sheetUrl: string = CLASS_PROJECTS_SHEET_URL
 ): Promise<{
@@ -302,7 +304,7 @@ export async function fetchLiveClassProjects(
       (window.location.hostname.includes('github.io') ||
         window.location.protocol === 'file:');
 
-    if (!isStaticHost) {
+    if (!isStaticHost && isProxyBackendSupported) {
       try {
         const res = await fetch(
           `/api/class-projects-live?url=${encodeURIComponent(sheetUrl)}`
@@ -312,8 +314,12 @@ export async function fetchLiveClassProjects(
           if (json && json.success && json.data) {
             return { success: true, data: json.data };
           }
+        } else if (res.status === 404 || res.status === 405) {
+          isProxyBackendSupported = false;
         }
-      } catch {}
+      } catch {
+        isProxyBackendSupported = false;
+      }
     }
 
     const rawText = await fetchRawTextDirect(sheetUrl);

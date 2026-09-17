@@ -68,16 +68,23 @@ export function loadAppData(): AppDataState {
   return { ...INITIAL_APP_DATA };
 }
 
+let isServerApiSupported = true;
+
 export function saveAppData(data: AppDataState): void {
   try {
     const sanitized = sanitizeAppData(data);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
-    
+
+    if (!isServerApiSupported) {
+      return;
+    }
+
     const isStaticHost = typeof window !== 'undefined' && (
       window.location.hostname.includes('github.io') ||
       window.location.protocol === 'file:'
     );
     if (isStaticHost) {
+      isServerApiSupported = false;
       return;
     }
 
@@ -85,29 +92,43 @@ export function saveAppData(data: AppDataState): void {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(sanitized),
-    }).catch(() => {
-    });
+    })
+      .then((res) => {
+        if (!res.ok || res.status === 404 || res.status === 405) {
+          isServerApiSupported = false;
+        }
+      })
+      .catch(() => {
+        isServerApiSupported = false;
+      });
   } catch (e) {
     console.error('Failed to save app data:', e);
   }
 }
 
 export async function fetchServerAppData(): Promise<AppDataState | null> {
+  if (!isServerApiSupported) {
+    return null;
+  }
+
   const isStaticHost = typeof window !== 'undefined' && (
     window.location.hostname.includes('github.io') ||
     window.location.protocol === 'file:'
   );
   if (isStaticHost) {
+    isServerApiSupported = false;
     return null;
   }
 
   try {
     const res = await fetch('/api/app-data');
-    if (!res.ok) {
+    if (!res.ok || res.status === 404 || res.status === 405) {
+      isServerApiSupported = false;
       return null;
     }
     const contentType = res.headers.get('content-type') || '';
     if (!contentType.includes('application/json')) {
+      isServerApiSupported = false;
       return null;
     }
     const json = await res.json();
@@ -115,6 +136,7 @@ export async function fetchServerAppData(): Promise<AppDataState | null> {
       return sanitizeAppData(json.data);
     }
   } catch {
+    isServerApiSupported = false;
   }
   return null;
 }
