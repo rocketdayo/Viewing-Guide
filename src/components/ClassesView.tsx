@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ClassProject, CongestionLevel } from '../types';
 import { useI18n, translateCategory, translateBuilding, translateGrade } from '../utils/i18n';
 import { matchProjectSearch } from '../utils/classSearch';
-import { getClassPosterFileName } from '../utils/classPoster';
+import { getClassPosterFileName, getClassPosterStem } from '../utils/classPoster';
 
 interface ClassesViewProps {
   projects: ClassProject[];
@@ -440,13 +440,25 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
                         </div>
                       </div>
 
-                      <div className="space-y-1">
-                        <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-600 transition-colors line-clamp-1">
-                          {proj.title}
-                        </h3>
-                        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                          {proj.catchphrase}
-                        </p>
+                      <div className="flex gap-3 items-start">
+                        {getClassPosterStem(proj) && (
+                          <div className="w-16 h-22 shrink-0 rounded-xs overflow-hidden bg-slate-100 border border-slate-200 shadow-2xs">
+                            <img
+                              src={`/classposter/${getClassPosterStem(proj)}.png`}
+                              alt={`${proj.classNumber} ポスター`}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                              loading="lazy"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0 space-y-1">
+                          <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-600 transition-colors line-clamp-1">
+                            {proj.title}
+                          </h3>
+                          <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                            {proj.catchphrase}
+                          </p>
+                        </div>
                       </div>
 
                       <div className="pt-1">
