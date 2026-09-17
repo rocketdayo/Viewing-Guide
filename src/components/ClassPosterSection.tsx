@@ -11,12 +11,12 @@ import {
   AlertCircle,
   ChevronDown,
   ChevronUp,
-  Image as ImageIcon
+  RotateCw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ClassProject } from '../types';
 import { useI18n } from '../utils/i18n';
-import { getClassPosterFileName } from '../utils/classPoster';
+import { getClassPosterFileName, getClassPosterStem } from '../utils/classPoster';
 
 interface ClassPosterSectionProps {
   project: ClassProject;
@@ -28,28 +28,24 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const posterFileName = getClassPosterFileName(project);
+  const stem = getClassPosterStem(project);
 
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [hasPoster, setHasPoster] = useState<boolean>(false);
-  const [isChecking, setIsChecking] = useState<boolean>(true);
+  const [imageUrl, setImageUrl] = useState<string>(`/classposter/${stem || '1-A'}.png`);
+  const [pdfUrl, setPdfUrl] = useState<string>(`/classposter/${stem || '1-A'}.pdf`);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
-  const [imageError, setImageError] = useState<boolean>(false);
-  const allowPosterReplacement = false;
-
-  const [candidateList, setCandidateList] = useState<string[]>([]);
   const [candidateIndex, setCandidateIndex] = useState<number>(0);
+  const [candidateList, setCandidateList] = useState<string[]>([]);
+  const [hasError, setHasError] = useState<boolean>(false);
 
   useEffect(() => {
     let isMounted = true;
-    if (!posterFileName) {
-      setHasPoster(false);
-      setIsChecking(false);
+    if (!stem) {
+      setIsLoading(false);
       return;
     }
 
@@ -57,66 +53,61 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
     if (savedPoster && (savedPoster.startsWith('data:image/') || savedPoster.startsWith('blob:'))) {
       if (isMounted) {
         setImageUrl(savedPoster);
-        setPdfUrl(null);
-        setHasPoster(true);
-        setIsChecking(false);
+        setPdfUrl(`/classposter/${stem}.pdf`);
+        setIsLoading(false);
+        setHasError(false);
       }
       return;
     }
 
-    setIsChecking(true);
-    setImageError(false);
+    const directImg = `/classposter/${stem}.png`;
+    const directPdf = `/classposter/${stem}.pdf`;
+    
+    setImageUrl(directImg);
+    setPdfUrl(directPdf);
+    setIsLoading(true);
+    setHasError(false);
     setCandidateIndex(0);
 
-    const stem = posterFileName.replace(/\.[^/.]+$/, '');
-    const defaultList = [
-      `/classposter/${stem}.png`,
+    const candidates = [
+      directImg,
       `/classposter/${stem}.jpg`,
       `/classposter/${stem}.jpeg`,
       `/classposter/${stem}.webp`,
       `/images/classes/${stem}.png`,
       `/images/classes/${stem}.jpg`
     ];
+    setCandidateList(candidates);
 
-    fetch(`/api/check-poster?file=${encodeURIComponent(posterFileName)}`)
+    fetch(`/api/check-poster?file=${encodeURIComponent(stem)}.pdf`)
       .then((res) => res.json())
       .then((data) => {
         if (!isMounted) return;
         if (data.exists && data.imageUrl) {
           const timestamp = Date.now();
-          const img = `${data.imageUrl}?t=${timestamp}`;
-          const pdf = data.pdfUrl ? `${data.pdfUrl}?t=${timestamp}` : `/classposter/${stem}.pdf`;
-          setImageUrl(img);
-          setPdfUrl(pdf);
-          setCandidateList([img, ...defaultList]);
-          setHasPoster(true);
-        } else {
-          setImageUrl(defaultList[0]);
-          setPdfUrl(`/classposter/${stem}.pdf`);
-          setCandidateList(defaultList);
-          setHasPoster(true);
+          const liveImg = `${data.imageUrl}?t=${timestamp}`;
+          const livePdf = data.pdfUrl ? `${data.pdfUrl}?t=${timestamp}` : directPdf;
+          setImageUrl(liveImg);
+          setPdfUrl(livePdf);
+          setCandidateList([liveImg, ...candidates]);
         }
       })
-      .catch(() => {
-        if (!isMounted) return;
-        setImageUrl(defaultList[0]);
-        setPdfUrl(`/classposter/${stem}.pdf`);
-        setCandidateList(defaultList);
-        setHasPoster(true);
-      })
+      .catch(() => {})
       .finally(() => {
-        if (isMounted) setIsChecking(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       });
 
     return () => {
       isMounted = false;
     };
-  }, [project.id, posterFileName]);
+  }, [project.id, stem]);
 
-  if (!posterFileName) return null;
+  if (!posterFileName && !stem) return null;
 
   const handleFileUpload = async (file: File) => {
-    if (!file) return;
+    if (!file || !stem) return;
     const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
     const isImage = file.type.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(file.name);
 
@@ -134,7 +125,7 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
       reader.onload = async () => {
         try {
           const base64Data = reader.result as string;
-          const targetName = isPdf ? posterFileName : `${posterFileName.replace(/\.pdf$/i, '')}.png`;
+          const targetName = isPdf ? `${stem}.pdf` : `${stem}.png`;
 
           const response = await fetch('/api/upload-poster', {
             method: 'POST',
@@ -149,23 +140,23 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
           const result = await response.json();
           if (result.success) {
             const timestamp = Date.now();
-            const newImgUrl = result.imageUrl ? `${result.imageUrl}?t=${timestamp}` : (isImage ? base64Data : null);
-            const newPdfUrl = result.pdfUrl ? `${result.pdfUrl}?t=${timestamp}` : (isPdf ? `/classposter/${targetName}?t=${timestamp}` : null);
+            const newImgUrl = result.imageUrl ? `${result.imageUrl}?t=${timestamp}` : (isImage ? base64Data : `/classposter/${stem}.png?t=${timestamp}`);
+            const newPdfUrl = result.pdfUrl ? `${result.pdfUrl}?t=${timestamp}` : `/classposter/${stem}.pdf?t=${timestamp}`;
 
-            setImageUrl(newImgUrl || newPdfUrl);
+            setImageUrl(newImgUrl);
             setPdfUrl(newPdfUrl);
-            setHasPoster(true);
+            setHasError(false);
             setUploadSuccess(true);
-            localStorage.setItem(`custom_poster_${project.id}`, newImgUrl || base64Data);
+            localStorage.setItem(`custom_poster_${project.id}`, newImgUrl);
 
-            if (onPosterUpdated && (newImgUrl || newPdfUrl)) {
-              onPosterUpdated((newImgUrl || newPdfUrl)!);
+            if (onPosterUpdated) {
+              onPosterUpdated(newImgUrl);
             }
             setTimeout(() => setUploadSuccess(false), 3500);
           } else {
             const fallbackBlob = URL.createObjectURL(file);
             setImageUrl(fallbackBlob);
-            setHasPoster(true);
+            setHasError(false);
             setUploadSuccess(true);
             localStorage.setItem(`custom_poster_${project.id}`, base64Data);
             setTimeout(() => setUploadSuccess(false), 3500);
@@ -173,7 +164,7 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
         } catch {
           const fallbackBlob = URL.createObjectURL(file);
           setImageUrl(fallbackBlob);
-          setHasPoster(true);
+          setHasError(false);
           setUploadSuccess(true);
           setTimeout(() => setUploadSuccess(false), 3500);
         } finally {
@@ -187,12 +178,20 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFileUpload(e.dataTransfer.files[0]);
+  const handleImageError = () => {
+    const nextIdx = candidateIndex + 1;
+    if (nextIdx < candidateList.length) {
+      setCandidateIndex(nextIdx);
+      setImageUrl(candidateList[nextIdx]);
+    } else {
+      setHasError(true);
     }
+  };
+
+  const handleReload = () => {
+    setHasError(false);
+    setCandidateIndex(0);
+    setImageUrl(`/classposter/${stem}.png?t=${Date.now()}`);
   };
 
   return (
@@ -203,11 +202,9 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
           <span className="font-bold text-xs sm:text-sm text-emerald-950">
             {language === 'en' ? 'Class Poster' : 'クラスポスター'}
           </span>
-          {posterFileName && (
-            <span className="bg-emerald-100/90 text-emerald-900 border border-emerald-300/80 font-mono text-[11px] font-bold px-2 py-0.5 rounded-xs shadow-2xs">
-              {posterFileName}
-            </span>
-          )}
+          <span className="bg-emerald-100/90 text-emerald-900 border border-emerald-300/80 font-mono text-[11px] font-bold px-2 py-0.5 rounded-xs shadow-2xs">
+            {posterFileName || `${stem}.pdf`}
+          </span>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -223,54 +220,40 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
             }}
           />
 
-          {allowPosterReplacement && (
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading}
-              className="flex items-center space-x-1 px-2.5 py-1 rounded-xs bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 transition-colors shadow-2xs cursor-pointer"
-              title={language === 'en' ? 'Upload or replace poster' : 'ポスターを登録・更新'}
-            >
-              <Upload className="w-3.5 h-3.5 text-emerald-700" />
-              <span className="hidden sm:inline">{hasPoster ? (language === 'en' ? 'Replace' : '差し替え') : (language === 'en' ? 'Upload' : '登録')}</span>
-            </button>
+          {pdfUrl && (
+            <>
+              <a
+                href={pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-1 px-2.5 py-1 rounded-xs bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 transition-colors shadow-2xs"
+                title={language === 'en' ? 'Open PDF in new tab' : 'PDFを別タブで開く'}
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-slate-600" />
+                <span className="hidden sm:inline">PDF</span>
+              </a>
+
+              <a
+                href={pdfUrl}
+                download={`${project.classNumber}_ポスター.pdf`}
+                className="flex items-center space-x-1 px-2.5 py-1 rounded-xs bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 transition-colors shadow-2xs"
+                title={language === 'en' ? 'Download PDF' : 'PDF保存'}
+              >
+                <Download className="w-3.5 h-3.5 text-slate-600" />
+                <span className="hidden sm:inline">{language === 'en' ? 'Save' : '保存'}</span>
+              </a>
+            </>
           )}
 
-          {hasPoster && (
-            <>
-              {pdfUrl && (
-                <>
-                  <a
-                    href={pdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-1 px-2.5 py-1 rounded-xs bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 transition-colors shadow-2xs"
-                    title={language === 'en' ? 'Open PDF in new tab' : 'PDFを別タブで開く'}
-                  >
-                    <ExternalLink className="w-3.5 h-3.5 text-slate-600" />
-                    <span className="hidden sm:inline">PDF</span>
-                  </a>
-
-                  <a
-                    href={pdfUrl}
-                    download={`${project.classNumber}_ポスター.pdf`}
-                    className="flex items-center space-x-1 px-2.5 py-1 rounded-xs bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 transition-colors shadow-2xs"
-                    title={language === 'en' ? 'Download PDF' : 'PDF保存'}
-                  >
-                    <Download className="w-3.5 h-3.5 text-slate-600" />
-                    <span className="hidden sm:inline">{language === 'en' ? 'Save' : '保存'}</span>
-                  </a>
-                </>
-              )}
-
-              <button
-                onClick={() => setIsFullscreen(true)}
-                className="flex items-center space-x-1 px-2.5 py-1 rounded-xs bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold transition-colors shadow-2xs cursor-pointer"
-                title={language === 'en' ? 'Fullscreen' : '全画面拡大'}
-              >
-                <Maximize2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{language === 'en' ? 'Enlarge' : '拡大'}</span>
-              </button>
-            </>
+          {!hasError && (
+            <button
+              onClick={() => setIsFullscreen(true)}
+              className="flex items-center space-x-1 px-2.5 py-1 rounded-xs bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold transition-colors shadow-2xs cursor-pointer"
+              title={language === 'en' ? 'Fullscreen' : '全画面拡大'}
+            >
+              <Maximize2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{language === 'en' ? 'Enlarge' : '拡大'}</span>
+            </button>
           )}
 
           <button
@@ -299,14 +282,37 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
 
       {!isCollapsed && (
         <div className="p-3 sm:p-4">
-          {isChecking ? (
-            <div className="h-48 sm:h-64 bg-slate-50 rounded-xs flex items-center justify-center border border-slate-200 text-slate-400 text-xs">
-              <div className="flex items-center space-x-2">
-                <span className="w-3 h-3 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></span>
-                <span>{language === 'en' ? 'Loading poster...' : 'ポスターを読み込み中...'}</span>
+          {hasError ? (
+            <div className="p-6 text-center rounded-xs border border-slate-200 bg-slate-50 flex flex-col items-center justify-center space-y-3">
+              <FileText className="w-10 h-10 text-emerald-700" />
+              <div>
+                <p className="text-sm font-bold text-slate-800">{project.classNumber} 公式ポスター ({stem}.pdf)</p>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {language === 'en' ? 'PDF file is available.' : 'PDFファイルが登録されています。'}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleReload}
+                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xs text-xs font-bold transition-colors cursor-pointer"
+                >
+                  <RotateCw className="w-3.5 h-3.5" />
+                  <span>{language === 'en' ? 'Retry' : '再読み込み'}</span>
+                </button>
+                {pdfUrl && (
+                  <a
+                    href={pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xs text-xs font-bold transition-colors shadow-2xs"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>{language === 'en' ? 'Open PDF' : 'PDFを開く'}</span>
+                  </a>
+                )}
               </div>
             </div>
-          ) : hasPoster && imageUrl && !imageError ? (
+          ) : (
             <div className="space-y-2">
               <div 
                 onClick={() => setIsFullscreen(true)}
@@ -316,16 +322,8 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
                   src={imageUrl}
                   alt={`${project.classNumber} ポスター`}
                   className="w-full h-auto max-h-[560px] object-contain rounded-xs select-none"
-                  onError={() => {
-                    const nextIdx = candidateIndex + 1;
-                    if (nextIdx < candidateList.length) {
-                      setCandidateIndex(nextIdx);
-                      setImageUrl(candidateList[nextIdx]);
-                    } else {
-                      setImageError(true);
-                    }
-                  }}
-                  loading="lazy"
+                  onError={handleImageError}
+                  loading="eager"
                 />
 
                 <div className="absolute inset-0 bg-slate-950/0 group-hover:bg-slate-950/20 transition-colors flex items-center justify-center">
@@ -336,46 +334,12 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
                 </div>
               </div>
             </div>
-          ) : (
-            <div
-              onDrop={handleDrop}
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              className={`p-6 text-center rounded-xs border-2 border-dashed transition-colors ${
-                isDragging ? 'border-emerald-500 bg-emerald-50/70' : 'border-slate-300 bg-white hover:bg-slate-50/60'
-              }`}
-            >
-              <div className="w-10 h-10 mx-auto rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-800 mb-2.5">
-                <ImageIcon className="w-5 h-5" />
-              </div>
-              <p className="text-xs sm:text-sm font-bold text-slate-800">
-                {language === 'en' ? `${project.classNumber} Poster` : `${project.classNumber} 公式ポスター`}
-              </p>
-              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                {language === 'en' 
-                  ? 'Drag & drop the poster PDF or image file here, or click to upload.'
-                  : 'ポスターPDFまたは画像ファイルをドラッグ＆ドロップするか、下のボタンから登録してください。'}
-              </p>
-              <div className="mt-3.5">
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                  className="inline-flex items-center space-x-1.5 px-4 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xs text-xs font-bold transition-colors shadow-2xs cursor-pointer"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>{isUploading ? (language === 'en' ? 'Uploading...' : '登録中...') : (language === 'en' ? 'Upload Poster' : 'ポスターを登録する')}</span>
-                </button>
-              </div>
-            </div>
           )}
         </div>
       )}
 
       <AnimatePresence>
-        {isFullscreen && imageUrl && (
+        {isFullscreen && !hasError && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
