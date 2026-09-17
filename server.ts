@@ -38,6 +38,26 @@ const searchDirs = [
   path.join(process.cwd(), 'dist')
 ];
 
+const normalizeClassCode = (input: string): string => {
+  if (!input) return '';
+  const half = input
+    .replace(/[！-～]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
+    .replace(/ー|—|–/g, '-')
+    .trim();
+
+  const match = half.match(/([1-3])\s*(?:年)?\s*[-_/\s]?\s*([A-Za-z])(?:\s*組)?/i);
+  if (match) {
+    return `${match[1]}-${match[2].toUpperCase()}`;
+  }
+
+  const idMatch = half.match(/p-([1-3])([a-z])/i);
+  if (idMatch) {
+    return `${idMatch[1]}-${idMatch[2].toUpperCase()}`;
+  }
+
+  return '';
+};
+
 const convertPdfToPng = (pdfPath: string, pngPath: string): boolean => {
   try {
     if (!fs.existsSync(pdfPath)) return false;
@@ -62,7 +82,12 @@ app.all(['/classposter/:file', '/alumni/:file', '/images/schedule/:file', '/imag
 
   const cleanBase = path.basename(decoded);
   const ext = path.extname(cleanBase).toLowerCase();
-  const stem = path.basename(cleanBase, ext);
+  let stem = path.basename(cleanBase, ext);
+
+  const normalizedCode = normalizeClassCode(stem) || normalizeClassCode(cleanBase);
+  if (normalizedCode) {
+    stem = normalizedCode;
+  }
 
   const candidateDirs = [
     path.join(process.cwd(), 'public/classposter'),
@@ -114,14 +139,14 @@ app.all(['/classposter/:file', '/alumni/:file', '/images/schedule/:file', '/imag
           }
         }
       }
-    } else if (ext === '.pdf') {
+    } else if (ext === '.pdf' || !ext) {
       for (const dir of candidateDirs) {
         if (!fs.existsSync(dir)) continue;
-        const pdfPath = path.join(dir, cleanBase);
-        if (fs.existsSync(pdfPath) && fs.statSync(pdfPath).size > 100) {
+        const pdfTarget = ext === '.pdf' ? path.join(dir, cleanBase) : path.join(dir, `${stem}.pdf`);
+        if (fs.existsSync(pdfTarget) && fs.statSync(pdfTarget).size > 100) {
           res.setHeader('Content-Type', 'application/pdf');
           res.setHeader('Content-Disposition', 'inline');
-          return res.sendFile(pdfPath);
+          return res.sendFile(pdfTarget);
         }
       }
     }
@@ -141,6 +166,12 @@ app.all(['/classposter/:file', '/alumni/:file', '/images/schedule/:file', '/imag
       variants.push(`${stem}${altExt}`);
       variants.push(`${stem}${altExt}`.normalize('NFC'));
       variants.push(`${stem}${altExt}`.normalize('NFD'));
+    }
+  }
+
+  if (normalizedCode) {
+    for (const altExt of ['.png', '.jpg', '.jpeg', '.webp', '.pdf']) {
+      variants.push(`${normalizedCode}${altExt}`);
     }
   }
 
@@ -181,7 +212,12 @@ app.get("/api/check-poster", (req, res) => {
   if (!file) return res.json({ exists: false, size: 0 });
   const safeName = path.basename(file);
   const ext = path.extname(safeName).toLowerCase();
-  const stem = path.basename(safeName, ext);
+  let stem = path.basename(safeName, ext);
+
+  const normalizedCode = normalizeClassCode(stem) || normalizeClassCode(safeName);
+  if (normalizedCode) {
+    stem = normalizedCode;
+  }
 
   const candidateDirs = [
     path.join(process.cwd(), 'public/classposter'),
@@ -205,7 +241,7 @@ app.get("/api/check-poster", (req, res) => {
         size: fs.statSync(pngPath).size,
         imageUrl: `/classposter/${stem}.png`,
         pdfUrl: fs.existsSync(pdfPath) ? `/classposter/${stem}.pdf` : null,
-        fileName: `${stem}.png`
+        fileName: `${stem}.pdf`
       });
     }
 
@@ -215,7 +251,7 @@ app.get("/api/check-poster", (req, res) => {
         size: fs.statSync(jpgPath).size,
         imageUrl: `/classposter/${stem}.jpg`,
         pdfUrl: fs.existsSync(pdfPath) ? `/classposter/${stem}.pdf` : null,
-        fileName: `${stem}.jpg`
+        fileName: `${stem}.pdf`
       });
     }
 
@@ -225,7 +261,7 @@ app.get("/api/check-poster", (req, res) => {
         size: fs.statSync(jpegPath).size,
         imageUrl: `/classposter/${stem}.jpeg`,
         pdfUrl: fs.existsSync(pdfPath) ? `/classposter/${stem}.pdf` : null,
-        fileName: `${stem}.jpeg`
+        fileName: `${stem}.pdf`
       });
     }
 
@@ -235,7 +271,7 @@ app.get("/api/check-poster", (req, res) => {
         size: fs.statSync(webpPath).size,
         imageUrl: `/classposter/${stem}.webp`,
         pdfUrl: fs.existsSync(pdfPath) ? `/classposter/${stem}.pdf` : null,
-        fileName: `${stem}.webp`
+        fileName: `${stem}.pdf`
       });
     }
 

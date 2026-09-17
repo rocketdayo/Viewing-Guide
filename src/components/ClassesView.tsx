@@ -408,9 +408,9 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
                             {proj.rawCategory || translateCategory(proj.category, language)}
                           </span>
                           {getClassPosterFileName(proj) && (
-                            <span className="bg-emerald-50/80 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 border border-emerald-200">
+                            <span className="bg-emerald-50 text-emerald-800 text-[10px] font-mono font-bold px-2 py-0.5 rounded-md flex items-center gap-1 border border-emerald-200">
                               <FileText className="w-3 h-3 text-emerald-600" />
-                              <span>{language === 'en' ? 'Poster' : 'ポスター'}</span>
+                              <span>{getClassPosterFileName(proj)}</span>
                             </span>
                           )}
                           {(isOnlineTicket || proj.ticketText === 'あり' || proj.congestion?.ticketRequired) && (

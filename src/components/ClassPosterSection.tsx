@@ -203,6 +203,11 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
           <span className="font-bold text-xs sm:text-sm text-emerald-950">
             {language === 'en' ? 'Class Poster' : 'クラスポスター'}
           </span>
+          {posterFileName && (
+            <span className="bg-emerald-100/90 text-emerald-900 border border-emerald-300/80 font-mono text-[11px] font-bold px-2 py-0.5 rounded-xs shadow-2xs">
+              {posterFileName}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center space-x-1.5">
