@@ -387,13 +387,16 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
                 return (
                   <motion.div
                     key={proj.id}
+                    id={`class-card-${proj.id}`}
                     layout
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.25, delay: Math.min(idx * 0.03, 0.3) }}
-                    whileHover={{ y: -3 }}
-                    className="p-5 rounded-xs bg-white border border-slate-200/90 hover:border-emerald-400 hover:shadow-md transition-all flex flex-col justify-between group relative"
+                    whileHover={{ y: -3, transition: { duration: 0.15 } }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => onSelectProject(proj.id)}
+                    className="p-5 rounded-xs bg-white border border-slate-200/90 hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group relative overflow-hidden"
                   >
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
@@ -420,6 +423,7 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
 
                         <div className="flex items-center space-x-1">
                           <button
+                            id={`bookmark-btn-${proj.id}`}
                             onClick={(e) => {
                               e.stopPropagation();
                               onToggleBookmark(proj.id);
@@ -436,10 +440,7 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
                         </div>
                       </div>
 
-                      <div 
-                        onClick={() => onSelectProject(proj.id)}
-                        className="cursor-pointer space-y-1"
-                      >
+                      <div className="space-y-1">
                         <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-600 transition-colors line-clamp-1">
                           {proj.title}
                         </h3>
@@ -461,13 +462,10 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
                         </span>
                       </div>
 
-                      <button
-                        onClick={() => onSelectProject(proj.id)}
-                        className="flex items-center space-x-1 font-bold text-emerald-600 group-hover:translate-x-1 transition-transform cursor-pointer"
-                      >
+                      <div className="flex items-center space-x-1 font-bold text-emerald-600 group-hover:translate-x-1 transition-transform">
                         <span>{t.viewDetails}</span>
                         <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
+                      </div>
                     </div>
                   </motion.div>
                 );

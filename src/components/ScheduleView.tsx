@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Calendar, 
   Clock, 
@@ -6,7 +6,6 @@ import {
   Search, 
   Sparkles, 
   Music, 
-  Users, 
   SlidersHorizontal,
   Share2, 
   Copy, 
@@ -17,13 +16,14 @@ import {
   X,
   Compass,
   Award,
-  Footprints,
   Shield,
-  Utensils,
   PartyPopper,
   Radio,
   BookOpen,
-  Image as ImageIcon
+  Bookmark,
+  ChevronRight,
+  ListFilter,
+  Columns
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ScheduleEvent } from '../types';
@@ -39,11 +39,22 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
   schedules = [],
   onNavigate
 }) => {
-  const { language, t } = useI18n();
+  const { language } = useI18n();
   const [selectedVenue, setSelectedVenue] = useState<string>('all');
-  const [selectedDay, setSelectedDay] = useState<'all' | 'Day1' | 'Day2'>('all');
+  const [selectedDay, setSelectedDay] = useState<'all' | 'Day1' | 'Day2'>('Day1');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'timeline' | 'venues'>('timeline');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'current' | 'upcoming'>('all');
+  const [bookmarkedIds, setBookmarkedIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('schedule_bookmarks');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [detailModalEvent, setDetailModalEvent] = useState<ScheduleEvent | null>(null);
@@ -82,6 +93,17 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     }
   }, [schedules]);
 
+  const toggleBookmark = (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setBookmarkedIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+      try {
+        localStorage.setItem('schedule_bookmarks', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => {
@@ -103,27 +125,38 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     const counts: Record<string, number> = { all: schedules.length };
     venueOptions.forEach(v => {
       if (v.id !== 'all') {
-        counts[v.id] = schedules.filter(s => s.venue === v.id).length;
+        counts[v.id] = schedules.filter(s => {
+          if (s.published === false) return false;
+          if (selectedDay !== 'all') {
+            if (s.day !== '両日' && s.day !== selectedDay) return false;
+          }
+          return s.venue === v.id;
+        }).length;
       }
     });
     return counts;
-  }, [schedules]);
+  }, [schedules, selectedDay]);
+
+  const getEventStatus = (startTime: string, endTime: string, day: string) => {
+    if (!startTime || !endTime) return 'upcoming';
+    if (currentTimeStr >= startTime && currentTimeStr <= endTime) return 'current';
+    if (currentTimeStr < startTime) return 'upcoming';
+    return 'finished';
+  };
 
   const filteredSchedules = useMemo(() => {
     const list = schedules.filter((event) => {
-      if (event.published === false) {
-        return false;
-      }
-      if (selectedVenue !== 'all' && event.venue !== selectedVenue) {
-        return false;
-      }
+      if (event.published === false) return false;
+      if (selectedVenue !== 'all' && event.venue !== selectedVenue) return false;
       if (selectedDay !== 'all') {
-        if (event.day !== '両日' && event.day !== selectedDay) {
-          return false;
-        }
+        if (event.day !== '両日' && event.day !== selectedDay) return false;
       }
       if (selectedType !== 'all') {
         if (event.performerType !== selectedType) return false;
+      }
+      if (statusFilter !== 'all') {
+        const status = getEventStatus(event.startTime, event.endTime, event.day);
+        if (status !== statusFilter) return false;
       }
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
@@ -148,14 +181,52 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
       }
       return a.startTime.localeCompare(b.startTime);
     });
-  }, [schedules, selectedVenue, selectedDay, selectedType, searchQuery]);
+  }, [schedules, selectedVenue, selectedDay, selectedType, statusFilter, searchQuery, currentTimeStr]);
 
-  const getEventStatus = (startTime: string, endTime: string, day: string) => {
-    if (!startTime || !endTime) return 'upcoming';
-    if (currentTimeStr >= startTime && currentTimeStr <= endTime) return 'current';
-    if (currentTimeStr < startTime) return 'upcoming';
-    return 'finished';
-  };
+  const groupedByHour = useMemo(() => {
+    const groups: { hourLabel: string; events: ScheduleEvent[] }[] = [];
+    const map = new Map<string, ScheduleEvent[]>();
+
+    filteredSchedules.forEach((ev) => {
+      const hour = ev.startTime.split(':')[0] || '09';
+      const hourLabel = `${hour}:00`;
+      if (!map.has(hourLabel)) {
+        map.set(hourLabel, []);
+      }
+      map.get(hourLabel)!.push(ev);
+    });
+
+    const sortedHours = Array.from(map.keys()).sort();
+    sortedHours.forEach((hour) => {
+      groups.push({
+        hourLabel: hour,
+        events: map.get(hour)!
+      });
+    });
+
+    return groups;
+  }, [filteredSchedules]);
+
+  const venuesColumns = useMemo(() => {
+    const distinctVenues = ['第一体育館', 'レクチャールーム', 'グラウンド', 'ラーニングコモンズ', '清教学園ツアー'];
+    return distinctVenues.map((venueName) => {
+      const venueEvents = filteredSchedules.filter((e) => e.venue === venueName);
+      return {
+        venueName,
+        events: venueEvents
+      };
+    }).filter((col) => col.events.length > 0 || selectedVenue === 'all');
+  }, [filteredSchedules, selectedVenue]);
+
+  const nowPlayingEvents = useMemo(() => {
+    return schedules.filter((event) => {
+      if (event.published === false) return false;
+      if (selectedDay !== 'all') {
+        if (event.day !== '両日' && event.day !== selectedDay) return false;
+      }
+      return getEventStatus(event.startTime, event.endTime, event.day) === 'current';
+    });
+  }, [schedules, selectedDay, currentTimeStr]);
 
   const formatShareTextSingle = (event: ScheduleEvent) => {
     const venueLabel = translateVenue(event.venue, language);
@@ -164,36 +235,23 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     return `✨【清教学園 文化祭 SGfes 2026】✨\n🎪 企画名: ${event.title}\n👤 出演・主催: ${event.performer} (${event.performerType || '企画'})\n🗓 日程: ${dayLabel}\n⏰ 時間: ${event.startTime}〜${event.endTime} (${event.duration || ''})${locationInfo}\n\n📝 内容:\n${event.description}\n\n#清教学園 #SGfes #文化祭`;
   };
 
-  const handleCopySingle = (event: ScheduleEvent) => {
+  const handleCopySingle = (event: ScheduleEvent, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     const text = formatShareTextSingle(event);
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text).then(() => {
         setCopiedId(event.id);
-        showToast(language === 'en' ? 'Event details copied to clipboard!' : '演目情報をコピーしました！LINEやSNSで友達に共有できます。');
+        showToast(language === 'en' ? 'Event copied to clipboard!' : '演目情報をコピーしました！');
         setTimeout(() => setCopiedId(null), 2500);
       });
     }
   };
 
-  const handleLineShare = (event: ScheduleEvent) => {
+  const handleLineShare = (event: ScheduleEvent, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     const text = formatShareTextSingle(event);
     const url = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
-  };
-
-  const handleWebShareSingle = async (event: ScheduleEvent) => {
-    const text = formatShareTextSingle(event);
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `${event.title} | 清教学園文化祭`,
-          text: text,
-          url: window.location.href,
-        });
-      } catch (e) {}
-    } else {
-      handleCopySingle(event);
-    }
   };
 
   const generateTimetableSummary = () => {
@@ -229,6 +287,53 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
+  const getVenueColor = (venue: string) => {
+    switch (venue) {
+      case '第一体育館':
+        return {
+          badge: 'bg-sky-100 text-sky-900 border-sky-300',
+          accent: 'border-l-sky-500',
+          lightBg: 'bg-sky-50/40',
+          dot: 'bg-sky-500'
+        };
+      case 'レクチャールーム':
+        return {
+          badge: 'bg-purple-100 text-purple-900 border-purple-300',
+          accent: 'border-l-purple-500',
+          lightBg: 'bg-purple-50/40',
+          dot: 'bg-purple-500'
+        };
+      case 'グラウンド':
+        return {
+          badge: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+          accent: 'border-l-emerald-500',
+          lightBg: 'bg-emerald-50/40',
+          dot: 'bg-emerald-500'
+        };
+      case 'ラーニングコモンズ':
+        return {
+          badge: 'bg-amber-100 text-amber-900 border-amber-300',
+          accent: 'border-l-amber-500',
+          lightBg: 'bg-amber-50/40',
+          dot: 'bg-amber-500'
+        };
+      case '清教学園ツアー':
+        return {
+          badge: 'bg-teal-100 text-teal-900 border-teal-300',
+          accent: 'border-l-teal-500',
+          lightBg: 'bg-teal-50/40',
+          dot: 'bg-teal-500'
+        };
+      default:
+        return {
+          badge: 'bg-slate-100 text-slate-800 border-slate-300',
+          accent: 'border-l-slate-400',
+          lightBg: 'bg-slate-50/40',
+          dot: 'bg-slate-500'
+        };
+    }
+  };
+
   const getEventIcon = (category: string) => {
     switch (category) {
       case '音楽・演奏':
@@ -239,76 +344,93 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
         return Award;
       case 'パフォーマンス':
         return PartyPopper;
-      case 'セレモニー':
-        return StarIcon;
       default:
         return Calendar;
     }
   };
 
-  function StarIcon(props: React.SVGProps<SVGSVGElement>) {
-    return <Sparkles {...props} />;
-  }
-
   return (
-    <div className="space-y-6 pb-24 max-w-5xl mx-auto px-3 sm:px-4">
+    <div className="space-y-5 pb-24 max-w-6xl mx-auto px-3 sm:px-4">
       {toastMessage && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-full text-xs font-bold shadow-lg border border-slate-700 flex items-center space-x-2 pointer-events-none animate-bounce">
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-4 py-2 rounded-xs text-xs font-bold shadow-lg border border-slate-700 flex items-center space-x-2 pointer-events-none animate-fade-in">
           <Check className="w-4 h-4 text-emerald-400" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      <div className="bg-white border border-slate-200 rounded-sm p-5 sm:p-7 shadow-xs">
+      <div className="bg-white border border-slate-200/90 rounded-xs p-4 sm:p-6 shadow-2xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center space-x-2 px-2.5 py-1 rounded-sm bg-sky-50 text-sky-800 border border-sky-200 text-xs font-bold mb-2">
-              <Calendar className="w-3.5 h-3.5 text-sky-600" />
+            <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-xs bg-sky-50 text-sky-800 border border-sky-200 text-xs font-bold mb-2">
+              <Clock className="w-3.5 h-3.5 text-sky-700" />
               <span>{language === 'en' ? 'Festival Timetable' : '清教学園 文化祭 タイムテーブル'}</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-serif">
-              {language === 'en' ? 'Event & Performance Timetable' : '公演・企画 タイムテーブル'}
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              {language === 'en' ? 'Performance & Stage Schedule' : '公演・ステージ・企画 タイムスケジュール'}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
               {language === 'en' 
-                ? 'Check out all stage shows, club performances, student tours, and special events across campus.' 
-                : '第一体育館、レクチャールーム、グラウンド、ラーニングコモンズなど全エリアの公演・企画をまとめて確認できます。'}
+                ? 'Check performance times for Gym 1, Lecture Room, Ground, and Tours. Tap any event for details.' 
+                : '第一体育館、レクチャールーム、グラウンド、在校生ツアー等の公演を時間軸で確認できます。カード全体をタップして詳細が開きます。'}
             </p>
           </div>
 
           <div className="flex items-center gap-2 self-start md:self-auto shrink-0">
             <button
               onClick={() => setShowShareModal(true)}
-              className="px-3.5 py-2 rounded-sm bg-sky-50 hover:bg-sky-100 border border-sky-300 text-sky-900 text-xs font-bold flex items-center space-x-1.5 transition-colors cursor-pointer shadow-2xs"
+              className="px-3 py-1.5 rounded-xs bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-900 text-xs font-bold flex items-center space-x-1.5 transition-colors cursor-pointer shadow-2xs"
             >
-              <Share2 className="w-4 h-4 text-sky-700" />
-              <span>{language === 'en' ? 'Share with Friends' : '友達に共有する'}</span>
+              <Share2 className="w-3.5 h-3.5 text-sky-700" />
+              <span>{language === 'en' ? 'Share' : '友達にシェア'}</span>
             </button>
-            <div className="px-3 py-2 rounded-sm bg-slate-50 border border-slate-200 text-center">
-              <div className="text-[11px] text-slate-500 font-medium">{language === 'en' ? 'Total Events' : '総企画数'}</div>
-              <div className="text-sm font-black text-slate-900">{schedules.length} <span className="text-[11px] font-normal text-slate-500">{language === 'en' ? 'items' : '件'}</span></div>
+
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-xs border border-slate-200">
+              <button
+                onClick={() => setViewMode('timeline')}
+                className={`flex items-center space-x-1 px-2.5 py-1 text-xs font-bold rounded-xs transition-colors cursor-pointer ${
+                  viewMode === 'timeline'
+                    ? 'bg-white text-slate-900 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+                title={language === 'en' ? 'Timeline View' : '時系列タイムライン'}
+              >
+                <ListFilter className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{language === 'en' ? 'Timeline' : 'タイムライン'}</span>
+              </button>
+              <button
+                onClick={() => setViewMode('venues')}
+                className={`flex items-center space-x-1 px-2.5 py-1 text-xs font-bold rounded-xs transition-colors cursor-pointer ${
+                  viewMode === 'venues'
+                    ? 'bg-white text-slate-900 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+                title={language === 'en' ? 'Venue Matrix View' : '会場別比較'}
+              >
+                <Columns className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{language === 'en' ? 'By Venue' : '会場別'}</span>
+              </button>
             </div>
           </div>
         </div>
 
-        <div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-sm">
-            <span className="text-xs text-slate-500 font-bold px-2 flex items-center">
-              <Clock className="w-3.5 h-3.5 mr-1" />
+        <div className="mt-4 pt-3.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xs">
+            <span className="text-xs text-slate-600 font-bold px-2 flex items-center">
+              <Calendar className="w-3.5 h-3.5 mr-1 text-slate-500" />
               {language === 'en' ? 'Day:' : '日程:'}
             </span>
             {[
+              { id: 'Day1', label: language === 'en' ? 'Day 1 (9/18 Fri)' : '1日目 9/18(金)' },
+              { id: 'Day2', label: language === 'en' ? 'Day 2 (9/19 Sat)' : '2日目 9/19(土)' },
               { id: 'all', label: language === 'en' ? 'All Days' : '全日程' },
-              { id: 'Day1', label: language === 'en' ? 'Day 1 (9/18)' : '1日目 (9/18)' },
-              { id: 'Day2', label: language === 'en' ? 'Day 2 (9/19)' : '2日目 (9/19)' },
             ].map(day => (
               <button
                 key={day.id}
                 onClick={() => setSelectedDay(day.id as any)}
-                className={`px-3 py-1 text-xs font-bold rounded-sm transition-all cursor-pointer ${
+                className={`px-3 py-1 text-xs font-bold rounded-xs transition-all cursor-pointer ${
                   selectedDay === day.id
-                    ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-slate-900 text-white shadow-2xs'
+                    : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/60'
                 }`}
               >
                 {day.label}
@@ -316,26 +438,80 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
             ))}
           </div>
 
-          <div className="text-xs text-slate-500 flex items-center space-x-1.5">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>{language === 'en' ? 'Current Time:' : '現在時刻:'}</span>
-            <strong className="font-mono text-slate-900 font-bold">{currentTimeStr}</strong>
+          <div className="flex items-center space-x-3 text-xs text-slate-600">
+            <div className="flex items-center space-x-1.5 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-xs text-emerald-950 font-bold">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+              <span>{language === 'en' ? 'Now:' : '現在時刻:'}</span>
+              <span className="font-mono text-emerald-900">{currentTimeStr}</span>
+            </div>
+            {nowPlayingEvents.length > 0 && (
+              <span className="text-[11px] font-bold text-slate-500 hidden sm:inline">
+                {language === 'en' ? `${nowPlayingEvents.length} in progress` : `現在 ${nowPlayingEvents.length} 件が進行中`}
+              </span>
+            )}
           </div>
         </div>
       </div>
 
+      {nowPlayingEvents.length > 0 && (
+        <div className="bg-linear-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-300 rounded-xs p-3.5 shadow-2xs space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-ping" />
+              <span className="text-xs font-black text-emerald-950 flex items-center gap-1">
+                <span>{language === 'en' ? 'HAPPENING NOW' : '現在進行中の公演・企画'}</span>
+              </span>
+            </div>
+            <span className="text-[11px] font-bold text-emerald-800">
+              {currentTimeStr}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {nowPlayingEvents.map((ev) => (
+              <div
+                key={`now-${ev.id}`}
+                onClick={() => setDetailModalEvent(ev)}
+                className="bg-white p-3 rounded-xs border border-emerald-300/80 hover:border-emerald-500 shadow-2xs cursor-pointer hover:shadow-xs transition-all flex flex-col justify-between"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="font-mono font-bold text-emerald-900 bg-emerald-100/90 px-1.5 py-0.2 rounded-xs">
+                      {ev.startTime} 〜 {ev.endTime}
+                    </span>
+                    <span className="font-bold text-slate-700 bg-slate-100 px-1.5 py-0.2 rounded-xs">
+                      {translateVenue(ev.venue, language)}
+                    </span>
+                  </div>
+                  <h4 className="text-xs sm:text-sm font-bold text-slate-900 line-clamp-1">
+                    {ev.title}
+                  </h4>
+                  <p className="text-[11px] text-slate-500 line-clamp-1">
+                    {ev.performer}
+                  </p>
+                </div>
+                <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-emerald-700 font-bold">
+                  <span>{language === 'en' ? 'Tap for details' : '詳細を見る'}</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="space-y-2">
-        <div className="text-xs font-bold text-slate-500 flex items-center justify-between px-1">
-          <span className="flex items-center space-x-1">
-            <MapPin className="w-3.5 h-3.5 text-sky-600" />
-            <span>{language === 'en' ? 'Select Venue / Area' : '会場・エリアを選択'}</span>
+        <div className="flex items-center justify-between px-1">
+          <span className="text-xs font-bold text-slate-600 flex items-center space-x-1">
+            <MapPin className="w-3.5 h-3.5 text-sky-700" />
+            <span>{language === 'en' ? 'Filter by Area / Venue' : '会場・エリアで絞り込み'}</span>
           </span>
-          <span className="text-[11px] text-slate-400">
-            {language === 'en' ? 'Tap to filter' : 'タップで切り替え'}
+          <span className="text-[11px] text-slate-500 font-bold">
+            {filteredSchedules.length} {language === 'en' ? 'events' : '件表示中'}
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1.5">
           {venueOptions.map((v) => {
             const isSelected = selectedVenue === v.id;
             const Icon = v.icon;
@@ -345,24 +521,22 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
               <button
                 key={v.id}
                 onClick={() => setSelectedVenue(v.id)}
-                className={`p-3 rounded-sm border text-left transition-all cursor-pointer flex flex-col justify-between h-20 ${
+                className={`p-2.5 rounded-xs border text-left transition-all cursor-pointer flex flex-col justify-between h-16 ${
                   isSelected
-                    ? 'bg-slate-900 border-slate-900 text-white shadow-xs'
-                    : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                    ? 'bg-slate-900 border-slate-900 text-white shadow-2xs'
+                    : 'bg-white border-slate-200 text-slate-800 hover:border-slate-300 hover:bg-slate-50'
                 }`}
               >
                 <div className="flex items-center justify-between w-full">
-                  <Icon className={`w-4 h-4 ${isSelected ? 'text-sky-300' : 'text-slate-500'}`} />
-                  <span className={`text-[11px] font-bold px-1.5 py-0.2 rounded-full ${
-                    isSelected ? 'bg-slate-800 text-sky-200' : 'bg-slate-100 text-slate-600'
+                  <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-sky-300' : 'text-slate-600'}`} />
+                  <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-xs ${
+                    isSelected ? 'bg-slate-800 text-sky-200' : 'bg-slate-100 text-slate-700'
                   }`}>
                     {count}
                   </span>
                 </div>
-                <div>
-                  <div className="font-bold text-xs leading-tight line-clamp-1">
-                    {language === 'en' ? v.labelEn : v.labelJa}
-                  </div>
+                <div className="font-bold text-[11px] sm:text-xs leading-tight line-clamp-1">
+                  {language === 'en' ? v.labelEn : v.labelJa}
                 </div>
               </button>
             );
@@ -370,100 +544,16 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
         </div>
       </div>
 
-      {selectedVenue === '第一体育館' && (
-        <div className="bg-sky-50 border border-sky-200 rounded-sm p-4 text-xs text-sky-900 space-y-1">
-          <div className="font-bold flex items-center space-x-1.5">
-            <Info className="w-4 h-4 text-sky-700 shrink-0" />
-            <span>{language === 'en' ? 'Gym 1 (Main Arena) Admission Notes' : '第一体育館 鑑賞にあたっての案内'}</span>
-          </div>
-          <p className="leading-relaxed text-sky-800 pl-5">
-            {language === 'en'
-              ? 'Outdoor shoes are permitted inside the venue (no need to change into slippers). "Floor" indicates the arena floor, and "Stage" indicates the main elevated stage. Night Fes 2026 will also take place here on Day 1 (16:00~).'
-              : '会場内は土足のままご入場いただけます（上履き・スリッパへの履き替えは不要です）。「舞台下」はアリーナフロア面、「舞台上」はメインステージ上となります。9/18(金)16:00〜の後夜祭 (Seikyo Night Fes) も第一体育館で開催されます！'}
-          </p>
-        </div>
-      )}
-
-      {selectedVenue === 'レクチャールーム' && (
-        <div className="bg-purple-50 border border-purple-200 rounded-sm p-4 text-xs text-purple-900 space-y-1">
-          <div className="font-bold flex items-center space-x-1.5">
-            <Radio className="w-4 h-4 text-purple-700 shrink-0" />
-            <span>{language === 'en' ? 'Lecture Room Information & Break' : 'レクチャールーム 案内・進行について'}</span>
-          </div>
-          <p className="leading-relaxed text-purple-800 pl-5">
-            {language === 'en'
-              ? 'Morning session features That\'s BRASS (10:20~) and Brass S (10:40~). Afternoon session features Twin Leaf (12:00~/12:10~) and Gospel Live (12:20~/12:30~). Lunch break is scheduled around 11:00-12:00.'
-              : '午前の部ではThat\'s BRASS（10:20〜）、Brass S（10:40〜）のアンサンブル。午後の部では有志Twin Leaf、聖書研究会ゴスペル部門による現代版ワーシップLIVEをお届けします！'}
-          </p>
-        </div>
-      )}
-
-      {selectedVenue === 'グラウンド' && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-sm p-4 text-xs text-emerald-900 space-y-1">
-          <div className="font-bold flex items-center space-x-1.5">
-            <Shield className="w-4 h-4 text-emerald-700 shrink-0" />
-            <span>{language === 'en' ? 'Ground Special Event & Food Trucks' : 'グラウンドエリアのご案内'}</span>
-          </div>
-          <p className="leading-relaxed text-emerald-800 pl-5">
-            {language === 'en'
-              ? '9/19(Sat) 10:00-12:00 features Police & Firefighter experience with patrol cars and batting clinics. Food trucks are also open nearby throughout both festival days!'
-              : '2日目(9/19) 10:00〜12:00はパトカー展示・指紋採取・防火服試着・野球教室を開催！また食堂前・グラウンド横中庭では大人気キッチンカーが常設オープンしています！'}
-          </p>
-        </div>
-      )}
-
-      {selectedVenue === 'ラーニングコモンズ' && (
-        <div className="bg-amber-50 border border-amber-200 rounded-sm p-4 text-xs text-amber-900 space-y-1">
-          <div className="font-bold flex items-center space-x-1.5">
-            <Award className="w-4 h-4 text-amber-700 shrink-0" />
-            <span>{language === 'en' ? 'Learning Commons Special Exhibits & Photo Spots' : 'ラーニングコモンズ 展示企画＆フォトスポット'}</span>
-          </div>
-          <p className="leading-relaxed text-amber-800 pl-5">
-            {language === 'en'
-              ? 'Exhibits by High School Art Club, Interact Club, International Exchange, Global Studies, and Home Economics. Includes photo spots & balloon gifts for kids!'
-              : '高校美術部、インターアクト部、国際交流、グローバルスタディーズ、家庭科の各種展示を実施中！写真撮影用フォトスポットや風船のプレゼント（小学生以下）もご用意しています。'}
-          </p>
-        </div>
-      )}
-
-      {selectedVenue === '校舎内' && (
-        <div className="bg-indigo-50 border border-indigo-200 rounded-sm p-4 text-xs text-indigo-900 space-y-1">
-          <div className="font-bold flex items-center space-x-1.5">
-            <MapPin className="w-4 h-4 text-indigo-700 shrink-0" />
-            <span>{language === 'en' ? 'SGfes Stamp Rally (School-wide Event)' : 'SGfesスタンプラリー（校内全域企画）'}</span>
-          </div>
-          <p className="leading-relaxed text-indigo-800 pl-5">
-            {language === 'en'
-              ? 'Collect 5 stamps placed around the school building and bring your completed sheet to Learning Commons to receive a gift!'
-              : '校内各所に設置された5箇所のスタンプを集めてラーニングコモンズへ持参すると景品をプレゼント！ぜひ校内を巡ってお楽しみください。'}
-          </p>
-        </div>
-      )}
-
-      {selectedVenue === '清教学園ツアー' && (
-        <div className="bg-teal-50 border border-teal-200 rounded-sm p-4 text-xs text-teal-900 space-y-1">
-          <div className="font-bold flex items-center space-x-1.5">
-            <Compass className="w-4 h-4 text-teal-700 shrink-0" />
-            <span>{language === 'en' ? 'School Tour for Alumni & Prospective Students' : '在校生による清教学園ツアー（景品あり）'}</span>
-          </div>
-          <p className="leading-relaxed text-teal-800 pl-5">
-            {language === 'en'
-              ? 'Day 2 (9/19) Tours start at 10:00, 12:00, and 14:00 (approx. 15 min each). Assembly point: In front of Gym 1. Free gifts included!'
-              : '文化祭2日目(9/19) 10:00〜 / 12:00〜 / 14:00〜 のタイムテーブルで計3回開催（約15分）。集合場所は第一体育館前の看板前です。参加者には景品もございます！'}
-          </p>
-        </div>
-      )}
-
-      <div className="bg-white border border-slate-200 rounded-sm p-3.5 space-y-3 shadow-2xs">
-        <div className="flex flex-col sm:flex-row gap-2.5">
+      <div className="bg-white border border-slate-200 rounded-xs p-3 space-y-2.5 shadow-2xs">
+        <div className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={language === 'en' ? 'Search by title, performer, venue, or keyword...' : '企画名、出演者、会場、キーワードで検索...'}
-              className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-600 focus:border-sky-600 transition-colors"
+              placeholder={language === 'en' ? 'Search by title, performer, or keyword...' : '企画名、出演者、会場、キーワードで検索...'}
+              className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xs focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-600 focus:border-sky-600 transition-colors"
             />
             {searchQuery && (
               <button 
@@ -475,24 +565,44 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
             )}
           </div>
 
-          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 sm:pb-0">
-            <span className="text-xs text-slate-500 font-bold whitespace-nowrap mr-1 flex items-center">
-              <SlidersHorizontal className="w-3.5 h-3.5 mr-1" />
-              {language === 'en' ? 'Type:' : '区分:'}
+          <div className="flex items-center space-x-1.5 overflow-x-auto pb-0.5 sm:pb-0">
+            <span className="text-xs text-slate-600 font-bold whitespace-nowrap mr-0.5 flex items-center">
+              <SlidersHorizontal className="w-3.5 h-3.5 mr-1 text-slate-500" />
+              {language === 'en' ? 'Status:' : '進行:'}
             </span>
             {[
               { id: 'all', label: language === 'en' ? 'All' : 'すべて' },
-              { id: '部活', label: language === 'en' ? 'Club' : '部活' },
-              { id: '有志', label: language === 'en' ? 'Volunteer' : '有志' },
+              { id: 'current', label: language === 'en' ? 'Now' : '進行中' },
+              { id: 'upcoming', label: language === 'en' ? 'Upcoming' : 'これから' },
+            ].map((st) => (
+              <button
+                key={st.id}
+                onClick={() => setStatusFilter(st.id as any)}
+                className={`px-2 py-1 rounded-xs text-xs font-bold whitespace-nowrap transition-colors cursor-pointer ${
+                  statusFilter === st.id
+                    ? 'bg-emerald-800 text-white'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                {st.label}
+              </button>
+            ))}
+
+            <span className="text-slate-300 mx-1">|</span>
+
+            {[
+              { id: 'all', label: language === 'en' ? 'All Types' : '全区分' },
+              { id: '部活', label: language === 'en' ? 'Clubs' : '部活' },
+              { id: '有志', label: language === 'en' ? 'Volunteers' : '有志' },
               { id: '特別', label: language === 'en' ? 'Special' : '特別企画' },
             ].map((tItem) => (
               <button
                 key={tItem.id}
                 onClick={() => setSelectedType(tItem.id)}
-                className={`px-2.5 py-1.5 rounded-sm text-xs font-bold whitespace-nowrap transition-colors cursor-pointer ${
+                className={`px-2 py-1 rounded-xs text-xs font-bold whitespace-nowrap transition-colors cursor-pointer ${
                   selectedType === tItem.id
                     ? 'bg-slate-900 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
                 {tItem.label}
@@ -501,31 +611,31 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
           </div>
         </div>
 
-        {(searchQuery || selectedType !== 'all' || selectedVenue !== 'all' || selectedDay !== 'all') && (
-          <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
+        {(searchQuery || selectedType !== 'all' || selectedVenue !== 'all' || statusFilter !== 'all') && (
+          <div className="flex items-center justify-between text-xs text-slate-600 pt-1.5 border-t border-slate-100">
             <span>
-              {language === 'en' ? 'Filtered Results:' : '表示中企画:'} <strong className="text-slate-900 font-bold">{filteredSchedules.length}</strong> {language === 'en' ? 'events' : '件'}
+              {language === 'en' ? 'Active filters result:' : '該当公演:'} <strong className="text-slate-900 font-bold">{filteredSchedules.length}</strong> {language === 'en' ? 'events' : '件'}
             </span>
             <button
               onClick={() => {
                 setSelectedVenue('all');
-                setSelectedDay('all');
                 setSelectedType('all');
+                setStatusFilter('all');
                 setSearchQuery('');
               }}
               className="text-sky-700 hover:underline font-bold cursor-pointer"
             >
-              {language === 'en' ? 'Reset Filters' : 'フィルターをリセット'}
+              {language === 'en' ? 'Reset Filters' : 'フィルター解除'}
             </button>
           </div>
         )}
       </div>
 
       {filteredSchedules.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-sm p-12 text-center space-y-3">
-          <Info className="w-10 h-10 text-slate-300 mx-auto" />
-          <h3 className="text-sm sm:text-base font-bold text-slate-700">
-            {language === 'en' ? 'No events found matching your criteria' : '条件に一致する公演・企画が見つかりませんでした'}
+        <div className="bg-white border border-slate-200 rounded-xs p-10 text-center space-y-3">
+          <Info className="w-8 h-8 text-slate-400 mx-auto" />
+          <h3 className="text-sm sm:text-base font-bold text-slate-800">
+            {language === 'en' ? 'No events found matching your filter' : '条件に一致する公演・企画が見つかりませんでした'}
           </h3>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
             {language === 'en' ? 'Try changing the venue, day, or search keywords.' : '日程や会場の絞り込みを変更するか、検索キーワードを見直してください。'}
@@ -533,226 +643,246 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
           <button
             onClick={() => {
               setSelectedVenue('all');
-              setSelectedDay('all');
               setSelectedType('all');
+              setStatusFilter('all');
               setSearchQuery('');
             }}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-sm transition-colors cursor-pointer"
+            className="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xs transition-colors cursor-pointer"
           >
             {language === 'en' ? 'Show All Events' : 'すべての企画を表示'}
           </button>
         </div>
-      ) : (
-        <div className="space-y-3">
-          {filteredSchedules.map((event, idx) => {
-            const status = getEventStatus(event.startTime, event.endTime, event.day);
-            const isGym = event.venue === '第一体育館';
-            const isHighlighted = highlightedId === event.id;
-            const Icon = getEventIcon(event.category);
-
+      ) : viewMode === 'venues' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {venuesColumns.map((col) => {
+            const venueColor = getVenueColor(col.venueName);
             return (
-              <motion.div
-                key={event.id}
-                id={event.id}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.15, delay: Math.min(idx * 0.02, 0.2) }}
-                className={`bg-white border rounded-sm shadow-2xs overflow-hidden transition-all ${
-                  isHighlighted 
-                    ? 'ring-2 ring-sky-500 border-sky-400 bg-sky-50/20' 
-                    : status === 'current' 
-                    ? 'border-emerald-400 ring-1 ring-emerald-400/30' 
-                    : 'border-slate-200 hover:border-slate-300 hover:shadow-xs'
-                }`}
+              <div 
+                key={col.venueName}
+                className="bg-white border border-slate-200 rounded-xs overflow-hidden flex flex-col shadow-2xs"
               >
-                <div className="bg-slate-50/90 px-4 py-2.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                    <span className="font-mono text-xs sm:text-sm font-black text-sky-900 bg-sky-100/80 border border-sky-200 px-2 py-0.5 rounded-sm flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-sky-700" />
-                      {event.startTime} 〜 {event.endTime}
-                    </span>
-                    {event.duration && (
-                      <span className="px-2 py-0.5 rounded-sm bg-white text-slate-600 border border-slate-200 text-xs font-bold">
-                        {event.duration}
-                      </span>
-                    )}
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-sm bg-slate-200/70 text-slate-700">
-                      {event.day === 'Day1' ? (language === 'en' ? 'Day 1 (9/18)' : '1日目(9/18)') : event.day === 'Day2' ? (language === 'en' ? 'Day 2 (9/19)' : '2日目(9/19)') : (language === 'en' ? 'Both Days' : '両日(9/18・19)')}
-                    </span>
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-sm bg-white text-slate-800 border border-slate-200 flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-slate-500" />
-                      {translateVenue(event.venue, language)}
-                      {event.stagePosition && <span className="text-slate-500 font-normal">({event.stagePosition})</span>}
-                    </span>
+                <div className={`px-4 py-2.5 border-b border-slate-200 font-bold text-xs flex items-center justify-between ${venueColor.lightBg}`}>
+                  <div className="flex items-center space-x-2">
+                    <span className={`w-2.5 h-2.5 rounded-full ${venueColor.dot}`} />
+                    <span className="text-slate-900">{translateVenue(col.venueName, language)}</span>
                   </div>
-
-                  <div className="flex items-center gap-1.5">
-                    {status === 'current' && (
-                      <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-emerald-500 text-white text-[11px] font-black animate-pulse">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                        <span>NOW</span>
-                      </span>
-                    )}
-                    {event.isImportant && (
-                      <span className="text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-300 px-2 py-0.5 rounded-sm flex items-center space-x-1">
-                        <Sparkles className="w-3 h-3 text-amber-600" />
-                        <span>{language === 'en' ? 'Featured' : '注目'}</span>
-                      </span>
-                    )}
-                  </div>
+                  <span className="text-slate-600 bg-white px-2 py-0.2 rounded-xs border border-slate-200 text-[11px]">
+                    {col.events.length} {language === 'en' ? 'events' : '公演'}
+                  </span>
                 </div>
 
-                <div className="p-4 sm:p-5 flex flex-col sm:flex-row items-start gap-4">
-                  {event.needsPoster !== false && (
-                    <div 
-                      onClick={() => setDetailModalEvent(event)} 
-                      className="shrink-0 w-24 sm:w-28 h-32 sm:h-38 rounded-sm overflow-hidden border border-slate-200 shadow-2xs cursor-pointer group hover:scale-[1.02] transition-transform self-center sm:self-start"
-                      title={language === 'en' ? 'Click to view poster' : 'クリックしてポスターを拡大'}
-                    >
-                      <PosterImage
-                        posterFile={event.posterFile}
-                        posterImage={event.posterImage}
-                        image={event.image}
-                        title={event.title}
-                        className="w-full h-full object-cover"
-                        allowZoom={false}
-                      />
+                <div className="p-2 space-y-2 flex-1 divide-y divide-slate-100 overflow-y-auto max-h-[700px]">
+                  {col.events.length === 0 ? (
+                    <div className="p-6 text-center text-xs text-slate-400">
+                      {language === 'en' ? 'No events scheduled for this day.' : 'この日程の予定はありません'}
                     </div>
+                  ) : (
+                    col.events.map((ev) => {
+                      const status = getEventStatus(ev.startTime, ev.endTime, ev.day);
+                      return (
+                        <div
+                          key={`col-${ev.id}`}
+                          onClick={() => setDetailModalEvent(ev)}
+                          className={`pt-2 first:pt-0 p-2.5 rounded-xs transition-colors cursor-pointer hover:bg-slate-50 border-l-4 ${venueColor.accent} ${
+                            status === 'current' ? 'bg-emerald-50/50 ring-1 ring-emerald-300' : ''
+                          }`}
+                        >
+                          <div className="flex items-center justify-between text-[11px] mb-1">
+                            <span className="font-mono font-bold text-slate-900 bg-slate-100 px-1.5 py-0.2 rounded-xs">
+                              {ev.startTime} 〜 {ev.endTime}
+                            </span>
+                            {status === 'current' && (
+                              <span className="bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-xs animate-pulse">
+                                NOW
+                              </span>
+                            )}
+                          </div>
+                          <h4 className="text-xs sm:text-sm font-bold text-slate-900 line-clamp-1">
+                            {ev.title}
+                          </h4>
+                          <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
+                            {ev.performer} {ev.stagePosition ? `(${ev.stagePosition})` : ''}
+                          </p>
+                        </div>
+                      );
+                    })
                   )}
-
-                  <div className="flex-1 min-w-0 space-y-2 w-full">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {event.department && (
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-sm bg-indigo-50 text-indigo-800 border border-indigo-200">
-                          {event.department}
-                        </span>
-                      )}
-                      {event.performerType && (
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-sm bg-slate-100 text-slate-700 border border-slate-200">
-                          {translatePerformerType(event.performerType, language)}
-                        </span>
-                      )}
-                      {event.category && (
-                        <span className="text-[11px] font-medium text-slate-500 bg-slate-50 px-2 py-0.5 rounded-sm border border-slate-200">
-                          {translateCategory(event.category, language)}
-                        </span>
-                      )}
-                    </div>
-
-                    <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-snug break-words">
-                      {event.title}
-                    </h3>
-
-                    <div className="text-xs font-bold text-slate-700 flex flex-wrap items-center gap-1.5">
-                      <span className="text-slate-500">{language === 'en' ? 'Project Name (Organizer):' : '企画名（出演・主催）:'}</span>
-                      <span className="text-slate-900 bg-slate-100 px-2 py-0.5 rounded-sm border border-slate-200 font-bold">{event.performer || event.title}</span>
-                    </div>
-
-                    {event.description && (
-                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-3 pt-0.5">
-                        {event.description}
-                      </p>
-                    )}
-
-                    {event.experienceTime && (
-                      <div className="text-xs text-slate-500 pt-1 flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-slate-400" />
-                        <span>{language === 'en' ? 'Duration / Hours: ' : '体験・閲覧時間: '}{event.experienceTime}</span>
-                      </div>
-                    )}
-                  </div>
                 </div>
-
-                <div className="px-4 py-2.5 bg-slate-50/60 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
-                  <div className="text-xs text-slate-500 flex items-center gap-1 truncate max-w-xs sm:max-w-md">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="truncate">{event.locationDetail || event.venue}</span>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <button
-                      onClick={() => setDetailModalEvent(event)}
-                      className="px-3 py-1.5 rounded-sm bg-sky-700 hover:bg-sky-800 text-white text-xs font-bold transition-colors cursor-pointer shadow-2xs"
-                    >
-                      {language === 'en' ? 'Details' : '詳細を見る'}
-                    </button>
-
-                    <button
-                      onClick={() => handleCopySingle(event)}
-                      title={language === 'en' ? 'Copy text' : 'テキストをコピー'}
-                      className="p-1.5 rounded-sm bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 text-xs transition-colors cursor-pointer"
-                    >
-                      {copiedId === event.id ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-slate-500" />}
-                    </button>
-
-                    <button
-                      onClick={() => handleLineShare(event)}
-                      title={language === 'en' ? 'Send via LINE' : 'LINEで送る'}
-                      className="p-1.5 rounded-sm bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-700 text-xs transition-colors cursor-pointer"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                    </button>
-
-                    <button
-                      onClick={() => handleWebShareSingle(event)}
-                      title={language === 'en' ? 'Share event' : '友達にシェア'}
-                      className="p-1.5 rounded-sm bg-sky-50 hover:bg-sky-100 border border-sky-300 text-sky-800 text-xs transition-colors cursor-pointer"
-                    >
-                      <Share2 className="w-4 h-4" />
-                    </button>
-
-                    {onNavigate && (
-                      <button
-                        onClick={() => onNavigate('map')}
-                        title={language === 'en' ? 'View Map' : 'マップで確認'}
-                        className="px-2.5 py-1.5 rounded-sm bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 text-xs font-medium flex items-center space-x-1 transition-colors cursor-pointer"
-                      >
-                        <MapPin className="w-3.5 h-3.5 text-slate-500" />
-                        <span className="hidden sm:inline">{language === 'en' ? 'Map' : '地図'}</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
+              </div>
             );
           })}
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {groupedByHour.map((group) => (
+            <div key={group.hourLabel} className="space-y-2.5">
+              <div className="flex items-center space-x-2 sticky top-14 z-10 bg-slate-50/95 backdrop-blur-xs py-1.5">
+                <span className="font-mono font-black text-xs sm:text-sm bg-slate-900 text-white px-2.5 py-1 rounded-xs shadow-2xs">
+                  {group.hourLabel}
+                </span>
+                <div className="h-px bg-slate-200 flex-1" />
+                <span className="text-[11px] font-bold text-slate-500">
+                  {group.events.length} {language === 'en' ? 'events' : '件'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {group.events.map((event) => {
+                  const status = getEventStatus(event.startTime, event.endTime, event.day);
+                  const isHighlighted = highlightedId === event.id;
+                  const isBookmarked = bookmarkedIds.includes(event.id);
+                  const venueColor = getVenueColor(event.venue);
+                  const Icon = getEventIcon(event.category);
+
+                  return (
+                    <motion.div
+                      key={event.id}
+                      id={event.id}
+                      onClick={() => setDetailModalEvent(event)}
+                      whileHover={{ y: -2 }}
+                      transition={{ duration: 0.15 }}
+                      className={`bg-white border rounded-xs shadow-2xs transition-all cursor-pointer flex flex-col justify-between overflow-hidden border-l-4 ${venueColor.accent} ${
+                        isHighlighted 
+                          ? 'ring-2 ring-sky-500 border-sky-400 bg-sky-50/20' 
+                          : status === 'current' 
+                          ? 'border-emerald-400 ring-1 ring-emerald-400/40 bg-emerald-50/20' 
+                          : 'border-slate-200/90 hover:border-slate-300 hover:shadow-xs'
+                      }`}
+                    >
+                      <div className="p-4 space-y-2.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center space-x-1.5 flex-wrap">
+                            <span className="font-mono text-xs font-black text-slate-900 bg-slate-100 px-2 py-0.5 rounded-xs border border-slate-200 flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-slate-600" />
+                              {event.startTime} 〜 {event.endTime}
+                            </span>
+                            <span className={`text-[11px] font-bold px-2 py-0.5 rounded-xs border ${venueColor.badge}`}>
+                              {translateVenue(event.venue, language)}
+                            </span>
+                            {event.stagePosition && (
+                              <span className="text-[11px] text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded-xs">
+                                {event.stagePosition}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center space-x-1 shrink-0">
+                            {status === 'current' && (
+                              <span className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded-xs animate-pulse">
+                                NOW
+                              </span>
+                            )}
+                            <button
+                              onClick={(e) => toggleBookmark(event.id, e)}
+                              className="p-1 text-slate-400 hover:text-amber-500 transition-colors cursor-pointer"
+                              title={isBookmarked ? 'お気に入り解除' : 'お気に入り登録'}
+                            >
+                              <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-amber-400 text-amber-500' : ''}`} />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3">
+                          {event.needsPoster !== false && (event.posterImage || event.image || event.posterFile) && (
+                            <div className="w-16 h-20 shrink-0 rounded-xs overflow-hidden border border-slate-200 bg-slate-100">
+                              <PosterImage
+                                posterFile={event.posterFile}
+                                posterImage={event.posterImage}
+                                image={event.image}
+                                title={event.title}
+                                className="w-full h-full object-cover"
+                                allowZoom={false}
+                              />
+                            </div>
+                          )}
+
+                          <div className="flex-1 min-w-0 space-y-1">
+                            <div className="flex items-center gap-1 text-[11px] text-slate-500">
+                              {event.performerType && (
+                                <span className="font-bold text-slate-700 bg-slate-100 px-1.5 py-0.2 rounded-xs">
+                                  {translatePerformerType(event.performerType, language)}
+                                </span>
+                              )}
+                              {event.category && (
+                                <span>{translateCategory(event.category, language)}</span>
+                              )}
+                            </div>
+
+                            <h3 className="text-base font-black text-slate-900 leading-snug line-clamp-1 group-hover:text-sky-700">
+                              {event.title}
+                            </h3>
+
+                            <div className="text-xs text-slate-700 font-bold truncate">
+                              {event.performer || event.title}
+                            </div>
+
+                            {event.description && (
+                              <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed pt-0.5">
+                                {event.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="px-4 py-2 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-xs">
+                        <div className="text-slate-500 text-[11px] truncate flex items-center gap-1 max-w-[200px] sm:max-w-xs">
+                          <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                          <span className="truncate">{event.locationDetail || event.venue}</span>
+                        </div>
+
+                        <div className="flex items-center space-x-1 text-sky-700 font-bold text-xs">
+                          <span>{language === 'en' ? 'Details' : '詳細'}</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
       {detailModalEvent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-sm border border-slate-200 max-w-lg w-full p-6 space-y-4 shadow-xl relative max-h-[90vh] overflow-y-auto">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs"
+          onClick={() => setDetailModalEvent(null)}
+        >
+          <div 
+            className="bg-white rounded-xs border border-slate-200 max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-xl relative max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={() => setDetailModalEvent(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 cursor-pointer p-1"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 cursor-pointer p-1.5"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div>
-              <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
-                {detailModalEvent.department && (
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-sm bg-indigo-50 text-indigo-800 border border-indigo-200">
-                    {language === 'en' ? 'Dept: ' : '部署: '}{detailModalEvent.department}
-                  </span>
-                )}
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-sm bg-sky-50 text-sky-800 border border-sky-200">
+              <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-xs bg-slate-900 text-white">
+                  {detailModalEvent.startTime} 〜 {detailModalEvent.endTime}
+                </span>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-xs border ${getVenueColor(detailModalEvent.venue).badge}`}>
                   {translateVenue(detailModalEvent.venue, language)}
                 </span>
                 {detailModalEvent.stagePosition && (
-                  <span className="text-[11px] font-medium px-2 py-0.5 rounded-sm bg-slate-100 text-slate-700">
+                  <span className="text-xs font-medium px-2 py-0.5 rounded-xs bg-slate-100 text-slate-700">
                     {detailModalEvent.stagePosition}
                   </span>
                 )}
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-sm bg-slate-100 text-slate-700">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-xs bg-slate-100 text-slate-700">
                   {detailModalEvent.officialDates || (detailModalEvent.day === 'Day1' ? '9/18 1日目' : detailModalEvent.day === 'Day2' ? '9/19 2日目' : '9/18・19 両日')}
                 </span>
               </div>
               <h2 className="text-xl font-black text-slate-900 tracking-tight">
                 {detailModalEvent.officialTitle || detailModalEvent.title}
               </h2>
-              <p className="text-xs font-bold text-slate-600 mt-1">
-                {language === 'en' ? 'Project Name (Organizer):' : '企画名（出演・主催）:'} <span className="text-slate-900 font-bold">{detailModalEvent.performer || detailModalEvent.officialTitle || detailModalEvent.title}</span>
+              <p className="text-xs font-bold text-slate-700 mt-1">
+                {language === 'en' ? 'Performer / Host:' : '出演・主催:'} <span className="text-slate-900 font-black">{detailModalEvent.performer || detailModalEvent.officialTitle || detailModalEvent.title}</span>
               </p>
             </div>
 
@@ -763,13 +893,13 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                   posterImage={detailModalEvent.posterImage}
                   image={detailModalEvent.image}
                   title={detailModalEvent.officialTitle || detailModalEvent.title}
-                  className="w-full max-h-72 rounded-sm"
+                  className="w-full max-h-72 rounded-xs"
                   allowZoom={true}
                 />
               </div>
             )}
 
-            <div className="bg-slate-50 border border-slate-200 rounded-sm p-3.5 text-xs space-y-2.5">
+            <div className="bg-slate-50 border border-slate-200 rounded-xs p-3.5 text-xs space-y-2.5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                 {detailModalEvent.department && (
                   <div>
@@ -778,10 +908,6 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                   </div>
                 )}
                 <div>
-                  <span className="text-slate-500 font-medium block">{language === 'en' ? 'Event Name:' : '企画名:'}</span>
-                  <span className="font-bold text-slate-900">{detailModalEvent.officialTitle || detailModalEvent.title}</span>
-                </div>
-                <div>
                   <span className="text-slate-500 font-medium block">{language === 'en' ? 'Dates:' : '実施日程:'}</span>
                   <span className="font-bold text-slate-900">{detailModalEvent.officialDates || (detailModalEvent.day === 'Day1' ? '9/18' : detailModalEvent.day === 'Day2' ? '9/19' : '9/18, 9/19')}</span>
                 </div>
@@ -789,9 +915,13 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                   <span className="text-slate-500 font-medium block">{language === 'en' ? 'Experience / Duration:' : '体験・閲覧時間:'}</span>
                   <span className="font-bold text-slate-900">{detailModalEvent.experienceTime || `${detailModalEvent.startTime}〜${detailModalEvent.endTime}`}</span>
                 </div>
+                <div>
+                  <span className="text-slate-500 font-medium block">{language === 'en' ? 'Category:' : 'ジャンル:'}</span>
+                  <span className="font-bold text-slate-900">{translateCategory(detailModalEvent.category, language)}</span>
+                </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-200/70">
+              <div className="pt-2 border-t border-slate-200">
                 <span className="text-slate-500 font-medium block">{language === 'en' ? 'Location:' : '活動場所:'}</span>
                 <span className="font-bold text-slate-900">{detailModalEvent.officialLocation || detailModalEvent.locationDetail || detailModalEvent.venue}</span>
               </div>
@@ -801,7 +931,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
               <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                 {language === 'en' ? 'Activity & Performance Details' : '活動・演目内容'}
               </h4>
-              <p className="text-xs sm:text-sm text-slate-700 whitespace-pre-line leading-relaxed bg-slate-50/50 p-3.5 rounded-sm border border-slate-200">
+              <p className="text-xs sm:text-sm text-slate-700 whitespace-pre-line leading-relaxed bg-slate-50 p-3 rounded-xs border border-slate-200">
                 {detailModalEvent.activityContent || detailModalEvent.description}
               </p>
             </div>
@@ -809,17 +939,17 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
               <button
                 onClick={() => handleLineShare(detailModalEvent)}
-                className="flex-1 py-2 rounded-sm bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
+                className="flex-1 py-2 rounded-xs bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
               >
                 <MessageCircle className="w-4 h-4" />
-                <span>{language === 'en' ? 'Send via LINE' : 'LINEで友達に送る'}</span>
+                <span>{language === 'en' ? 'Send via LINE' : 'LINEで送る'}</span>
               </button>
               <button
                 onClick={() => handleCopySingle(detailModalEvent)}
-                className="flex-1 py-2 rounded-sm bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
+                className="flex-1 py-2 rounded-xs bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
               >
                 <Copy className="w-4 h-4 text-slate-600" />
-                <span>{language === 'en' ? 'Copy Text' : 'テキストをコピー'}</span>
+                <span>{language === 'en' ? 'Copy Info' : '情報をコピー'}</span>
               </button>
             </div>
           </div>
@@ -827,11 +957,17 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
       )}
 
       {showShareModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-sm border border-slate-200 max-w-lg w-full p-6 space-y-4 shadow-xl relative max-h-[90vh] overflow-y-auto">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs"
+          onClick={() => setShowShareModal(false)}
+        >
+          <div 
+            className="bg-white rounded-xs border border-slate-200 max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-xl relative max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={() => setShowShareModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 cursor-pointer p-1"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 cursor-pointer p-1.5"
             >
               <X className="w-5 h-5" />
             </button>
@@ -851,21 +987,21 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
               </p>
             </div>
 
-            <div className="bg-slate-50 border border-slate-200 rounded-sm p-3.5 text-xs text-slate-700 max-h-56 overflow-y-auto font-mono whitespace-pre-wrap leading-relaxed select-all">
+            <div className="bg-slate-50 border border-slate-200 rounded-xs p-3.5 text-xs text-slate-700 max-h-56 overflow-y-auto font-mono whitespace-pre-wrap leading-relaxed select-all">
               {generateTimetableSummary()}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-slate-100">
               <button
                 onClick={handleLineShareAll}
-                className="flex-1 py-2.5 rounded-sm bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center space-x-2 transition-colors cursor-pointer"
+                className="flex-1 py-2.5 rounded-xs bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center space-x-2 transition-colors cursor-pointer"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>{language === 'en' ? 'Send via LINE' : 'LINEで送信する'}</span>
               </button>
               <button
                 onClick={handleCopyAllSummary}
-                className="flex-1 py-2.5 rounded-sm bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center justify-center space-x-2 transition-colors cursor-pointer"
+                className="flex-1 py-2.5 rounded-xs bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center justify-center space-x-2 transition-colors cursor-pointer"
               >
                 <Copy className="w-4 h-4" />
                 <span>{language === 'en' ? 'Copy to Clipboard' : 'クリップボードにコピー'}</span>
@@ -875,8 +1011,8 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
         </div>
       )}
 
-      <div className="bg-slate-50 border border-slate-200 rounded-sm p-5 space-y-3 text-xs text-slate-600">
-        <div className="flex items-center space-x-2 text-slate-800 font-bold text-sm">
+      <div className="bg-slate-50 border border-slate-200 rounded-xs p-4 sm:p-5 space-y-2.5 text-xs text-slate-600">
+        <div className="flex items-center space-x-2 text-slate-900 font-bold text-sm">
           <Info className="w-4 h-4 text-sky-700" />
           <span>{language === 'en' ? 'Stage & Event Guidelines' : 'タイムテーブル・観覧に関するご案内・注意事項'}</span>
         </div>

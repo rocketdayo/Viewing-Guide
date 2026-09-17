@@ -40,6 +40,7 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [imageError, setImageError] = useState<boolean>(false);
+  const allowPosterReplacement = false;
 
   useEffect(() => {
     let isMounted = true;
@@ -212,15 +213,17 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
             }}
           />
 
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xs bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 transition-colors shadow-2xs cursor-pointer"
-            title={language === 'en' ? 'Upload or replace poster' : 'ポスターを登録・更新'}
-          >
-            <Upload className="w-3.5 h-3.5 text-emerald-700" />
-            <span className="hidden sm:inline">{hasPoster ? (language === 'en' ? 'Replace' : '差し替え') : (language === 'en' ? 'Upload' : '登録')}</span>
-          </button>
+          {allowPosterReplacement && (
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              className="flex items-center space-x-1 px-2.5 py-1 rounded-xs bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 transition-colors shadow-2xs cursor-pointer"
+              title={language === 'en' ? 'Upload or replace poster' : 'ポスターを登録・更新'}
+            >
+              <Upload className="w-3.5 h-3.5 text-emerald-700" />
+              <span className="hidden sm:inline">{hasPoster ? (language === 'en' ? 'Replace' : '差し替え') : (language === 'en' ? 'Upload' : '登録')}</span>
+            </button>
+          )}
 
           {hasPoster && (
             <>
