@@ -758,6 +758,9 @@ async function fetchAndParseClassProjects(targetUrl: string) {
   let rulesCol = -1;
   let ticketCol = -1;
   let menuCol = -1;
+  let h1Col = -1;
+  let h2Col = -1;
+  let h3Col = -1;
   let startRow = 1;
 
   if (rows.length > 0) {
@@ -798,6 +801,15 @@ async function fetchAndParseClassProjects(targetUrl: string) {
       } else if (val.includes('料金') || val.includes('メニュー') || val.includes('価格') || val.includes('値段') || val.includes('price')) {
         menuCol = c;
         foundHeaders = true;
+      } else if (val.includes('見どころ') || val.includes('特徴') || val.includes('highlight')) {
+        if (val.includes('1') || val.includes('１') || val.endsWith('1') || h1Col === -1) {
+          h1Col = c;
+        } else if (val.includes('2') || val.includes('２') || val.endsWith('2') || h2Col === -1) {
+          h2Col = c;
+        } else if (val.includes('3') || val.includes('３') || val.endsWith('3') || h3Col === -1) {
+          h3Col = c;
+        }
+        foundHeaders = true;
       }
     }
     if (!foundHeaders) {
@@ -820,6 +832,11 @@ async function fetchAndParseClassProjects(targetUrl: string) {
     const rawTitle = titleCol >= 0 ? (row[titleCol]?.trim() || '') : '';
     if (!rawTitle) continue;
 
+    const h1 = (h1Col >= 0 && row[h1Col] ? row[h1Col] : row[12] || '')?.trim() || '';
+    const h2 = (h2Col >= 0 && row[h2Col] ? row[h2Col] : row[13] || '')?.trim() || '';
+    const h3 = (h3Col >= 0 && row[h3Col] ? row[h3Col] : row[14] || '')?.trim() || '';
+    const highlightsList = [h1, h2, h3].filter(Boolean);
+
     results[classCode] = {
       classCode,
       title: rawTitle,
@@ -832,6 +849,10 @@ async function fetchAndParseClassProjects(targetUrl: string) {
       rules: rulesCol >= 0 ? (row[rulesCol]?.trim() || '') : '',
       ticket: ticketCol >= 0 ? (row[ticketCol]?.trim() || '') : '',
       menuPrice: menuCol >= 0 ? (row[menuCol]?.trim() || '') : '',
+      highlight1: h1,
+      highlight2: h2,
+      highlight3: h3,
+      highlights: highlightsList,
     };
   }
 

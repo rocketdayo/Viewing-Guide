@@ -295,11 +295,11 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({
                 </p>
               </div>
 
-              {false && project.highlights && project.highlights.length > 0 && (
+              {project.highlights && project.highlights.length > 0 && (
                 <div className="space-y-2">
                   <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-amber-500" />
-                    {language === 'en' ? 'Highlights' : '見どころ・特徴'}
+                    {language === 'en' ? 'Highlights & Features' : '見どころ・特徴'}
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {project.highlights.map((item, idx) => (

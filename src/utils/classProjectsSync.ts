@@ -17,6 +17,10 @@ export interface ClassProjectSheetItem {
   rules: string;
   ticket: string;
   menuPrice: string;
+  highlight1?: string;
+  highlight2?: string;
+  highlight3?: string;
+  highlights?: string[];
 }
 
 const CLASS_METADATA_MAP: Record<
@@ -118,8 +122,23 @@ export function parseClassProjectsCsv(rawText: string): Record<string, ClassProj
   const result: Record<string, ClassProjectSheetItem> = {};
 
   let startRow = 0;
-  if (rows.length > 0 && rows[0][0] && rows[0][0].toLowerCase().includes('id')) {
-    startRow = 1;
+  let h1Col = 12;
+  let h2Col = 13;
+  let h3Col = 14;
+
+  if (rows.length > 0 && rows[0]) {
+    const firstCell = (rows[0][0] || '').toLowerCase();
+    if (firstCell.includes('id') || firstCell.includes('クラス')) {
+      startRow = 1;
+    }
+    rows[0].forEach((colName, cIdx) => {
+      const lower = (colName || '').toLowerCase().replace(/\s+/g, '');
+      if (lower.includes('見どころ') || lower.includes('特徴') || lower.includes('highlight')) {
+        if (lower.includes('1') || lower.includes('１') || lower.endsWith('1')) h1Col = cIdx;
+        else if (lower.includes('2') || lower.includes('２') || lower.endsWith('2')) h2Col = cIdx;
+        else if (lower.includes('3') || lower.includes('３') || lower.endsWith('3')) h3Col = cIdx;
+      }
+    });
   }
 
   for (let r = startRow; r < rows.length; r++) {
@@ -147,6 +166,11 @@ export function parseClassProjectsCsv(rawText: string): Record<string, ClassProj
     const ticket = (row[10] || '').trim();
     const menuPrice = (row[11] || '').trim();
 
+    const h1 = (h1Col >= 0 && row[h1Col] ? row[h1Col] : row[12] || '').trim();
+    const h2 = (h2Col >= 0 && row[h2Col] ? row[h2Col] : row[13] || '').trim();
+    const h3 = (h3Col >= 0 && row[h3Col] ? row[h3Col] : row[14] || '').trim();
+    const highlightsList = [h1, h2, h3].filter((h) => h.length > 0);
+
     result[matchedKey] = {
       classId: matchedKey,
       className: className || CLASS_METADATA_MAP[matchedKey].classNumber,
@@ -160,6 +184,10 @@ export function parseClassProjectsCsv(rawText: string): Record<string, ClassProj
       rules,
       ticket,
       menuPrice,
+      highlight1: h1,
+      highlight2: h2,
+      highlight3: h3,
+      highlights: highlightsList,
     };
   }
 
@@ -224,6 +252,13 @@ export function applyClassProjectsSync(
       menuItemsList.unshift(`${item.title || proj.title}：${item.menuPrice}`);
     }
 
+    const updatedHighlights =
+      item.highlights && item.highlights.length > 0
+        ? item.highlights
+        : (item.highlight1 || item.highlight2 || item.highlight3)
+          ? [item.highlight1, item.highlight2, item.highlight3].filter((h): h is string => Boolean(h && h.trim()))
+          : proj.highlights;
+
     return {
       ...proj,
       title: item.title || proj.title,
@@ -236,6 +271,7 @@ export function applyClassProjectsSync(
       floor: meta.floor,
       description: item.description || proj.description,
       fullDetails: item.description || proj.fullDetails || proj.description,
+      highlights: updatedHighlights && updatedHighlights.length > 0 ? updatedHighlights : proj.highlights,
       duration: item.duration || proj.duration,
       capacity: item.capacity || proj.capacity,
       rules: parsedRules.length > 0 ? parsedRules : proj.rules,
