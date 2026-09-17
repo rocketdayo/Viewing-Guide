@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
   X, 
   Search, 
@@ -30,6 +30,18 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 }) => {
   const { language, t } = useI18n();
   const [query, setQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 60);
+      return () => clearTimeout(timer);
+    } else {
+      setQuery('');
+    }
+  }, [isOpen]);
 
   const searchResults = useMemo(() => {
     if (!query.trim()) {
@@ -99,7 +111,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-start justify-center pt-16 sm:pt-24 p-3 overflow-y-auto"
+          className="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-xs flex items-start justify-center pt-16 sm:pt-24 p-3 overflow-y-auto"
           onClick={onClose}
         >
           <motion.div
@@ -114,6 +126,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
             <div className="p-4 border-b border-slate-200 flex items-center space-x-3 bg-slate-50/80">
               <Search className="w-5 h-5 text-emerald-600 shrink-0" />
               <input
+                ref={inputRef}
                 id="search-input-field"
                 type="text"
                 placeholder={language === 'en' ? 'Search projects, classes, stage schedules...' : '企画名、クラス、演劇、お化け屋敷、吹奏楽、スケジュール等...'}

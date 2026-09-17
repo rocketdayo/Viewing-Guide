@@ -308,8 +308,11 @@ export default function App() {
   }, [currentPage]);
 
   const handleOpenSearch = useCallback(() => {
+    setIsTocOpen(false);
     setIsSearchOpen(true);
-    if (window.location.hash !== '#search') {
+    if (window.location.hash === '#menu' || window.location.hash === '#toc') {
+      window.history.replaceState({ modal: 'search' }, '', window.location.pathname + '#search');
+    } else if (window.location.hash !== '#search') {
       window.history.pushState({ modal: 'search' }, '', window.location.pathname + '#search');
     }
   }, []);
@@ -322,8 +325,11 @@ export default function App() {
   }, []);
 
   const handleOpenToc = useCallback(() => {
+    setIsSearchOpen(false);
     setIsTocOpen(true);
-    if (window.location.hash !== '#menu' && window.location.hash !== '#toc') {
+    if (window.location.hash === '#search') {
+      window.history.replaceState({ modal: 'menu' }, '', window.location.pathname + '#menu');
+    } else if (window.location.hash !== '#menu' && window.location.hash !== '#toc') {
       window.history.pushState({ modal: 'menu' }, '', window.location.pathname + '#menu');
     }
   }, []);
@@ -537,14 +543,6 @@ export default function App() {
         bookmarksCount={(bookmarks || []).length}
       />
 
-      <SearchModal
-        isOpen={isSearchOpen}
-        onClose={handleCloseSearch}
-        appData={appData}
-        onSelectProject={handleSelectProject}
-        onNavigate={handleNavigate}
-      />
-
       <TableOfContentsModal
         isOpen={isTocOpen}
         onClose={handleCloseToc}
@@ -556,6 +554,14 @@ export default function App() {
         onOpenPwaModal={() => setShowPwaModal(true)}
         bookmarksCount={(bookmarks || []).length}
         isAdminLoggedIn={isAdminLoggedIn}
+      />
+
+      <SearchModal
+        isOpen={isSearchOpen}
+        onClose={handleCloseSearch}
+        appData={appData}
+        onSelectProject={handleSelectProject}
+        onNavigate={handleNavigate}
       />
 
       <PwaInstallBanner

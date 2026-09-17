@@ -86,6 +86,13 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
     onClose();
   };
 
+  const handleSearchClick = () => {
+    document.body.style.overflow = '';
+    if (onOpenSearch) {
+      onOpenSearch();
+    }
+  };
+
   const primaryNavItems = [
     { 
       id: 'home', 
@@ -236,10 +243,7 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
               <div className="flex items-center space-x-1">
                 {onOpenSearch && (
                   <button
-                    onClick={() => {
-                      onClose();
-                      onOpenSearch();
-                    }}
+                    onClick={handleSearchClick}
                     className="p-2 text-slate-300 hover:text-white hover:bg-white/10 rounded-xs transition-colors cursor-pointer"
                     title={t.search}
                     aria-label={t.search}
@@ -261,10 +265,7 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 text-slate-800">
               {onOpenSearch && (
                 <button
-                  onClick={() => {
-                    onClose();
-                    onOpenSearch();
-                  }}
+                  onClick={handleSearchClick}
                   className="w-full flex items-center justify-between px-3.5 py-2.5 bg-slate-50 hover:bg-emerald-50/50 border border-slate-200 hover:border-emerald-300 rounded-xs transition-all text-left text-xs sm:text-sm text-slate-500 cursor-pointer shadow-2xs group"
                 >
                   <div className="flex items-center space-x-2">

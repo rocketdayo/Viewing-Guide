@@ -13,12 +13,10 @@ import {
   ZoomIn,
   CheckCircle2,
   Dog,
-  Heart,
-  BookOpen
+  Heart
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
-  CAREER_GUIDE_BASE64,
   GOURMET_BASE64,
   CLASS_REUNION_PDF_BASE64,
 } from '../assets/alumniData';
@@ -32,38 +30,13 @@ interface AlumniSectionProps {
 export const AlumniSection: React.FC<AlumniSectionProps> = () => {
   const { language, t } = useI18n();
   const [activeTab, setActiveTab] = useState<'both' | 'career' | 'gourmet' | 'guideDog'>('both');
-  const [modalPage, setModalPage] = useState<1 | 2 | 3 | null>(null);
+  const [modalPage, setModalPage] = useState<2 | 3 | null>(null);
 
   const pdfUrl = '/alumni/classreunion.pdf';
 
   const handleOpenPdf = (e: React.MouseEvent) => {
     e.preventDefault();
     window.open('/alumni/classreunion.pdf', '_blank');
-  };
-
-  const careerData = {
-    pageNumber: 1,
-    id: 'career',
-    title: language === 'en' ? 'Ask Alumni! Future Career Guidebook' : '先輩に聞こう！未来の仕事図鑑',
-    subheading: language === 'en' ? '~From this classroom to individual futures~' : '～この教室からそれぞれの未来へ～',
-    catchphrase: language === 'en' 
-      ? 'Hear directly from graduates about university life and real-world career paths!' 
-      : '清教学園を卒業した先輩方から進学・仕事のリアルな話を個別で聞けます！',
-    date: language === 'en' ? 'Sep 19, 2026 (Sat)' : '2026年9月19日(土)',
-    timeSlot: language === 'en' ? '①10:00-12:00 / ②12:30-14:30' : '①10:00〜12:00 / ②12:30〜14:30',
-    location: language === 'en' ? 'Main Bldg 3rd Year E, F, G Classrooms' : '本館 高3E・F・G教室',
-    organizer: language === 'en' ? 'Seikyo Gakuen Alumni Association' : '清教学園同窓会（清教会）',
-    target: language === 'en' ? 'High School & JHS Students, Parents, Visitors' : '高校生・中学生・保護者・一般来場者',
-    imageSrc: CAREER_GUIDE_BASE64,
-    features: language === 'en' ? [
-      'Many alumni working on the frontlines will visit and advise',
-      'Consult one-on-one about university majors and careers',
-      'Scan the on-site QR code for the complete roster of participating alumni',
-    ] : [
-      '第一線で活躍する清教OB・OGが多数来校',
-      '大学生活・学問・職業のリアルを個別ブースでじっくり相談',
-      '参加先輩の職業一覧は会場内QRコードから即時確認可能',
-    ],
   };
 
   const gourmetData = {
@@ -231,105 +204,8 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
           </motion.div>
         )}
 
-        <div className={`grid gap-8 ${activeTab === 'both' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 max-w-4xl mx-auto'}`}>
+        <div className={`grid gap-8 ${activeTab === 'both' ? 'grid-cols-1 md:grid-cols-2 max-w-5xl mx-auto' : 'grid-cols-1 max-w-4xl mx-auto'}`}>
           
-          {(activeTab === 'both' || activeTab === 'career') && (
-            <motion.div
-              layout
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white border-2 border-sky-200/90 rounded-xs shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col justify-between"
-            >
-              <div className="p-5 sm:p-6 border-b border-sky-100 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="p-2 bg-sky-50 text-sky-700 border border-sky-200 rounded-xs">
-                      <Briefcase className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-mono font-bold text-sky-800 tracking-wider">
-                        {language === 'en' ? 'Alumni Feature 1' : '同窓会 企画 1'}
-                      </span>
-                      <h3 className="text-lg sm:text-xl font-bold text-slate-900">
-                        {careerData.title}
-                      </h3>
-                    </div>
-                  </div>
-                  <span className="bg-sky-100 text-sky-900 text-xs font-bold font-mono px-2.5 py-1 rounded-xs border border-sky-200">
-                    {language === 'en' ? 'Career & Guidance' : '進路・相談'}
-                  </span>
-                </div>
-
-                <p className="text-xs font-bold text-sky-800 bg-sky-50/70 p-2.5 rounded-xs border border-sky-100">
-                  {careerData.subheading} {careerData.catchphrase}
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
-                  <div className="flex items-center space-x-1.5 bg-slate-50 p-2 rounded-xs border border-slate-200/70">
-                    <Clock className="w-4 h-4 text-emerald-700 shrink-0" />
-                    <span><strong>{language === 'en' ? 'Time: ' : '時間：'}</strong>{careerData.timeSlot}</span>
-                  </div>
-                  <div className="flex items-center space-x-1.5 bg-slate-50 p-2 rounded-xs border border-slate-200/70">
-                    <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
-                    <span><strong>{language === 'en' ? 'Location: ' : '場所：'}</strong>{careerData.location}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-2 pt-2">
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span className="font-bold text-slate-700">{language === 'en' ? 'Official Flyer' : '案内チラシ'}</span>
-                    <span className="text-sky-700 font-bold flex items-center gap-1">
-                      <ZoomIn className="w-3.5 h-3.5" /> {language === 'en' ? 'Tap to Zoom' : 'タップで拡大'}
-                    </span>
-                  </div>
-                  
-                  <div
-                    onClick={() => setModalPage(1)}
-                    className="relative group cursor-pointer overflow-hidden border border-slate-300 rounded-xs bg-slate-100 shadow-inner"
-                  >
-                    <img
-                      src={careerData.imageSrc}
-                      alt={careerData.title}
-                      className="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-[1.015]"
-                    />
-                    <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                      <span className="px-4 py-2 bg-slate-900/85 text-white text-xs font-bold rounded-xs shadow-md flex items-center gap-2 backdrop-blur-xs">
-                        <Maximize2 className="w-4 h-4 text-amber-400" />
-                        {language === 'en' ? 'View High-Res Fullscreen' : '全画面で高画質拡大表示'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-1.5 pt-2">
-                  <span className="text-xs font-bold text-slate-700 block">
-                    {language === 'en' ? 'Highlights:' : '企画のポイント：'}
-                  </span>
-                  {careerData.features.map((feat, fIdx) => (
-                    <div key={fIdx} className="flex items-start space-x-2 text-xs text-slate-600">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-sky-600 mt-0.5 shrink-0" />
-                      <span>{feat}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="p-4 bg-sky-50/50 border-t border-sky-100 flex items-center justify-between">
-                <span className="text-xs text-sky-900 font-medium">
-                  {language === 'en' ? 'Organizer: ' : '主催：'}{careerData.organizer}
-                </span>
-                <button
-                  onClick={() => setModalPage(1)}
-                  className="px-3.5 py-1.5 bg-sky-700 hover:bg-sky-800 text-white text-xs font-bold rounded-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                  <span>{language === 'en' ? 'Enlarge Flyer' : 'チラシを拡大表示'}</span>
-                </button>
-              </div>
-            </motion.div>
-          )}
-
           {(activeTab === 'both' || activeTab === 'gourmet') && (
             <motion.div
               layout
@@ -557,26 +433,16 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
             >
               <div className="flex items-center space-x-3">
                 <span className="bg-amber-500 text-slate-950 text-xs font-bold px-2 py-0.5 rounded-xs">
-                  {modalPage === 1 
-                    ? (language === 'en' ? 'Feature 1' : '企画 1') 
-                    : modalPage === 2 
+                  {modalPage === 2 
                     ? (language === 'en' ? 'Feature 2' : '企画 2') 
                     : (language === 'en' ? 'Feature 3' : '企画 3')}
                 </span>
                 <h3 className="text-xs sm:text-sm font-bold text-white truncate max-w-[200px] sm:max-w-md">
-                  {modalPage === 1 ? careerData.title : modalPage === 2 ? gourmetData.title : guideDogData.title}
+                  {modalPage === 2 ? gourmetData.title : guideDogData.title}
                 </h3>
               </div>
 
               <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setModalPage(1)}
-                  className={`px-2.5 py-1 rounded-xs text-xs font-bold cursor-pointer transition-colors ${
-                    modalPage === 1 ? 'bg-sky-500 text-white' : 'bg-slate-800 text-slate-300 hover:text-white'
-                  }`}
-                >
-                  {language === 'en' ? '1. Careers' : '1. 仕事図鑑'}
-                </button>
                 <button
                   onClick={() => setModalPage(2)}
                   className={`px-2.5 py-1 rounded-xs text-xs font-bold cursor-pointer transition-colors ${
@@ -618,8 +484,8 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <img
-                src={modalPage === 1 ? careerData.imageSrc : modalPage === 2 ? gourmetData.imageSrc : guideDogData.imageSrc}
-                alt={modalPage === 1 ? careerData.title : modalPage === 2 ? gourmetData.title : guideDogData.title}
+                src={modalPage === 2 ? gourmetData.imageSrc : guideDogData.imageSrc}
+                alt={modalPage === 2 ? gourmetData.title : guideDogData.title}
                 className="max-h-[80vh] w-auto max-w-full object-contain rounded-xs shadow-2xl border border-slate-700 bg-white"
               />
             </div>
@@ -631,9 +497,7 @@ export const AlumniSection: React.FC<AlumniSectionProps> = () => {
               <div className="flex items-center space-x-2 text-slate-300">
                 <Info className="w-4 h-4 text-amber-400 shrink-0" />
                 <span>
-                  {modalPage === 1
-                    ? (language === 'en' ? 'Sep 19 (Sat) ①10:00-12:00 / ②12:30-14:30 (Main Bldg 3F)' : '9月19日(土) ①10:00〜12:00 / ②12:30〜14:30（本館 高3E・F・G教室）')
-                    : modalPage === 2
+                  {modalPage === 2
                     ? (language === 'en' ? 'Sep 19 (Sat) 10:00-14:30 (In front of Campus & Int. Room)' : '9月19日(土) 10:00〜14:30（清教キャンパス前＆国際交流室前）')
                     : (language === 'en' ? 'Sep 19 (Sat) 10:00-14:30 (Alumni Special Feature Booth Area)' : '9月19日(土) 10:00〜14:30（同窓会特別企画ブースエリア）')}
                 </span>
