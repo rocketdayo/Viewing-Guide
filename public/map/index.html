@@ -1,31 +1,59 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>校内マップ</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background: #f8fafc;
-      color: #334155;
-    }
-    .container {
-      text-align: center;
-      padding: 2rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>校内マップ</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <div class="container">
-    <h2>校内マップ</h2>
-    <p>mapフォルダ内のコンテンツがここに表示されます。</p>
-  </div>
+
+    <header class="header">
+
+        <h1>校内マップ</h1>
+
+        <p>
+            見たい階を選択してください
+        </p>
+
+    </header>
+
+<main class="floor-menu">
+
+    <a href="floor1.html" class="floor-card">
+        <span>1</span>
+        <strong>1階</strong>
+    </a>
+
+    <a href="floor2.html" class="floor-card">
+        <span>2</span>
+        <strong>2階</strong>
+    </a>
+
+    <a href="floor3.html" class="floor-card">
+        <span>3</span>
+        <strong>3階</strong>
+    </a>
+
+    <a href="floor4.html" class="floor-card">
+        <span>4</span>
+        <strong>4階</strong>
+    </a>
+
+    <a href="floor地下.html" class="floor-card">
+        <span>地下</span>
+        <strong>地下階</strong>
+    </a>
+
+</main>
 </body>
+
 </html>
