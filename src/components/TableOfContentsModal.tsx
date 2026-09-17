@@ -144,13 +144,6 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
       icon: HelpCircle, 
       color: 'teal' 
     },
-    ...(isAdminLoggedIn ? [{ 
-      id: 'admin', 
-      label: t.navAdmin, 
-      desc: language === 'en' ? 'Admin console & updates' : '混雑度・お知らせ・企画編集', 
-      icon: Shield, 
-      color: 'slate' 
-    }] : []),
   ];
 
   const specialSections = [

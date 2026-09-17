@@ -36,7 +36,7 @@ export function getAppBasePath(): string {
     return '/Viewing-Guide';
   }
   const segments = pathname.split('/').filter(Boolean);
-  const reservedPages = ['home', 'schedule', 'classes', 'congestion', 'bookmarks', 'timeline', 'map', 'faq', 'admin', 'project'];
+  const reservedPages = ['home', 'schedule', 'classes', 'congestion', 'bookmarks', 'timeline', 'map', 'faq', 'admin', 'user=alladmin', 'project'];
   if (segments.length > 0 && !reservedPages.includes(segments[0]) && !segments[0].includes('.')) {
     return `/${segments[0]}`;
   }
@@ -71,7 +71,7 @@ function parseCurrentUrl(): RouteState {
   const paramProjectId = searchParams.get('project') || searchParams.get('id');
 
   const projectMatch = relPath.match(/^\/(?:project|classes)\/([a-zA-Z0-9_-]+)$/);
-  const reservedPages = ['home', 'schedule', 'classes', 'congestion', 'bookmarks', 'timeline', 'map', 'faq', 'admin'];
+  const reservedPages = ['home', 'schedule', 'classes', 'congestion', 'bookmarks', 'timeline', 'map', 'faq', 'admin', 'user=alladmin'];
   
   if (projectMatch && !reservedPages.includes(projectMatch[1])) {
     return {
@@ -88,7 +88,7 @@ function parseCurrentUrl(): RouteState {
   else if (relPath === '/bookmarks' || relPath === '/timeline') page = 'bookmarks';
   else if (relPath === '/map') page = 'map';
   else if (relPath === '/faq') page = 'faq';
-  else if (relPath === '/admin') page = 'admin';
+  else if (relPath === '/user=alladmin' || relPath === '/admin') page = 'admin';
   else if (relPath === '/' || relPath === '/home') page = 'home';
   else {
     page = 'home';
@@ -257,7 +257,7 @@ export default function App() {
     }
 
     const basePath = getAppBasePath();
-    let targetPath = page === 'home' ? `${basePath}/home` : `${basePath}/${page}`;
+    let targetPath = page === 'home' ? `${basePath}/home` : (page === 'admin' ? `${basePath}/user=alladmin` : `${basePath}/${page}`);
     let targetAnchor = '';
     let targetProjectId: string | null = null;
 

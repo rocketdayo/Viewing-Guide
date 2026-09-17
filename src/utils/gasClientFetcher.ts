@@ -351,36 +351,6 @@ export async function fetchRawTextDirect(targetUrl: string): Promise<string> {
   } catch {
   }
 
-  try {
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(csvUrl)}`;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
-    const response = await fetch(proxyUrl, { signal: controller.signal });
-    clearTimeout(timeoutId);
-    if (response.ok) {
-      const text = await response.text();
-      if (text && !text.trim().startsWith("<!DOCTYPE")) {
-        return text;
-      }
-    }
-  } catch {
-  }
-
-  try {
-    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(csvUrl)}`;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
-    const response = await fetch(proxyUrl, { signal: controller.signal });
-    clearTimeout(timeoutId);
-    if (response.ok) {
-      const text = await response.text();
-      if (text && !text.trim().startsWith("<!DOCTYPE")) {
-        return text;
-      }
-    }
-  } catch {
-  }
-
   throw new Error("スプレッドシート・GASからの直接取得に失敗しました");
 }
 

@@ -136,15 +136,6 @@ export const Footer: React.FC<FooterProps> = ({ appData, onNavigate, onOpenToc }
                 <Globe className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Language / 言語切替: {language === 'ja' ? 'English' : '日本語'}</span>
               </button>
-              {onNavigate && (
-                <button
-                  onClick={() => onNavigate('admin')}
-                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xs bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-medium border border-slate-800 transition-colors cursor-pointer"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
-                  <span>{t.navAdmin}</span>
-                </button>
-              )}
             </div>
           </div>
         </div>

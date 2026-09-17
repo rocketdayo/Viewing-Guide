@@ -7,8 +7,29 @@ import { createServer as createViteServer } from "vite";
 const app = express();
 const PORT = 3000;
 
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://docs.google.com https://script.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://docs.google.com https://script.google.com https://*.google.com;"
+  );
+  next();
+});
+
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+app.post("/api/admin/login", (req, res) => {
+  const { password } = req.body || {};
+  const adminSecret = process.env.ADMIN_PASSWORD || "SeikyoAdmin2026";
+  if (password && password === adminSecret) {
+    return res.json({ success: true, token: "authenticated" });
+  }
+  return res.status(401).json({ success: false, error: "Invalid credentials" });
+});
 
 app.use('/images/schedule', express.static(path.join(process.cwd(), 'public/images/schedule')));
 app.use('/images/projects', express.static(path.join(process.cwd(), 'public/images/projects')));

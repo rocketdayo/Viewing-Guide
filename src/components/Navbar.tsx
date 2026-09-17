@@ -46,7 +46,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'congestion', label: t.navCongestion, icon: Activity },
     { id: 'map', label: t.navMap, icon: MapPin, isDraft: true },
     { id: 'faq', label: language === 'en' ? 'FAQ & Manners' : 'FAQ・マナー', icon: HelpCircle },
-    ...(isAdminLoggedIn ? [{ id: 'admin', label: t.navAdmin, icon: Shield, isAdmin: true }] : []),
   ];
 
   const handleNav = (id: string, anchor?: string) => {

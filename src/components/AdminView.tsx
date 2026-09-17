@@ -17,7 +17,7 @@ import {
   Radio
 } from 'lucide-react';
 import { AppDataState } from '../types';
-import { ANNOUNCEMENT_PORTAL_URL, getClassCongestionInputUrl, INITIAL_APP_DATA } from '../data/defaultData';
+import { ANNOUNCEMENT_PORTAL_URL, INITIAL_APP_DATA } from '../data/defaultData';
 import { useI18n } from '../utils/i18n';
 
 interface AdminViewProps {
@@ -48,14 +48,24 @@ export const AdminView: React.FC<AdminViewProps> = ({
     setFormData(appData);
   }, [appData]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'SeikyoAdmin2026') {
-      setIsAdminLoggedIn(true);
-      setLoginError(false);
-      setPassword('');
-      setFormData(appData);
-    } else {
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsAdminLoggedIn(true);
+        setLoginError(false);
+        setPassword('');
+        setFormData(appData);
+      } else {
+        setLoginError(true);
+      }
+    } catch {
       setLoginError(true);
     }
   };
@@ -160,7 +170,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
       <div className="flex p-1.5 bg-slate-100 rounded-xs space-x-1 overflow-x-auto text-xs font-bold">
         {[
           { id: 'announcements', label: language === 'en' ? 'Announcements Portal' : 'お知らせ配信ポータル', icon: Megaphone },
-          { id: 'projects', label: language === 'en' ? 'Class Projects & GAS Links' : 'クラス企画・混雑入力リンク', icon: Layers },
+          { id: 'projects', label: language === 'en' ? 'Class Projects' : 'クラス企画一覧', icon: Layers },
           { id: 'schedules', label: language === 'en' ? 'Schedule Overview' : 'スケジュール', icon: Calendar },
           { id: 'settings', label: language === 'en' ? 'System Reset' : 'システム設定・初期化', icon: Settings },
         ].map((tab) => {
@@ -366,12 +376,10 @@ export const AdminView: React.FC<AdminViewProps> = ({
                       classCode = `${gradeNum}${letter}`;
                     }
 
-                    const gasUrl = getClassCongestionInputUrl(classCode);
-
                     return (
                       <div
                         key={proj.id}
-                        className="p-4 rounded-xs bg-white border border-slate-200 shadow-2xs space-y-3 hover:border-emerald-300 transition-colors flex flex-col justify-between"
+                        className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2 hover:border-emerald-300 transition-colors flex flex-col justify-between"
                       >
                         <div className="space-y-1.5">
                           <div className="flex items-center justify-between">
@@ -384,19 +392,6 @@ export const AdminView: React.FC<AdminViewProps> = ({
                           </div>
                           <h3 className="text-sm font-bold text-slate-900 line-clamp-1">{proj.title}</h3>
                           <p className="text-[11px] text-slate-500">📍 {proj.location}</p>
-                        </div>
-
-                        <div className="pt-2 border-t border-slate-100 space-y-2">
-                          <a
-                            href={gasUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 py-2 px-3 rounded-xs shadow-2xs transition-colors"
-                            title={`${proj.classNumber} GAS`}
-                          >
-                            <span>{language === 'en' ? `Open ${proj.classNumber} GAS` : `${proj.classNumber}の入力サイトを開く`}</span>
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
                         </div>
                       </div>
                     );
