@@ -1143,5 +1143,31 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '高校1年家庭科の保育の実習として折り紙を使ってカレンダーを製作しました。限られた時間の中での製作でしたが、子どもが見たときに楽しめるよう、季節を感じられる作品や、キャラクターをモチーフにしたものなど、デザインを考え、折り紙で色や折り方を工夫しながら一生懸命取り組みました。ぜひ楽しんでご覧ください。',
     needsPoster: false,
     published: true
+  },
+  {
+    id: 'sch-police-d2',
+    day: 'Day2',
+    startTime: '10:00',
+    endTime: '12:00',
+    duration: '120分',
+    experienceTime: '10:00〜12:00',
+    title: '警察：高三I 指紋採取,逮捕術　高三J ：モンタージュ',
+    officialTitle: '文化祭で警察の体験ができる！ (高3I・高3J)',
+    department: 'グラウンド・高三I,J',
+    officialDates: '9/19',
+    officialLocation: '警察：グラウンド、高三I,J',
+    performer: '高3I・高3J 有志',
+    performerType: '有志',
+    venue: 'グラウンド',
+    stagePosition: 'グラウンド・高3I,J教室',
+    locationDetail: 'グラウンド・高3I教室・高3J教室',
+    category: '特別企画',
+    description: '指紋採取　ドラマで見るような指紋採取の体験ができます\n逮捕術　犯人を逮捕する際の術を学ぶことができます\nモンタージュ　犯人の目・鼻・口などの顔のパーツの写真や絵を組み合わせて、一人の顔を作り上げる体験です',
+    activityContent: '指紋採取　ドラマで見るような指紋採取の体験ができます\n逮捕術　犯人を逮捕する際の術を学ぶことができます\nモンタージュ　犯人の目・鼻・口などの顔のパーツの写真や絵を組み合わせて、一人の顔を作り上げる体験です',
+    needsPoster: true,
+    posterFile: 'police.jpeg',
+    posterImage: '/images/schedule/police.jpeg',
+    image: '/images/schedule/police.jpeg',
+    published: true
   }
 ];
