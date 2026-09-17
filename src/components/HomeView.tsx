@@ -396,7 +396,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               key={activeGreeting.id}
               className="bg-white p-6 sm:p-10 border border-slate-300 shadow-2xs space-y-6"
             >
-              <div className="border-b border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="border-b border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <div className="text-xs font-mono text-emerald-800 font-bold">{activeGreeting.role}</div>
                   <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mt-1">
@@ -404,11 +404,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   </h3>
                   <div className="text-sm font-bold text-slate-700 mt-1">{activeGreeting.name}</div>
                 </div>
-                {activeGreeting.message.includes('確認中') && (
-                  <span className="self-start sm:self-auto px-3 py-1 bg-amber-50 text-amber-900 border border-amber-300 text-xs font-bold rounded-xs">
-                    {language === 'en' ? 'Pending Confirmation' : '内容確認中'}
-                  </span>
-                )}
+                <div className="flex items-center gap-3">
+                  {activeGreeting.logoUrl && (
+                    <img 
+                      src={activeGreeting.logoUrl} 
+                      alt="創立75周年記念ロゴ" 
+                      className="w-20 h-20 sm:w-24 sm:h-24 object-contain p-1 border border-amber-200 bg-amber-50/50 rounded-xs"
+                    />
+                  )}
+                  {activeGreeting.message.includes('確認中') && (
+                    <span className="self-start sm:self-auto px-3 py-1 bg-amber-50 text-amber-900 border border-amber-300 text-xs font-bold rounded-xs">
+                      {language === 'en' ? 'Pending Confirmation' : '内容確認中'}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-3 text-sm sm:text-base text-slate-700 leading-relaxed font-sans">

@@ -75,6 +75,7 @@ export interface Greeting {
   themeTitle: string;
   message: string;
   profileNote?: string;
+  logoUrl?: string;
 }
 
 export interface Announcement {

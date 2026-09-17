@@ -46,7 +46,8 @@ export const INITIAL_APP_DATA: AppDataState = {
 
 学校法人清教学園
 理事長　井上良作`,
-      profileNote: '学校法人清教学園 理事長'
+      profileNote: '学校法人清教学園 理事長',
+      logoUrl: '/images/75th_logo.png'
     },
     {
       id: 'greet-council-president',
