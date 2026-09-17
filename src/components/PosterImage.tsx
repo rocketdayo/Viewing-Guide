@@ -51,10 +51,14 @@ export const getPosterCandidateUrls = (src?: string, posterFile?: string, poster
   }
 
   const prefixes = [
+    '/classposter/',
+    'classposter/',
     '/SGfes/',
     '/images/schedule/',
     '/images/projects/',
     '/images/classes/',
+    '/images/alumni/',
+    '/alumni/',
     '/images/',
     '/',
     'SGfes/',

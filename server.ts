@@ -60,32 +60,69 @@ app.all(['/classposter/:file', '/alumni/:file', '/images/schedule/:file', '/imag
     decoded = decodeURIComponent(rawFile);
   } catch {}
 
-  const classPosterDir = path.join(process.cwd(), 'public/classposter');
-  if (req.path.startsWith('/classposter/')) {
-    const cleanBase = path.basename(decoded);
-    const ext = path.extname(cleanBase).toLowerCase();
-    const stem = path.basename(cleanBase, ext);
+  const cleanBase = path.basename(decoded);
+  const ext = path.extname(cleanBase).toLowerCase();
+  const stem = path.basename(cleanBase, ext);
 
-    if (ext === '.png' || ext === '.jpg' || ext === '.jpeg') {
-      const pngPath = path.join(classPosterDir, `${stem}.png`);
-      if (fs.existsSync(pngPath) && fs.statSync(pngPath).size > 100) {
-        res.setHeader('Content-Type', 'image/png');
-        return res.sendFile(pngPath);
+  const candidateDirs = [
+    path.join(process.cwd(), 'public/classposter'),
+    path.join(process.cwd(), 'dist/classposter'),
+    path.join(process.cwd(), 'public/alumni'),
+    path.join(process.cwd(), 'dist/alumni'),
+    path.join(process.cwd(), 'public/images/schedule'),
+    path.join(process.cwd(), 'public/images/projects'),
+    path.join(process.cwd(), 'public/images/classes'),
+    path.join(process.cwd(), 'public/images/alumni'),
+    path.join(process.cwd(), 'public/images'),
+    path.join(process.cwd(), 'public/SGfes'),
+    path.join(process.cwd(), 'SGfes'),
+    path.join(process.cwd(), 'public'),
+    path.join(process.cwd(), 'dist')
+  ];
+
+  if (req.path.startsWith('/classposter/')) {
+    if (ext === '.png' || ext === '.jpg' || ext === '.jpeg' || ext === '.webp') {
+      for (const dir of candidateDirs) {
+        if (!fs.existsSync(dir)) continue;
+        const imgPath = path.join(dir, `${stem}${ext}`);
+        if (fs.existsSync(imgPath) && fs.statSync(imgPath).size > 100) {
+          const contentType = ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : 'image/jpeg';
+          res.setHeader('Content-Type', contentType);
+          return res.sendFile(imgPath);
+        }
+        for (const altExt of ['.png', '.jpg', '.jpeg', '.webp']) {
+          const altImgPath = path.join(dir, `${stem}${altExt}`);
+          if (fs.existsSync(altImgPath) && fs.statSync(altImgPath).size > 100) {
+            const contentType = altExt === '.png' ? 'image/png' : altExt === '.webp' ? 'image/webp' : 'image/jpeg';
+            res.setHeader('Content-Type', contentType);
+            return res.sendFile(altImgPath);
+          }
+        }
       }
-      const pdfPath = path.join(classPosterDir, `${stem}.pdf`);
-      if (fs.existsSync(pdfPath) && fs.statSync(pdfPath).size > 100) {
-        const ok = convertPdfToPng(pdfPath, pngPath);
-        if (ok && fs.existsSync(pngPath)) {
-          res.setHeader('Content-Type', 'image/png');
-          return res.sendFile(pngPath);
+
+      for (const dir of candidateDirs) {
+        if (!fs.existsSync(dir)) continue;
+        const pdfPath = path.join(dir, `${stem}.pdf`);
+        if (fs.existsSync(pdfPath) && fs.statSync(pdfPath).size > 100) {
+          const publicDir = path.join(process.cwd(), 'public/classposter');
+          if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
+          const targetPng = path.join(publicDir, `${stem}.png`);
+          const ok = convertPdfToPng(pdfPath, targetPng);
+          if (ok && fs.existsSync(targetPng)) {
+            res.setHeader('Content-Type', 'image/png');
+            return res.sendFile(targetPng);
+          }
         }
       }
     } else if (ext === '.pdf') {
-      const pdfPath = path.join(classPosterDir, cleanBase);
-      if (fs.existsSync(pdfPath) && fs.statSync(pdfPath).size > 100) {
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'inline');
-        return res.sendFile(pdfPath);
+      for (const dir of candidateDirs) {
+        if (!fs.existsSync(dir)) continue;
+        const pdfPath = path.join(dir, cleanBase);
+        if (fs.existsSync(pdfPath) && fs.statSync(pdfPath).size > 100) {
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Disposition', 'inline');
+          return res.sendFile(pdfPath);
+        }
       }
     }
   }
@@ -99,13 +136,11 @@ app.all(['/classposter/:file', '/alumni/:file', '/images/schedule/:file', '/imag
     rawFile.normalize('NFD')
   ];
 
-  const ext = path.extname(decoded);
-  const base = path.basename(decoded, ext);
-  if (base) {
-    for (const altExt of ['.png', '.jpg', '.jpeg', '.webp']) {
-      variants.push(`${base}${altExt}`);
-      variants.push(`${base}${altExt}`.normalize('NFC'));
-      variants.push(`${base}${altExt}`.normalize('NFD'));
+  if (stem) {
+    for (const altExt of ['.png', '.jpg', '.jpeg', '.webp', '.pdf']) {
+      variants.push(`${stem}${altExt}`);
+      variants.push(`${stem}${altExt}`.normalize('NFC'));
+      variants.push(`${stem}${altExt}`.normalize('NFD'));
     }
   }
 
@@ -118,6 +153,12 @@ app.all(['/classposter/:file', '/alumni/:file', '/images/schedule/:file', '/imag
         if (target.endsWith('.pdf')) {
           res.setHeader('Content-Type', 'application/pdf');
           res.setHeader('Content-Disposition', 'inline');
+        } else if (target.endsWith('.png')) {
+          res.setHeader('Content-Type', 'image/png');
+        } else if (target.endsWith('.jpg') || target.endsWith('.jpeg')) {
+          res.setHeader('Content-Type', 'image/jpeg');
+        } else if (target.endsWith('.webp')) {
+          res.setHeader('Content-Type', 'image/webp');
         }
         res.setHeader('Content-Length', stats.size.toString());
         if (req.method === 'HEAD') {

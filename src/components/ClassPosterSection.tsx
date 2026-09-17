@@ -42,6 +42,9 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
   const [imageError, setImageError] = useState<boolean>(false);
   const allowPosterReplacement = false;
 
+  const [candidateList, setCandidateList] = useState<string[]>([]);
+  const [candidateIndex, setCandidateIndex] = useState<number>(0);
+
   useEffect(() => {
     let isMounted = true;
     if (!posterFileName) {
@@ -63,32 +66,42 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
 
     setIsChecking(true);
     setImageError(false);
+    setCandidateIndex(0);
 
     const stem = posterFileName.replace(/\.[^/.]+$/, '');
-    const defaultImgPath = `/classposter/${stem}.png`;
-    const defaultPdfPath = `/classposter/${stem}.pdf`;
+    const defaultList = [
+      `/classposter/${stem}.png`,
+      `/classposter/${stem}.jpg`,
+      `/classposter/${stem}.jpeg`,
+      `/classposter/${stem}.webp`,
+      `/images/classes/${stem}.png`,
+      `/images/classes/${stem}.jpg`
+    ];
 
     fetch(`/api/check-poster?file=${encodeURIComponent(posterFileName)}`)
       .then((res) => res.json())
       .then((data) => {
         if (!isMounted) return;
-        if (data.exists) {
+        if (data.exists && data.imageUrl) {
           const timestamp = Date.now();
-          const img = data.imageUrl ? `${data.imageUrl}?t=${timestamp}` : null;
-          const pdf = data.pdfUrl ? `${data.pdfUrl}?t=${timestamp}` : null;
-          setImageUrl(img || pdf || defaultImgPath);
-          setPdfUrl(pdf || defaultPdfPath);
+          const img = `${data.imageUrl}?t=${timestamp}`;
+          const pdf = data.pdfUrl ? `${data.pdfUrl}?t=${timestamp}` : `/classposter/${stem}.pdf`;
+          setImageUrl(img);
+          setPdfUrl(pdf);
+          setCandidateList([img, ...defaultList]);
           setHasPoster(true);
         } else {
-          setImageUrl(defaultImgPath);
-          setPdfUrl(defaultPdfPath);
+          setImageUrl(defaultList[0]);
+          setPdfUrl(`/classposter/${stem}.pdf`);
+          setCandidateList(defaultList);
           setHasPoster(true);
         }
       })
       .catch(() => {
         if (!isMounted) return;
-        setImageUrl(defaultImgPath);
-        setPdfUrl(defaultPdfPath);
+        setImageUrl(defaultList[0]);
+        setPdfUrl(`/classposter/${stem}.pdf`);
+        setCandidateList(defaultList);
         setHasPoster(true);
       })
       .finally(() => {
@@ -299,7 +312,13 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
                   alt={`${project.classNumber} ポスター`}
                   className="w-full h-auto max-h-[560px] object-contain rounded-xs select-none"
                   onError={() => {
-                    setImageError(true);
+                    const nextIdx = candidateIndex + 1;
+                    if (nextIdx < candidateList.length) {
+                      setCandidateIndex(nextIdx);
+                      setImageUrl(candidateList[nextIdx]);
+                    } else {
+                      setImageError(true);
+                    }
                   }}
                   loading="lazy"
                 />
