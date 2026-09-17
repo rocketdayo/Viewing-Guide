@@ -181,28 +181,27 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
-      <div className="p-6 sm:p-8 rounded-xs bg-gradient-to-br from-emerald-900 via-emerald-950 to-slate-900 text-white shadow-xl space-y-4 relative overflow-hidden">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-4">
         <div className="flex items-center space-x-3">
-          <div className="p-3 rounded-xs bg-white/10 backdrop-blur-md shadow-inner">
-            <HelpCircle className="w-7 h-7 text-emerald-300" />
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+            <HelpCircle className="w-5 h-5 text-emerald-600" />
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-black">{t.faqTitle}</h2>
-            <p className="text-xs sm:text-sm text-emerald-200 mt-1 max-w-3xl">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">{t.faqTitle}</h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5 max-w-3xl">
               {t.faqSubtitle}
             </p>
           </div>
         </div>
 
-        <div className="relative pt-2">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-5 pointer-events-none" />
+        <div className="relative pt-1">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-4 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t.faqSearchPlaceholder}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xs bg-white/95 text-slate-900 text-xs sm:text-sm placeholder:text-slate-400 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all shadow-inner"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm placeholder:text-slate-400 font-medium focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
           />
         </div>
       </div>

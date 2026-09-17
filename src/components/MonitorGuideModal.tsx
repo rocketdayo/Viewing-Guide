@@ -40,18 +40,18 @@ export const MonitorGuideModal: React.FC<MonitorGuideModalProps> = ({
         onClick={(e) => e.stopPropagation()}
         className="bg-white rounded-xs shadow-2xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200"
       >
-        <div className="p-5 sm:p-6 bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white flex items-center justify-between border-b border-emerald-900/50">
+        <div className="p-5 sm:p-6 bg-white border-b border-slate-200 text-slate-900 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="p-2.5 bg-emerald-600/30 border border-emerald-400/30 rounded-xs text-emerald-300">
-              <Tv className="w-6 h-6" />
+            <div className="w-10 h-10 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-600 flex items-center justify-center shrink-0">
+              <Tv className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-[11px] font-bold tracking-wider uppercase text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-bold tracking-wider uppercase text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
                   {language === 'en' ? 'Monitor / TV / Projector Output' : 'モニター・TV・プロジェクター出力'}
                 </span>
               </div>
-              <h2 className="text-lg sm:text-xl font-black tracking-tight text-white mt-1">
+              <h2 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 mt-1">
                 {language === 'en' ? 'Campus Monitor Connection & Digital Signage Guide' : '校内モニター接続＆デジタルサイネージ投影ガイド'}
               </h2>
             </div>
@@ -59,7 +59,7 @@ export const MonitorGuideModal: React.FC<MonitorGuideModalProps> = ({
           <button
             id="close-monitor-guide-btn"
             onClick={onClose}
-            className="p-2 rounded-xs text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
             aria-label={t.close}
           >
             <X className="w-6 h-6" />
@@ -277,7 +277,7 @@ export const MonitorGuideModal: React.FC<MonitorGuideModalProps> = ({
               onLaunchMonitorMode();
               onClose();
             }}
-            className="w-full sm:w-auto px-6 py-3 rounded-xs bg-gradient-to-r from-emerald-900 to-emerald-800 hover:from-emerald-950 hover:to-emerald-900 text-white text-xs sm:text-sm font-black shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-2xs transition-all flex items-center justify-center space-x-2 cursor-pointer"
           >
             <Tv className="w-4 h-4 text-emerald-400" />
             <span>{language === 'en' ? 'Launch Big Screen Signage Mode' : '今すぐ「大画面モニター・サイネージモード」を開く'}</span>

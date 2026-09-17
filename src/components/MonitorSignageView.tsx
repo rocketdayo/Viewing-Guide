@@ -388,7 +388,7 @@ export const MonitorSignageView: React.FC<MonitorSignageViewProps> = ({
         )}
       </div>
 
-      <footer className="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-t border-slate-800 px-4 py-2.5 flex items-center justify-between text-xs shrink-0">
+      <footer className="bg-slate-900 border-t border-slate-800 px-4 py-2.5 flex items-center justify-between text-xs shrink-0">
         <div className="flex items-center space-x-2 text-amber-400 font-bold shrink-0">
           <Megaphone className="w-4 h-4 animate-bounce text-amber-400" />
           <span className="bg-amber-500/20 border border-amber-500/40 text-amber-300 px-2 py-0.5 rounded uppercase text-[10px]">

@@ -226,15 +226,15 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
               className="w-screen max-w-lg md:max-w-xl bg-white shadow-2xl flex flex-col pointer-events-auto border-l border-slate-200 overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-            <div className="p-4 sm:p-5 bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900 text-white flex items-center justify-between shrink-0 shadow-sm">
+            <div className="p-4 sm:p-5 bg-white border-b border-slate-200/90 text-slate-900 flex items-center justify-between shrink-0 shadow-2xs">
               <div className="flex items-center space-x-3">
                 <LogoBadge className="w-9 h-9 shrink-0" size={36} />
                 <div>
                   <div className="flex items-center space-x-1.5">
-                    <span className="text-[10px] font-bold text-emerald-300 bg-emerald-900/60 px-1.5 py-0.2 rounded">{t.academicYear}</span>
-                    <span className="text-[11px] text-slate-300">{t.schoolName}</span>
+                    <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/80 px-1.5 py-0.5 rounded-xs">{t.academicYear}</span>
+                    <span className="text-[11px] text-slate-500 font-medium">{t.schoolName}</span>
                   </div>
-                  <h2 className="text-sm sm:text-base font-bold text-white tracking-tight flex items-center gap-1.5">
+                  <h2 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight flex items-center gap-1.5 mt-0.5">
                     {language === 'en' ? 'Table of Contents & Navigation' : 'メニュー・全ページ目次'}
                   </h2>
                 </div>
@@ -244,7 +244,7 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
                 {onOpenSearch && (
                   <button
                     onClick={handleSearchClick}
-                    className="p-2 text-slate-300 hover:text-white hover:bg-white/10 rounded-xs transition-colors cursor-pointer"
+                    className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
                     title={t.search}
                     aria-label={t.search}
                   >
@@ -254,7 +254,7 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
                 <button
                   id="close-menu-drawer-btn"
                   onClick={onClose}
-                  className="p-2 rounded-xs text-white/80 hover:text-white hover:bg-white/15 transition-colors cursor-pointer flex items-center gap-1 text-xs font-bold"
+                  className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer flex items-center gap-1 text-xs font-bold"
                   aria-label={t.close}
                 >
                   <X className="w-5 h-5" />

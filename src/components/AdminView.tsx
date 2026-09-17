@@ -125,16 +125,16 @@ export const AdminView: React.FC<AdminViewProps> = ({
 
   return (
     <div className="space-y-6 pb-20">
-      <div className="p-5 sm:p-6 rounded-xs bg-gradient-to-r from-slate-900 via-emerald-950 to-emerald-900 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
+      <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/90 text-slate-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
-            <span className="bg-emerald-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-              <Unlock className="w-3 h-3" />
+            <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+              <Unlock className="w-3 h-3 text-emerald-600" />
               {language === 'en' ? 'Admin Mode Active' : '管理者モード有効'}
             </span>
-            <span className="text-xs text-slate-300">{language === 'en' ? '2026 Seikyo High School Festival' : '2026 清教学園高校文化祭'}</span>
+            <span className="text-xs text-slate-500 font-medium">{language === 'en' ? '2026 Seikyo High School Festival' : '2026 清教学園高校文化祭'}</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight">
+          <h1 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900">
             {language === 'en' ? 'Event Information Management Panel' : 'イベント情報 総合更新パネル'}
           </h1>
         </div>
@@ -185,7 +185,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
 
       {activeTab === "announcements" && (
         <div className="space-y-6">
-          <div className="p-6 rounded-xs bg-gradient-to-br from-amber-500/15 via-orange-500/10 to-emerald-950/10 border-2 border-amber-400/50 shadow-sm space-y-4">
+          <div className="p-6 rounded-2xl bg-amber-50/60 border border-amber-200/80 shadow-2xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center space-x-3">
                 <div className="p-3 bg-amber-500 text-white rounded-xs shadow-md">

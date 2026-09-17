@@ -289,15 +289,15 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
   const getCongestionBadge = (level: CongestionLevel) => {
     switch (level) {
       case 'smooth':
-        return <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">🟢 {t.statusSmooth}</span>;
+        return <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-[10px] font-bold">🟢 {t.statusSmooth}</span>;
       case 'moderate':
-        return <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">🟡 {t.statusModerate}</span>;
+        return <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60 text-[10px] font-bold">🟡 {t.statusModerate}</span>;
       case 'crowded':
-        return <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold">🔴 {t.statusCrowded}</span>;
+        return <span className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200/60 text-[10px] font-bold">🔴 {t.statusCrowded}</span>;
       case 'ticket':
-        return <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[10px] font-bold">🎫 {t.statusTicket}</span>;
+        return <span className="px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200/60 text-[10px] font-bold">🎫 {t.statusTicket}</span>;
       case 'closed':
-        return <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold">⛔ {t.statusClosed}</span>;
+        return <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-bold">⛔ {t.statusClosed}</span>;
     }
   };
 
@@ -309,7 +309,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xs shadow-2xl flex items-center space-x-2 border border-slate-700"
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-800/95 text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg flex items-center space-x-2 border border-slate-700/50 backdrop-blur-md"
           >
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>{toastMessage}</span>
@@ -317,56 +317,57 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
         )}
       </AnimatePresence>
 
-      <div className="p-6 rounded-xs bg-gradient-to-br from-emerald-900 via-emerald-950 to-slate-900 text-white shadow-xl space-y-3 relative overflow-hidden">
-        <div className="absolute top-0 right-0 -mt-6 -mr-6 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="flex items-center space-x-3">
-          <div className="p-2.5 rounded-xs bg-white/10 backdrop-blur-md shadow-inner">
-            <Sparkles className="w-6 h-6 text-emerald-300" />
+      <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+              <Sparkles className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">{t.timelineTitle}</h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {t.timelineSubtitle}
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-xl sm:text-2xl font-black">{t.timelineTitle}</h2>
-            <p className="text-xs sm:text-sm text-emerald-200 mt-0.5">
-              {t.timelineSubtitle}
-            </p>
-          </div>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 pt-2">
-          <button
-            onClick={() => setIsAddingCustom(true)}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xs bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition-colors cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>{t.addCustomSchedule}</span>
-          </button>
-          <button
-            onClick={() => setShowShareModal(true)}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xs bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-md transition-colors cursor-pointer"
-          >
-            <Share2 className="w-4 h-4 text-emerald-200" />
-            <span>{t.shareTimeline}</span>
-          </button>
-          <button
-            onClick={() => onNavigate('congestion')}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xs bg-white/10 hover:bg-white/20 text-white text-xs font-bold backdrop-blur-md transition-colors cursor-pointer"
-          >
-            <Clock className="w-4 h-4 text-emerald-300" />
-            <span>{t.checkCongestion} →</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2 pt-1 sm:pt-0">
+            <button
+              onClick={() => setIsAddingCustom(true)}
+              className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{t.addCustomSchedule}</span>
+            </button>
+            <button
+              onClick={() => setShowShareModal(true)}
+              className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition-colors cursor-pointer"
+            >
+              <Share2 className="w-4 h-4 text-slate-600" />
+              <span>{t.shareTimeline}</span>
+            </button>
+            <button
+              onClick={() => onNavigate('congestion')}
+              className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs font-bold transition-colors cursor-pointer"
+            >
+              <Clock className="w-4 h-4 text-emerald-600" />
+              <span>{t.checkCongestion} →</span>
+            </button>
+          </div>
         </div>
       </div>
 
       <AnimatePresence>
         {showShareModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-xs border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-5"
+              className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-lg w-full p-6 space-y-5"
             >
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div className="flex items-center space-x-2 text-emerald-900">
+                <div className="flex items-center space-x-2 text-slate-900">
                   <Share2 className="w-5 h-5 text-emerald-600" />
                   <h3 className="font-bold text-base">
                     {language === 'en' ? 'Share Timeline with Friends & Family' : 'タイムラインを友達・家族と共有'}
@@ -374,14 +375,14 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                 </div>
                 <button
                   onClick={() => setShowShareModal(false)}
-                  className="p-1 text-slate-400 hover:text-slate-600 rounded-xs"
+                  className="p-1 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-4 text-xs sm:text-sm text-slate-700">
-                <p className="text-slate-600 text-xs">
+                <p className="text-slate-500 text-xs leading-relaxed">
                   {language === 'en' 
                     ? 'Share your planned schedule, bookmarked exhibits, visiting times, and notes with anyone via link or message.' 
                     : 'あなたが作成したタイムスケジュール（保存した企画・時間・メモ）をURLやテキストで送ることができます。'}
@@ -390,35 +391,35 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <button
                     onClick={handleCopyShareLink}
-                    className="flex items-center justify-center space-x-2 p-3 rounded-xs bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer"
+                    className="flex items-center justify-center space-x-2 p-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold transition-colors cursor-pointer"
                   >
                     <Copy className="w-4 h-4" />
                     <span>{language === 'en' ? 'Copy Share Link URL' : '共有リンクURLをコピー'}</span>
                   </button>
                   <button
                     onClick={handleCopyTextSummary}
-                    className="flex items-center justify-center space-x-2 p-3 rounded-xs bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold transition-colors cursor-pointer"
+                    className="flex items-center justify-center space-x-2 p-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer"
                   >
                     <FileText className="w-4 h-4" />
                     <span>{language === 'en' ? 'Copy Text Summary' : 'スケジュール文章をコピー'}</span>
                   </button>
                   <button
                     onClick={handleShareLine}
-                    className="flex items-center justify-center space-x-2 p-3 rounded-xs bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-bold transition-colors cursor-pointer"
+                    className="flex items-center justify-center space-x-2 p-3 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-bold transition-colors cursor-pointer"
                   >
                     <MessageCircle className="w-4 h-4" />
                     <span>{language === 'en' ? 'Send via LINE' : 'LINEで友達に送る'}</span>
                   </button>
                   <button
                     onClick={handleShareX}
-                    className="flex items-center justify-center space-x-2 p-3 rounded-xs bg-slate-900 hover:bg-black text-white text-xs font-bold transition-colors cursor-pointer"
+                    className="flex items-center justify-center space-x-2 p-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold transition-colors cursor-pointer"
                   >
-                    <span className="font-mono text-sm font-black">𝕏</span>
-                    <span>{language === 'en' ? 'Share on X (Twitter)' : 'X (Twitter) でシェア'}</span>
+                    <span className="font-mono text-sm font-bold">𝕏</span>
+                    <span>{language === 'en' ? 'Share on X' : 'X でシェア'}</span>
                   </button>
                 </div>
 
-                <div className="space-y-1 pt-2">
+                <div className="space-y-1.5 pt-2">
                   <label className="block text-[11px] font-bold text-slate-500">
                     {language === 'en' ? 'Share Link URL' : '共有リンクURL'}
                   </label>
@@ -427,29 +428,29 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                       type="text"
                       readOnly
                       value={generateShareUrl()}
-                      className="w-full px-3 py-2 bg-slate-100 rounded-xs border border-slate-300 text-xs font-mono text-slate-700 select-all truncate"
+                      className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono text-slate-700 select-all truncate"
                     />
                     <button
                       onClick={handleCopyShareLink}
-                      className="px-3 py-2 bg-emerald-900 hover:bg-emerald-950 text-white text-xs font-bold rounded-xs shrink-0 cursor-pointer"
+                      className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shrink-0 transition-colors cursor-pointer"
                     >
                       {language === 'en' ? 'Copy' : 'コピー'}
                     </button>
                   </div>
                 </div>
 
-                <div className="p-4 bg-slate-50 rounded-xs border border-slate-200 flex flex-col items-center justify-center space-y-2 text-center">
-                  <div className="flex items-center space-x-1.5 text-xs font-bold text-slate-800">
-                    <QrCode className="w-4 h-4 text-emerald-700" />
+                <div className="p-4 bg-slate-50/80 rounded-xl border border-slate-200/80 flex flex-col items-center justify-center space-y-2 text-center">
+                  <div className="flex items-center space-x-1.5 text-xs font-bold text-slate-700">
+                    <QrCode className="w-4 h-4 text-emerald-600" />
                     <span>{language === 'en' ? 'In-Person Smartphone QR Code' : '対面でスマホカメラから読み取るQRコード'}</span>
                   </div>
                   <img
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(generateShareUrl())}`}
                     alt="Timeline QR Code"
-                    className="w-32 h-32 bg-white p-1 rounded-xs border border-slate-300 shadow-xs"
+                    className="w-32 h-32 bg-white p-1 rounded-lg border border-slate-200 shadow-2xs"
                     loading="lazy"
                   />
-                  <p className="text-[10px] text-slate-500">
+                  <p className="text-[10px] text-slate-400">
                     {language === 'en' ? 'Scan with your camera to open this schedule immediately' : '友達のスマホのカメラでかざすとスケジュールが一発で開きます'}
                   </p>
                 </div>
@@ -458,7 +459,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
               <div className="flex justify-end pt-2 border-t border-slate-100">
                 <button
                   onClick={() => setShowShareModal(false)}
-                  className="px-4 py-2 rounded-xs bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
                 >
                   {t.close}
                 </button>
@@ -469,7 +470,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
       </AnimatePresence>
 
       {isAddingCustom && (
-        <form onSubmit={handleAddCustomEvent} className="p-5 bg-white rounded-xs border border-emerald-200 shadow-lg space-y-4">
+        <form onSubmit={handleAddCustomEvent} className="p-5 bg-white rounded-2xl border border-slate-200/90 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
               <Calendar className="w-4 h-4 text-emerald-600" />
@@ -478,7 +479,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
             <button
               type="button"
               onClick={() => setIsAddingCustom(false)}
-              className="text-xs text-slate-400 hover:text-slate-600 font-bold"
+              className="text-xs text-slate-400 hover:text-slate-600 font-bold cursor-pointer"
             >
               ✕ {t.close}
             </button>
@@ -495,7 +496,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                 placeholder={language === 'en' ? 'e.g. Dining Hall Lunch, Meetup at Food Booths' : '例: 食堂でランチ、模擬店で軽食'}
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                className="w-full px-3 py-2 rounded-xs border border-slate-300 text-xs font-bold"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               />
             </div>
             <div>
@@ -507,12 +508,12 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                 placeholder={language === 'en' ? 'e.g. Cafeteria, New Bldg 2F' : '例: 食堂・新館2F'}
                 value={newLocation}
                 onChange={(e) => setNewLocation(e.target.value)}
-                className="w-full px-3 py-2 rounded-xs border border-slate-300 text-xs"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">
                 {language === 'en' ? 'Start Time' : '開始時刻'}
@@ -521,7 +522,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                 type="time"
                 value={newStartTime}
                 onChange={(e) => setNewStartTime(e.target.value)}
-                className="w-full px-3 py-2 rounded-xs border border-slate-300 text-xs font-bold"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               />
             </div>
             <div>
@@ -532,7 +533,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                 type="time"
                 value={newEndTime}
                 onChange={(e) => setNewEndTime(e.target.value)}
-                className="w-full px-3 py-2 rounded-xs border border-slate-300 text-xs font-bold"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               />
             </div>
           </div>
@@ -546,7 +547,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
               placeholder={language === 'en' ? 'e.g. Bring meal ticket' : '例: 食券を忘れずに持っていく'}
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
-              className="w-full px-3 py-2 rounded-xs border border-slate-300 text-xs"
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
             />
           </div>
 
@@ -554,13 +555,13 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
             <button
               type="button"
               onClick={() => setIsAddingCustom(false)}
-              className="px-4 py-2 rounded-xs bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
+              className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
             >
               {language === 'en' ? 'Cancel' : 'キャンセル'}
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xs bg-emerald-900 hover:bg-emerald-950 text-white text-xs font-bold shadow-md transition-colors cursor-pointer"
+              className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer"
             >
               {language === 'en' ? 'Add Item' : '追加する'}
             </button>
@@ -579,17 +580,17 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
         </div>
 
         {combinedTimelineItems.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-xs border border-slate-200 text-slate-500 space-y-3 shadow-2xs">
-            <div className="w-12 h-12 rounded-xs bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+          <div className="p-10 sm:p-14 text-center bg-white rounded-2xl border border-slate-200/90 text-slate-500 space-y-3 shadow-2xs">
+            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-100/60">
               <Calendar className="w-6 h-6" />
             </div>
             <p className="text-sm font-bold text-slate-800">{t.emptyTimeline}</p>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-400 max-w-md mx-auto">
               {language === 'en' ? 'Bookmark projects from the Class Projects list or add custom events above to craft your itinerary.' : 'クラス企画一覧からブックマークするか、上記の「自由スケジュールを追加」ボタンを押して予定を組み立ててください。'}
             </p>
             <button
               onClick={() => onNavigate('classes')}
-              className="mt-2 px-5 py-2.5 rounded-xs bg-emerald-900 hover:bg-emerald-950 text-white text-xs font-bold shadow-md cursor-pointer transition-colors"
+              className="mt-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-2xs cursor-pointer transition-colors"
             >
               {t.findProjects}
             </button>
@@ -604,17 +605,17 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
               return (
                 <div
                   key={`${item.type}-${item.id}`}
-                  className="p-4 sm:p-5 rounded-xs bg-white border border-slate-200 shadow-2xs hover:border-emerald-300 transition-all space-y-3 relative overflow-hidden"
+                  className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-slate-300 transition-all space-y-3 relative overflow-hidden"
                 >
-                  <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${isProject ? 'bg-emerald-600' : 'bg-emerald-500'}`} />
+                  <div className={`absolute left-0 top-0 bottom-0 w-1 ${isProject ? 'bg-emerald-500' : 'bg-sky-400'}`} />
 
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3 pl-2">
                     <div className="flex items-center space-x-3">
-                      <div className="flex items-center space-x-1.5 bg-emerald-50 text-emerald-900 px-3 py-1 rounded-xs font-mono text-xs font-black shadow-2xs">
+                      <div className="flex items-center space-x-1.5 bg-slate-50 text-slate-800 border border-slate-200/80 px-2.5 py-1 rounded-lg font-mono text-xs font-semibold">
                         <Clock className="w-3.5 h-3.5 text-emerald-600" />
                         <span>{item.startTime} 〜 {item.endTime}</span>
                       </div>
-                      <span className="text-xs font-bold text-slate-500">📍 {item.location}</span>
+                      <span className="text-xs font-semibold text-slate-500">📍 {item.location}</span>
                     </div>
 
                     <div className="flex items-center space-x-2">
@@ -622,7 +623,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                       {!isProject && (
                         <button
                           onClick={() => handleDeleteCustomEvent(item.id)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                           title="自由スケジュールを削除"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -631,7 +632,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                       {isProject && proj && (
                         <button
                           onClick={() => onToggleBookmark(proj.id)}
-                          className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors"
+                          className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors cursor-pointer"
                           title="ブックマークを解除"
                         >
                           <Bookmark className="w-4 h-4 fill-rose-500" />
@@ -643,10 +644,10 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                   <div className="pl-2 space-y-1.5">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
-                        <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">{item.subtitle}</span>
+                        <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{item.subtitle}</span>
                         <h4 
                           onClick={() => isProject && proj && onSelectProject(proj.id)}
-                          className={`text-base font-black text-slate-900 ${isProject ? 'cursor-pointer hover:text-emerald-700 transition-colors' : ''}`}
+                          className={`text-base font-bold text-slate-900 ${isProject ? 'cursor-pointer hover:text-emerald-600 transition-colors' : ''}`}
                         >
                           {item.title} {isProject && ' →'}
                         </h4>
@@ -655,7 +656,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                       {isProject && proj && !isEditing && (
                         <button
                           onClick={() => startEditingProject(proj)}
-                          className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xs bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 text-xs font-bold transition-colors cursor-pointer self-start sm:self-auto"
+                          className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 hover:text-emerald-700 text-xs font-semibold transition-colors cursor-pointer self-start sm:self-auto"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                           <span>{language === 'en' ? 'Edit Visit Time' : '訪問時間を変更'}</span>
@@ -664,36 +665,36 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                     </div>
 
                     {isEditing && (
-                      <div className="p-3 bg-emerald-50/70 rounded-xs border border-emerald-200 space-y-3 mt-2">
-                        <div className="text-xs font-bold text-emerald-900">
+                      <div className="p-4 bg-slate-50/80 rounded-xl border border-slate-200/90 space-y-3 mt-2">
+                        <div className="text-xs font-bold text-slate-800">
                           {language === 'en' ? 'Edit Visit Time & Personal Note' : '訪問時間とメモの編集'}
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <label className="block text-[10px] font-semibold text-slate-600 mb-0.5">
+                            <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">
                               {language === 'en' ? 'Start' : '開始時刻'}
                             </label>
                             <input
                               type="time"
                               value={editStart}
                               onChange={(e) => setEditStart(e.target.value)}
-                              className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold bg-white"
+                              className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold bg-white focus:outline-none focus:border-emerald-500"
                             />
                           </div>
                           <div>
-                            <label className="block text-[10px] font-semibold text-slate-600 mb-0.5">
+                            <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">
                               {language === 'en' ? 'End' : '終了時刻'}
                             </label>
                             <input
                               type="time"
                               value={editEnd}
                               onChange={(e) => setEditEnd(e.target.value)}
-                              className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold bg-white"
+                              className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold bg-white focus:outline-none focus:border-emerald-500"
                             />
                           </div>
                         </div>
                         <div>
-                          <label className="block text-[10px] font-semibold text-slate-600 mb-0.5">
+                          <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">
                             {language === 'en' ? 'Personal Note' : '個人メモ'}
                           </label>
                           <input
@@ -701,21 +702,21 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                             placeholder={language === 'en' ? 'e.g. Pick up morning tickets' : '例: 11時回の整理券を10時に取りに行く'}
                             value={editNote}
                             onChange={(e) => setEditNote(e.target.value)}
-                            className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs bg-white"
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs bg-white focus:outline-none focus:border-emerald-500"
                           />
                         </div>
                         <div className="flex justify-end space-x-2 pt-1">
                           <button
                             type="button"
                             onClick={() => setEditingProjectId(null)}
-                            className="px-3 py-1 rounded-lg bg-white text-slate-600 text-xs font-bold border border-slate-200"
+                            className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-600 text-xs font-semibold border border-slate-200 cursor-pointer"
                           >
                             {language === 'en' ? 'Cancel' : 'キャンセル'}
                           </button>
                           <button
                             type="button"
                             onClick={() => handleSaveProjectMeta(proj!.id)}
-                            className="px-3 py-1 rounded-lg bg-emerald-900 text-white text-xs font-bold shadow-2xs cursor-pointer"
+                            className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-2xs cursor-pointer transition-colors"
                           >
                             {language === 'en' ? 'Save' : '保存'}
                           </button>
@@ -724,7 +725,7 @@ export const MyTimelineView: React.FC<MyTimelineViewProps> = ({
                     )}
 
                     {item.note && !isEditing && (
-                      <div className="text-xs text-slate-600 bg-slate-50 px-3 py-2 rounded-xs border border-slate-100 flex items-start space-x-2">
+                      <div className="text-xs text-slate-600 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100 flex items-start space-x-2">
                         <span className="font-bold text-emerald-700 shrink-0">{language === 'en' ? 'Note:' : 'メモ:'}</span>
                         <span>{item.note}</span>
                       </div>
