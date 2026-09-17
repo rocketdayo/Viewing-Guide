@@ -130,26 +130,39 @@ const basementPlaces = [
   { name: "人権啓発委員会", x: 1287, y: 2289, width: 240, height: 65 }
 ];
 
-const path = decodeURIComponent(window.location.pathname);
+let rawPath = window.location.pathname;
+let decodedPath = rawPath;
+try {
+  decodedPath = decodeURIComponent(rawPath);
+  try {
+    decodedPath = decodeURIComponent(decodedPath);
+  } catch {}
+} catch {}
 
 let places = [];
 let floorName = "";
 
-if (path.includes("floor地下")) {
-  places = basementPlaces;
-  floorName = "地下階";
-} else if (path.includes("floor1")) {
+const pLower = decodedPath.toLowerCase();
+const rawLower = rawPath.toLowerCase();
+
+if (pLower.includes("floor1") || rawLower.includes("floor1")) {
   places = floor1Places;
   floorName = "1階";
-} else if (path.includes("floor2")) {
+} else if (pLower.includes("floor2") || rawLower.includes("floor2")) {
   places = floor2Places;
   floorName = "2階";
-} else if (path.includes("floor3")) {
+} else if (pLower.includes("floor3") || rawLower.includes("floor3")) {
   places = floor3Places;
   floorName = "3階";
-} else if (path.includes("floor4")) {
+} else if (pLower.includes("floor4") || rawLower.includes("floor4")) {
   places = floor4Places;
   floorName = "4階";
+} else if (pLower.includes("floorb1") || rawLower.includes("floorb1")) {
+  places = basementPlaces;
+  floorName = "地下階";
+} else {
+  places = basementPlaces;
+  floorName = "地下階";
 }
 
 const mapButtons = document.getElementById("map-buttons");
