@@ -142,26 +142,80 @@ app.get("/api/check-poster", (req, res) => {
   const ext = path.extname(safeName).toLowerCase();
   const stem = path.basename(safeName, ext);
 
-  const targetDir = path.join(process.cwd(), 'public/classposter');
-  const pdfPath = path.join(targetDir, `${stem}.pdf`);
-  const pngPath = path.join(targetDir, `${stem}.png`);
+  const candidateDirs = [
+    path.join(process.cwd(), 'public/classposter'),
+    path.join(process.cwd(), 'dist/classposter'),
+    path.join(process.cwd(), 'public/images/classes'),
+    path.join(process.cwd(), 'dist/images/classes')
+  ];
 
-  const pdfExists = fs.existsSync(pdfPath) && fs.statSync(pdfPath).size > 100;
-  let pngExists = fs.existsSync(pngPath) && fs.statSync(pngPath).size > 100;
+  for (const dir of candidateDirs) {
+    if (!fs.existsSync(dir)) continue;
 
-  if (pdfExists && !pngExists) {
-    pngExists = convertPdfToPng(pdfPath, pngPath);
-  }
+    const pngPath = path.join(dir, `${stem}.png`);
+    const jpgPath = path.join(dir, `${stem}.jpg`);
+    const jpegPath = path.join(dir, `${stem}.jpeg`);
+    const webpPath = path.join(dir, `${stem}.webp`);
+    const pdfPath = path.join(dir, `${stem}.pdf`);
 
-  if (pngExists || pdfExists) {
-    const size = pngExists ? fs.statSync(pngPath).size : fs.statSync(pdfPath).size;
-    return res.json({
-      exists: true,
-      size,
-      imageUrl: pngExists ? `/classposter/${stem}.png` : null,
-      pdfUrl: pdfExists ? `/classposter/${stem}.pdf` : null,
-      fileName: `${stem}.pdf`
-    });
+    if (fs.existsSync(pngPath) && fs.statSync(pngPath).size > 100) {
+      return res.json({
+        exists: true,
+        size: fs.statSync(pngPath).size,
+        imageUrl: `/classposter/${stem}.png`,
+        pdfUrl: fs.existsSync(pdfPath) ? `/classposter/${stem}.pdf` : null,
+        fileName: `${stem}.png`
+      });
+    }
+
+    if (fs.existsSync(jpgPath) && fs.statSync(jpgPath).size > 100) {
+      return res.json({
+        exists: true,
+        size: fs.statSync(jpgPath).size,
+        imageUrl: `/classposter/${stem}.jpg`,
+        pdfUrl: fs.existsSync(pdfPath) ? `/classposter/${stem}.pdf` : null,
+        fileName: `${stem}.jpg`
+      });
+    }
+
+    if (fs.existsSync(jpegPath) && fs.statSync(jpegPath).size > 100) {
+      return res.json({
+        exists: true,
+        size: fs.statSync(jpegPath).size,
+        imageUrl: `/classposter/${stem}.jpeg`,
+        pdfUrl: fs.existsSync(pdfPath) ? `/classposter/${stem}.pdf` : null,
+        fileName: `${stem}.jpeg`
+      });
+    }
+
+    if (fs.existsSync(webpPath) && fs.statSync(webpPath).size > 100) {
+      return res.json({
+        exists: true,
+        size: fs.statSync(webpPath).size,
+        imageUrl: `/classposter/${stem}.webp`,
+        pdfUrl: fs.existsSync(pdfPath) ? `/classposter/${stem}.pdf` : null,
+        fileName: `${stem}.webp`
+      });
+    }
+
+    if (fs.existsSync(pdfPath) && fs.statSync(pdfPath).size > 100) {
+      let targetPng = path.join(dir, `${stem}.png`);
+      let converted = convertPdfToPng(pdfPath, targetPng);
+      if (!converted) {
+        const publicDir = path.join(process.cwd(), 'public/classposter');
+        if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
+        targetPng = path.join(publicDir, `${stem}.png`);
+        converted = convertPdfToPng(pdfPath, targetPng);
+      }
+
+      return res.json({
+        exists: true,
+        size: fs.statSync(pdfPath).size,
+        imageUrl: converted && fs.existsSync(targetPng) ? `/classposter/${stem}.png` : `/classposter/${stem}.pdf`,
+        pdfUrl: `/classposter/${stem}.pdf`,
+        fileName: `${stem}.pdf`
+      });
+    }
   }
 
   res.json({ exists: false, size: 0 });

@@ -51,20 +51,22 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
     }
 
     const savedPoster = localStorage.getItem(`custom_poster_${project.id}`);
-    if (savedPoster) {
-      if (savedPoster.startsWith('data:image/') || savedPoster.startsWith('blob:')) {
-        if (isMounted) {
-          setImageUrl(savedPoster);
-          setPdfUrl(null);
-          setHasPoster(true);
-          setIsChecking(false);
-        }
-        return;
+    if (savedPoster && (savedPoster.startsWith('data:image/') || savedPoster.startsWith('blob:'))) {
+      if (isMounted) {
+        setImageUrl(savedPoster);
+        setPdfUrl(null);
+        setHasPoster(true);
+        setIsChecking(false);
       }
+      return;
     }
 
     setIsChecking(true);
     setImageError(false);
+
+    const stem = posterFileName.replace(/\.[^/.]+$/, '');
+    const defaultImgPath = `/classposter/${stem}.png`;
+    const defaultPdfPath = `/classposter/${stem}.pdf`;
 
     fetch(`/api/check-poster?file=${encodeURIComponent(posterFileName)}`)
       .then((res) => res.json())
@@ -74,30 +76,20 @@ export const ClassPosterSection: React.FC<ClassPosterSectionProps> = ({ project,
           const timestamp = Date.now();
           const img = data.imageUrl ? `${data.imageUrl}?t=${timestamp}` : null;
           const pdf = data.pdfUrl ? `${data.pdfUrl}?t=${timestamp}` : null;
-          setImageUrl(img || pdf);
-          setPdfUrl(pdf);
-          setHasPoster(true);
-        } else if (savedPoster) {
-          setImageUrl(savedPoster);
-          setPdfUrl(null);
+          setImageUrl(img || pdf || defaultImgPath);
+          setPdfUrl(pdf || defaultPdfPath);
           setHasPoster(true);
         } else {
-          setImageUrl(null);
-          setPdfUrl(null);
-          setHasPoster(false);
+          setImageUrl(defaultImgPath);
+          setPdfUrl(defaultPdfPath);
+          setHasPoster(true);
         }
       })
       .catch(() => {
         if (!isMounted) return;
-        if (savedPoster) {
-          setImageUrl(savedPoster);
-          setPdfUrl(null);
-          setHasPoster(true);
-        } else {
-          setImageUrl(null);
-          setPdfUrl(null);
-          setHasPoster(false);
-        }
+        setImageUrl(defaultImgPath);
+        setPdfUrl(defaultPdfPath);
+        setHasPoster(true);
       })
       .finally(() => {
         if (isMounted) setIsChecking(false);
