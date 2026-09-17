@@ -1,11 +1,11 @@
 import { AppDataState } from '../types';
 import { initialSchedules } from './scheduleData';
 
-export const INITIAL_GAS_URL = "https://docs.google.com/spreadsheets/d/154F3vcdcOSyMc55VbY9qPCey4JtL7mW1pCOWBrDVuZc/edit?gid=0#gid=0";
-export const INITIAL_ANNOUNCEMENT_URL = "https://docs.google.com/spreadsheets/d/1Ajv5ErGHjhIz740IaB-IqhywYkV66dREwOdk7G3EiEg/edit?gid=0#gid=0";
-export const ANNOUNCEMENT_PORTAL_URL = "https://script.google.com/a/macros/stu.seikyo.ed.jp/s/AKfycbwsTDpMSe6Kdr1RoQ8TVByVtVVqAZG5q3mSvPmMxhH_SRUx8wZSwJdaKD8qwwphmAgaEg/exec";
+export const INITIAL_GAS_URL = import.meta.env.VITE_GAS_CONGESTION_URL || "https://docs.google.com/spreadsheets/d/154F3vcdcOSyMc55VbY9qPCey4JtL7mW1pCOWBrDVuZc/edit?gid=0#gid=0";
+export const INITIAL_ANNOUNCEMENT_URL = import.meta.env.VITE_ANNOUNCEMENT_SPREADSHEET_URL || "https://docs.google.com/spreadsheets/d/1Ajv5ErGHjhIz740IaB-IqhywYkV66dREwOdk7G3EiEg/edit?gid=0#gid=0";
+export const ANNOUNCEMENT_PORTAL_URL = import.meta.env.VITE_ANNOUNCEMENT_PORTAL_URL || "https://script.google.com/a/macros/stu.seikyo.ed.jp/s/AKfycbwsTDpMSe6Kdr1RoQ8TVByVtVVqAZG5q3mSvPmMxhH_SRUx8wZSwJdaKD8qwwphmAgaEg/exec";
 
-export const CLASS_CONGESTION_BASE_URL = "https://script.google.com/a/macros/stu.seikyo.ed.jp/s/AKfycbw9YPL2B506p_7KNog97UfAaO4JXRYma5HBmzY5MCIguxxzkm_E3e6tIysFdbuS1Jjm9g/exec";
+export const CLASS_CONGESTION_BASE_URL = import.meta.env.VITE_CLASS_CONGESTION_BASE_URL || "https://script.google.com/a/macros/stu.seikyo.ed.jp/s/AKfycbw9YPL2B506p_7KNog97UfAaO4JXRYma5HBmzY5MCIguxxzkm_E3e6tIysFdbuS1Jjm9g/exec";
 
 export function getClassCongestionInputUrl(classCode: string): string {
   const normalized = classCode.replace(/[\s\-_]/g, '').toUpperCase();
