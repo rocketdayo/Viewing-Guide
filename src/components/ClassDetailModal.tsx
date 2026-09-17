@@ -21,6 +21,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { ClassProject, CongestionLevel } from '../types';
 import { useI18n, translateCategory, translateBuilding, translateGrade } from '../utils/i18n';
+import { ClassPosterSection } from './ClassPosterSection';
 
 interface ClassDetailModalProps {
   project: ClassProject | null;
@@ -156,6 +157,8 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({
             </div>
 
             <div className="p-5 sm:p-6 overflow-y-auto space-y-5 text-slate-800">
+              <ClassPosterSection project={project} />
+
               {isOnlineTicketClass && (
                 <div className="p-4 rounded-xs bg-purple-50 text-purple-950 border border-purple-200 shadow-xs">
                   <div className="flex items-start justify-between gap-3">

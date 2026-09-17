@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
+import { execSync } from "child_process";
 import { createServer as createViteServer } from "vite";
 
 const app = express();
@@ -16,10 +17,14 @@ app.use('/images/alumni', express.static(path.join(process.cwd(), 'public/images
 app.use('/images', express.static(path.join(process.cwd(), 'public/images')));
 app.use('/alumni', express.static(path.join(process.cwd(), 'public/alumni')));
 app.use('/alumni', express.static(path.join(process.cwd(), 'dist/alumni')));
+app.use('/classposter', express.static(path.join(process.cwd(), 'public/classposter')));
+app.use('/classposter', express.static(path.join(process.cwd(), 'dist/classposter')));
 app.use('/SGfes', express.static(path.join(process.cwd(), 'public/SGfes')));
 app.use('/SGfes', express.static(path.join(process.cwd(), 'SGfes')));
 
 const searchDirs = [
+  path.join(process.cwd(), 'public/classposter'),
+  path.join(process.cwd(), 'dist/classposter'),
   path.join(process.cwd(), 'public/alumni'),
   path.join(process.cwd(), 'dist/alumni'),
   path.join(process.cwd(), 'public/images/schedule'),
@@ -33,12 +38,57 @@ const searchDirs = [
   path.join(process.cwd(), 'dist')
 ];
 
-app.get(['/alumni/:file', '/images/schedule/:file', '/images/projects/:file', '/images/classes/:file', '/images/alumni/:file', '/images/:file', '/SGfes/:file', '/:file.pdf'], (req, res, next) => {
+const convertPdfToPng = (pdfPath: string, pngPath: string): boolean => {
+  try {
+    if (!fs.existsSync(pdfPath)) return false;
+    const dir = path.dirname(pngPath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    execSync(
+      `gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m -r150 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -dFirstPage=1 -dLastPage=1 -sOutputFile="${pngPath}" "${pdfPath}"`,
+      { stdio: 'ignore', timeout: 15000 }
+    );
+    return fs.existsSync(pngPath) && fs.statSync(pngPath).size > 100;
+  } catch {
+    return false;
+  }
+};
+
+app.all(['/classposter/:file', '/alumni/:file', '/images/schedule/:file', '/images/projects/:file', '/images/classes/:file', '/images/alumni/:file', '/images/:file', '/SGfes/:file', '/:file.pdf'], (req, res, next) => {
   const rawFile = req.params.file || req.path.split('/').pop() || '';
   let decoded = rawFile;
   try {
     decoded = decodeURIComponent(rawFile);
   } catch {}
+
+  const classPosterDir = path.join(process.cwd(), 'public/classposter');
+  if (req.path.startsWith('/classposter/')) {
+    const cleanBase = path.basename(decoded);
+    const ext = path.extname(cleanBase).toLowerCase();
+    const stem = path.basename(cleanBase, ext);
+
+    if (ext === '.png' || ext === '.jpg' || ext === '.jpeg') {
+      const pngPath = path.join(classPosterDir, `${stem}.png`);
+      if (fs.existsSync(pngPath) && fs.statSync(pngPath).size > 100) {
+        res.setHeader('Content-Type', 'image/png');
+        return res.sendFile(pngPath);
+      }
+      const pdfPath = path.join(classPosterDir, `${stem}.pdf`);
+      if (fs.existsSync(pdfPath) && fs.statSync(pdfPath).size > 100) {
+        const ok = convertPdfToPng(pdfPath, pngPath);
+        if (ok && fs.existsSync(pngPath)) {
+          res.setHeader('Content-Type', 'image/png');
+          return res.sendFile(pngPath);
+        }
+      }
+    } else if (ext === '.pdf') {
+      const pdfPath = path.join(classPosterDir, cleanBase);
+      if (fs.existsSync(pdfPath) && fs.statSync(pdfPath).size > 100) {
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'inline');
+        return res.sendFile(pdfPath);
+      }
+    }
+  }
 
   const variants = [
     rawFile,
@@ -64,15 +114,57 @@ app.get(['/alumni/:file', '/images/schedule/:file', '/images/projects/:file', '/
     for (const v of variants) {
       const target = path.join(dir, v);
       if (fs.existsSync(target) && fs.statSync(target).isFile()) {
+        const stats = fs.statSync(target);
         if (target.endsWith('.pdf')) {
           res.setHeader('Content-Type', 'application/pdf');
           res.setHeader('Content-Disposition', 'inline');
+        }
+        res.setHeader('Content-Length', stats.size.toString());
+        if (req.method === 'HEAD') {
+          return res.status(200).end();
         }
         return res.sendFile(target);
       }
     }
   }
+
+  if (req.path.startsWith('/classposter/') || req.path.endsWith('.pdf')) {
+    return res.status(404).send('Not Found');
+  }
+
   next();
+});
+
+app.get("/api/check-poster", (req, res) => {
+  const file = String(req.query.file || '');
+  if (!file) return res.json({ exists: false, size: 0 });
+  const safeName = path.basename(file);
+  const ext = path.extname(safeName).toLowerCase();
+  const stem = path.basename(safeName, ext);
+
+  const targetDir = path.join(process.cwd(), 'public/classposter');
+  const pdfPath = path.join(targetDir, `${stem}.pdf`);
+  const pngPath = path.join(targetDir, `${stem}.png`);
+
+  const pdfExists = fs.existsSync(pdfPath) && fs.statSync(pdfPath).size > 100;
+  let pngExists = fs.existsSync(pngPath) && fs.statSync(pngPath).size > 100;
+
+  if (pdfExists && !pngExists) {
+    pngExists = convertPdfToPng(pdfPath, pngPath);
+  }
+
+  if (pngExists || pdfExists) {
+    const size = pngExists ? fs.statSync(pngPath).size : fs.statSync(pdfPath).size;
+    return res.json({
+      exists: true,
+      size,
+      imageUrl: pngExists ? `/classposter/${stem}.png` : null,
+      pdfUrl: pdfExists ? `/classposter/${stem}.pdf` : null,
+      fileName: `${stem}.pdf`
+    });
+  }
+
+  res.json({ exists: false, size: 0 });
 });
 
 app.get("/api/poster-list", (req, res) => {
@@ -95,9 +187,39 @@ app.post("/api/upload-poster", (req, res) => {
       return res.status(400).json({ success: false, error: "fileName and dataBase64 required" });
     }
 
-    const cleanBase64 = dataBase64.replace(/^data:image\/[a-z0-9+]+;base64,/, '');
+    const cleanBase64 = dataBase64.replace(/^data:(image\/[a-z0-9+]+|application\/pdf);base64,/, '');
     const buffer = Buffer.from(cleanBase64, 'base64');
     
+    if (folder === 'classposter') {
+      const classPosterDir = path.join(process.cwd(), 'public/classposter');
+      if (!fs.existsSync(classPosterDir)) fs.mkdirSync(classPosterDir, { recursive: true });
+      const safeName = path.basename(fileName);
+      const ext = path.extname(safeName).toLowerCase();
+      const stem = path.basename(safeName, ext);
+
+      const filePath = path.join(classPosterDir, safeName);
+      fs.writeFileSync(filePath, buffer);
+
+      let imageUrl: string | null = null;
+      if (ext === '.pdf') {
+        const pngPath = path.join(classPosterDir, `${stem}.png`);
+        convertPdfToPng(filePath, pngPath);
+        if (fs.existsSync(pngPath)) {
+          imageUrl = `/classposter/${stem}.png`;
+        }
+      } else if (ext === '.png' || ext === '.jpg' || ext === '.jpeg') {
+        imageUrl = `/classposter/${safeName}`;
+      }
+
+      return res.json({
+        success: true,
+        url: imageUrl || `/classposter/${safeName}`,
+        imageUrl,
+        pdfUrl: ext === '.pdf' ? `/classposter/${safeName}` : null,
+        fileName: safeName
+      });
+    }
+
     const targetDir = folder === 'projects' 
       ? path.join(process.cwd(), 'public/images/projects')
       : path.join(process.cwd(), 'public/images/schedule');

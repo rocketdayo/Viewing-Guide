@@ -15,6 +15,7 @@ export interface ClassProject {
   fullDetails: string;
   highlights: string[];
   imageUrl?: string;
+  posterPdf?: string;
   organizer?: string;
   targetAudience?: string;
   timeSlot?: string;

@@ -7,12 +7,14 @@ import {
   ChevronRight, 
   Ticket, 
   SlidersHorizontal,
-  Radio
+  Radio,
+  FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ClassProject, CongestionLevel } from '../types';
 import { useI18n, translateCategory, translateBuilding, translateGrade } from '../utils/i18n';
 import { matchProjectSearch } from '../utils/classSearch';
+import { getClassPosterFileName } from '../utils/classPoster';
 
 interface ClassesViewProps {
   projects: ClassProject[];
@@ -402,6 +404,12 @@ export const ClassesView: React.FC<ClassesViewProps> = ({
                           <span className="text-[11px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md font-medium">
                             {proj.rawCategory || translateCategory(proj.category, language)}
                           </span>
+                          {getClassPosterFileName(proj) && (
+                            <span className="bg-emerald-50/80 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 border border-emerald-200">
+                              <FileText className="w-3 h-3 text-emerald-600" />
+                              <span>{language === 'en' ? 'Poster' : 'ポスター'}</span>
+                            </span>
+                          )}
                           {(isOnlineTicket || proj.ticketText === 'あり' || proj.congestion?.ticketRequired) && (
                             <span className="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-0.5 border border-purple-200">
                               <Ticket className="w-3 h-3 text-purple-600" />
