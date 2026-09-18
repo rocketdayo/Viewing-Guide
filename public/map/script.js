@@ -1042,42 +1042,68 @@ const basementPlaces = [
 ];
 
 
-// ========================================
-// 今いるページが何階か判定
-// ========================================
-
-const path = decodeURIComponent(window.location.pathname);
+const path = decodeURIComponent(window.location.pathname + " " + window.location.href).toLowerCase();
+const pageTitle = (document.title || "").toLowerCase();
+const h1Text = (document.querySelector("h1")?.textContent || "").toLowerCase();
+const mapImgSrc = (document.querySelector(".map-image")?.getAttribute("src") || "").toLowerCase();
+const mapImgAlt = (document.querySelector(".map-image")?.getAttribute("alt") || "").toLowerCase();
 
 let places = [];
 let floorName = "";
 
-if (path.toLowerCase().includes("floorb") || path.includes("floor地下")) {
+if (
+    (typeof window !== "undefined" && window.__CURRENT_FLOOR__ === "basement") ||
+    path.includes("floorb") ||
+    path.includes("floor地下") ||
+    path.includes("地下") ||
+    pageTitle.includes("地下") ||
+    h1Text.includes("地下") ||
+    mapImgSrc.includes("floorb") ||
+    mapImgAlt.includes("地下")
+) {
     places = basementPlaces;
     floorName = "地下階";
-} else if (path.includes("floor1")) {
+} else if (
+    (typeof window !== "undefined" && window.__CURRENT_FLOOR__ === "floor1") ||
+    path.includes("floor1") ||
+    pageTitle.includes("1階") ||
+    h1Text.includes("1階") ||
+    mapImgSrc.includes("floor1")
+) {
     places = floor1Places;
     floorName = "1階";
-} else if (path.includes("floor2")) {
+} else if (
+    (typeof window !== "undefined" && window.__CURRENT_FLOOR__ === "floor2") ||
+    path.includes("floor2") ||
+    pageTitle.includes("2階") ||
+    h1Text.includes("2階") ||
+    mapImgSrc.includes("floor2")
+) {
     places = floor2Places;
     floorName = "2階";
-} else if (path.includes("floor3")) {
+} else if (
+    (typeof window !== "undefined" && window.__CURRENT_FLOOR__ === "floor3") ||
+    path.includes("floor3") ||
+    pageTitle.includes("3階") ||
+    h1Text.includes("3階") ||
+    mapImgSrc.includes("floor3")
+) {
     places = floor3Places;
     floorName = "3階";
-} else if (path.includes("floor4")) {
+} else if (
+    (typeof window !== "undefined" && window.__CURRENT_FLOOR__ === "floor4") ||
+    path.includes("floor4") ||
+    pageTitle.includes("4階") ||
+    h1Text.includes("4階") ||
+    mapImgSrc.includes("floor4")
+) {
     places = floor4Places;
     floorName = "4階";
 }
 
-
-// ========================================
-// HTML要素取得
-// ========================================
-
 const mapButtons = document.getElementById("map-buttons");
-
 const popupOverlay = document.getElementById("popup-overlay");
 const closeButton = document.getElementById("close-button");
-
 const popupCategory = document.getElementById("popup-category");
 const popupTitle = document.getElementById("popup-title");
 const popupDescription = document.getElementById("popup-description");
@@ -1085,204 +1111,123 @@ const popupLocation = document.getElementById("popup-location");
 const popupTime = document.getElementById("popup-time");
 const popupImage = document.getElementById("popup-image");
 
+function openPopup(place) {
+    const overlay = document.getElementById("popup-overlay") || popupOverlay;
+    if (!overlay) {
+        return;
+    }
+    const cat = document.getElementById("popup-category") || popupCategory;
+    if (cat) {
+        cat.textContent = place.detail === true ? "施設情報" : "校内マップ";
+    }
+    const tit = document.getElementById("popup-title") || popupTitle;
+    if (tit) {
+        tit.textContent = place.name;
+    }
+    const img = document.getElementById("popup-image") || popupImage;
+    if (img) {
+        if (place.image) {
+            img.src = place.image;
+            img.alt = place.name;
+            img.style.display = "block";
+        } else {
+            img.removeAttribute("src");
+            img.alt = "";
+            img.style.display = "none";
+        }
+    }
+    const desc = document.getElementById("popup-description") || popupDescription;
+    const loc = document.getElementById("popup-location") || popupLocation;
+    const tim = document.getElementById("popup-time") || popupTime;
+    if (place.detail === true) {
+        if (desc) desc.textContent = place.description || "説明は準備中です。";
+        if (loc) loc.textContent = place.location || floorName;
+        if (tim) tim.textContent = place.time || "―";
+    } else {
+        if (desc) desc.textContent = `${place.name}の場所です。`;
+        if (loc) loc.textContent = floorName;
+        if (tim) tim.textContent = "―";
+    }
+    overlay.classList.add("active");
+}
 
-// ========================================
-// タップ領域を作成
-// ========================================
+function closePopup() {
+    const overlay = document.getElementById("popup-overlay") || popupOverlay;
+    if (overlay) {
+        overlay.classList.remove("active");
+    }
+}
 
 if (mapButtons) {
-
     places.forEach(place => {
-
         const button = document.createElement("button");
-
         button.type = "button";
         button.className = "map-button";
-
-        // 詳細情報がある場所
         if (place.detail === true) {
             button.classList.add("has-popup");
         }
-
-        // 地図画像に文字があるため、ボタン上には文字を表示しない
         button.textContent = "";
+        button.setAttribute("aria-label", `${place.name}を開く`);
 
-        button.setAttribute(
-            "aria-label",
-            `${place.name}を開く`
-        );
-
-        // ========================================
-        // クリスタ座標をパーセントに変換
-        // ========================================
-
-        const xPercent =
-            (place.x / ORIGINAL_WIDTH) * 100;
-
-        const yPercent =
-            (place.y / ORIGINAL_HEIGHT) * 100;
-
-        const widthPercent =
-            ((place.width || 160) / ORIGINAL_WIDTH) * 100;
-
-        const heightPercent =
-            ((place.height || 65) / ORIGINAL_HEIGHT) * 100;
-
-
-        // ========================================
-        // タップ領域の位置・大きさ
-        // ========================================
+        const xPercent = (place.x / ORIGINAL_WIDTH) * 100;
+        const yPercent = (place.y / ORIGINAL_HEIGHT) * 100;
+        const widthPercent = ((place.width || 160) / ORIGINAL_WIDTH) * 100;
+        const heightPercent = ((place.height || 65) / ORIGINAL_HEIGHT) * 100;
 
         button.style.left = `${xPercent}%`;
         button.style.top = `${yPercent}%`;
-
         button.style.width = `${widthPercent}%`;
         button.style.height = `${heightPercent}%`;
+        button.style.transform = "translate(-50%, -50%)";
+        button.style.background = "transparent";
+        button.style.border = "none";
+        button.style.minWidth = "44px";
+        button.style.minHeight = "44px";
+        button.style.zIndex = "10";
+        button.style.touchAction = "manipulation";
 
-        // x・yを中心座標として扱う
-        button.style.transform =
-            "translate(-50%, -50%)";
-
-
-       // ========================================
-     　// タップ領域は透明にする
-     　// ========================================
-     button.style.background = "transparent";
-     button.style.border = "none";
-
-        // ========================================
-        // クリック・タップ時の処理
-        // ========================================
-
-        button.addEventListener("click", () => {
+        let lastTrigger = 0;
+        const handleTrigger = (e) => {
+            const now = Date.now();
+            if (now - lastTrigger < 250) return;
+            lastTrigger = now;
             openPopup(place);
-        });
+        };
 
+        button.addEventListener("click", handleTrigger);
+        button.addEventListener("touchend", handleTrigger);
 
         mapButtons.appendChild(button);
-
     });
-
 }
 
-
-// ========================================
-// ポップアップを開く
-// ========================================
-
-function openPopup(place) {
-
-    if (!popupOverlay) {
-        return;
-    }
-
-    // カテゴリー
-    popupCategory.textContent =
-        place.detail === true
-            ? "施設情報"
-            : "校内マップ";
-
-
-    // タイトル
-    popupTitle.textContent =
-        place.name;
-
-
-    // 画像
-    if (popupImage) {
-
-        if (place.image) {
-
-            // HTMLと同じフォルダに画像がある場合
-            popupImage.src = place.image;
-            popupImage.alt = place.name;
-            popupImage.style.display = "block";
-
-        } else {
-
-            popupImage.removeAttribute("src");
-            popupImage.alt = "";
-            popupImage.style.display = "none";
-
+if (closeButton) {
+    closeButton.addEventListener("click", (e) => {
+        if (e) e.stopPropagation();
+        closePopup();
+    });
+    closeButton.addEventListener("touchend", (e) => {
+        if (e) {
+            e.stopPropagation();
+            if (e.cancelable) e.preventDefault();
         }
-
-    }
-
-
-    // 詳細情報がある場所
-    if (place.detail === true) {
-
-        popupDescription.textContent =
-            place.description || "説明は準備中です。";
-
-        popupLocation.textContent =
-            place.location || floorName;
-
-        popupTime.textContent =
-            place.time || "―";
-
-    } else {
-
-        popupDescription.textContent =
-            `${place.name}の場所です。`;
-
-        popupLocation.textContent =
-            floorName;
-
-        popupTime.textContent =
-            "―";
-
-    }
-
-
-    // ポップアップを表示
-    popupOverlay.classList.add("active");
-
-}
-
-
-// ========================================
-// ×ボタンで閉じる
-// ========================================
-
-if (closeButton && popupOverlay) {
-
-    closeButton.addEventListener("click", () => {
-        popupOverlay.classList.remove("active");
+        closePopup();
     });
-
 }
-
-
-// ========================================
-// 背景をクリックして閉じる
-// ========================================
 
 if (popupOverlay) {
-
-    popupOverlay.addEventListener("click", event => {
-
+    const handleOverlayClose = (event) => {
         if (event.target === popupOverlay) {
-            popupOverlay.classList.remove("active");
+            if (event.cancelable) event.preventDefault();
+            closePopup();
         }
-
-    });
-
+    };
+    popupOverlay.addEventListener("click", handleOverlayClose);
+    popupOverlay.addEventListener("touchend", handleOverlayClose);
 }
 
-
-// ========================================
-// Escキーで閉じる
-// ========================================
-
 document.addEventListener("keydown", event => {
-
-    if (
-        event.key === "Escape" &&
-        popupOverlay &&
-        popupOverlay.classList.contains("active")
-    ) {
-        popupOverlay.classList.remove("active");
+    if (event.key === "Escape") {
+        closePopup();
     }
-
 });

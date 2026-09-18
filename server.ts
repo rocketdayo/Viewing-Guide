@@ -42,6 +42,13 @@ app.use('/classposter', express.static(path.join(process.cwd(), 'public/classpos
 app.use('/classposter', express.static(path.join(process.cwd(), 'dist/classposter')));
 app.use('/SGfes', express.static(path.join(process.cwd(), 'public/SGfes')));
 app.use('/SGfes', express.static(path.join(process.cwd(), 'SGfes')));
+app.use('/map', express.static(path.join(process.cwd(), 'public/map'), {
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+}));
 
 const searchDirs = [
   path.join(process.cwd(), 'public/classposter'),

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'seikyo-fes-cache-v1';
+const CACHE_NAME = 'seikyo-fes-cache-v2';
 
 const STATIC_ASSETS = [
   './',
@@ -42,6 +42,11 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
   // Skip Google Apps Script external live sync API from strict caching
+  if (url.pathname.includes('/map/')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   if (url.hostname.includes('script.google.com') || url.hostname.includes('script.googleusercontent.com')) {
     event.respondWith(
       fetch(event.request).catch(() => {
