@@ -184,6 +184,13 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
       action: () => handleJump('home', 'student-portal-section'),
     },
     {
+      title: language === 'en' ? 'Campus Tour (Day 2 Special)' : '清教学園ツアー（文化祭2日目特別企画）',
+      desc: language === 'en' ? 'Student-led guided tour, meeting point & timetable' : '在校生が案内する校内ツアー！実施タイムテーブル・集合場所・参加景品案内',
+      icon: Compass,
+      color: 'text-teal-800 bg-teal-50 border-teal-200',
+      action: () => handleJump('home', 'campus-tour-section'),
+    },
+    {
       title: language === 'en' ? 'Alumni Features & Guide Dog Booth' : '清教学園同窓会 特別企画 ＆ 盲導犬訓練所',
       desc: language === 'en' ? 'Career Guidebook, Alumni Food Stalls & Guide Dog Booth' : '特設案内：『未来の仕事図鑑』・『先輩グルメ』＆『日本ライトハウス盲導犬訓練所』',
       icon: GraduationCap,

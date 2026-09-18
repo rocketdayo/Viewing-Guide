@@ -26,7 +26,8 @@ import { AppDataState, ClassProject } from '../types';
 import { AlumniSection } from './AlumniSection';
 import { AnnouncementsSection } from './AnnouncementsSection';
 import { StudentInfoSection } from './StudentInfoSection';
-import { useI18n, translateCategory } from '../utils/i18n';
+import { CampusTourSection } from './CampusTourSection';
+import { useI18n } from '../utils/i18n';
 
 interface HomeViewProps {
   appData: AppDataState;
@@ -63,7 +64,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
   }, []);
 
   const projects = appData?.projects || [];
-  const featuredProjects = projects.slice(0, 4);
   const activeGreeting =
     (appData?.greetings || []).find((g) => g.id === selectedGreetingTab) ||
     (appData?.greetings || [])[0];
@@ -441,58 +441,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
       <StudentInfoSection />
 
+      <CampusTourSection onNavigate={onNavigate} />
+
       <AlumniSection />
-
-      <section className="py-14 bg-white opacity-95 transition-opacity duration-1000">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-          <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-            <div>
-              <span className="text-xs font-mono font-bold text-emerald-800 tracking-wider uppercase">PICKUP EXHIBITIONS</span>
-              <h2 className="text-2xl font-serif font-bold text-slate-900">{t.pickupTitle}</h2>
-            </div>
-            <button
-              onClick={() => onNavigate('classes')}
-              className="text-xs font-bold text-emerald-800 hover:text-emerald-950 underline cursor-pointer"
-            >
-              {t.viewAllProjects} →
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {featuredProjects.map((proj) => {
-              return (
-                <div
-                  key={proj.id}
-                  onClick={() => onSelectProject(proj.id)}
-                  className="bg-[#FAFBFD] p-6 border border-slate-200 hover:border-emerald-700 transition-all cursor-pointer flex flex-col justify-between space-y-4 shadow-2xs group"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono border-b border-slate-200/80 pb-2.5">
-                      <span className="bg-white px-2 py-0.5 border border-slate-300 font-bold text-slate-900">{proj.classNumber}</span>
-                      <span className="text-emerald-800 font-bold">{translateCategory(proj.category, language)}</span>
-                    </div>
-                    <h4 className="text-base font-bold text-slate-900 group-hover:text-emerald-800 transition-colors line-clamp-1">
-                      {proj.title}
-                    </h4>
-                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                      {proj.description}
-                    </p>
-                    <div className="text-[11px] text-slate-600 pt-1 flex items-center space-x-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                      <span>{proj.location}</span>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs font-bold text-emerald-800">
-                    <span>{t.viewDetails}</span>
-                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
     </div>
   );
 };
