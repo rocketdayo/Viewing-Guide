@@ -23,8 +23,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '私たちは「声を合わせ、心を一つにして、聞いてくださる方の心に響く歌を歌うこと」を目指して、中高合わせて41人で毎日楽しく活動しています。コンクール曲に加え、みなさんも一度は耳にしたことのあるPOPS曲も歌わせていただきます。ぜひ最後まで楽しんでお聴きください！',
     needsPoster: true,
     posterFile: '合唱部.jpg',
-    posterImage: '/images/schedule/合唱部.jpg',
-    image: '/images/schedule/合唱部.jpg',
+    posterImage: '/SGfes/合唱部.jpg',
+    image: '/SGfes/合唱部.jpg',
     published: true
   },
   {
@@ -49,8 +49,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: 'ハンドベル部です！私たちはトーンチャイムという楽器を使って嵐の有名曲をメドレーで演奏します。11人全員で息を合わせて頑張ります。みなさんぜひお越しください！',
     needsPoster: true,
     posterFile: 'ハンドベル部.jpg',
-    posterImage: '/images/schedule/ハンドベル部.jpg',
-    image: '/images/schedule/ハンドベル部.jpg',
+    posterImage: '/SGfes/ハンドベル部.jpg',
+    image: '/SGfes/ハンドベル部.jpg',
     published: true
   },
   {
@@ -75,8 +75,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '高二25人で人気曲を踊ります！第一体育館で1日目は9時50分、2日目は10時10分からスタートです！ぜひお越しください！',
     needsPoster: true,
     posterFile: '^_^☺︎(にこにこスマイル).jpg',
-    posterImage: '/images/schedule/^_^☺︎(にこにこスマイル).jpg',
-    image: '/images/schedule/^_^☺︎(にこにこスマイル).jpg',
+    posterImage: '/SGfes/^_^☺︎(にこにこスマイル).jpg',
+    image: '/SGfes/^_^☺︎(にこにこスマイル).jpg',
     published: true
   },
   {
@@ -101,8 +101,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: 'こんにちは。that’s brass です。私たちはレクチャールームで10:20分からクラリネットとバスクラリネットで2重奏を演奏させていただきます。普段はあまり聞けない編成でのアンサンブルなので是非この機会にお越しください。',
     needsPoster: true,
     posterFile: "That's BRASS.png",
-    posterImage: "/images/schedule/That's BRASS.png",
-    image: "/images/schedule/That's BRASS.png",
+    posterImage: "/SGfes/That's BRASS.png",
+    image: "/SGfes/That's BRASS.png",
     published: true
   },
   {
@@ -154,8 +154,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: 'Brass Sです！レクチャールーム、10:40~10:50で金管5重奏のアンサンブルをします！楽器編成は、トランペット、トロンボーン、ホルン、ユーフォニアム、チューバです。全く雰囲気の違う２曲をお届けいたしますので、金管アンサンブルの様々な可能性を感じていただけます！ぜひお越しください！！',
     needsPoster: true,
     posterFile: 'Brass S.jpg',
-    posterImage: '/images/schedule/Brass S.jpg',
-    image: '/images/schedule/Brass S.jpg',
+    posterImage: '/SGfes/Brass S.jpg',
+    image: '/SGfes/Brass S.jpg',
     published: true
   },
   {
@@ -204,8 +204,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '部員一同が一つになって、1 日目は高校生ならではの、恐れず挑戦する気持ちを形にし、2 日目はいつも支えてくださる皆様に感謝の気持ちを伝えます。今日までの成長の証となる、私たちの「挑戦」と「感謝」をぜひ見にきてください！',
     needsPoster: true,
     posterFile: '書道部.jpg',
-    posterImage: '/images/schedule/書道部.jpg',
-    image: '/images/schedule/書道部.jpg',
+    posterImage: '/SGfes/書道部.jpg',
+    image: '/SGfes/書道部.jpg',
     published: true
   },
   {
@@ -230,8 +230,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '皆さんこんにちは、ブラックワンです！ 私たちはピアノとボーカルによる音楽ユニットです。本日は皆さんにも聞き馴染みのある人気のポップスを演奏します。優しい歌声と繊細なピアノが織りなす、ブラックワンならではの世界観をぜひお楽しみください！',
     needsPoster: true,
     posterFile: 'ブラックワン.png',
-    posterImage: '/images/schedule/ブラックワン.png',
-    image: '/images/schedule/ブラックワン.png',
+    posterImage: '/SGfes/ブラックワン.png',
+    image: '/SGfes/ブラックワン.png',
     published: true
   },
   {
@@ -256,8 +256,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '去年も同じ2人で有志に出させていただいた経験があるので、前回よりももっと良い歌声を届けられると思います。最後の曲ではお互いにハモリのあるパート分けになっているので、注目して聞いてほしいです！',
     needsPoster: true,
     posterFile: 'TwinLeaf.png',
-    posterImage: '/images/schedule/TwinLeaf.png',
-    image: '/images/schedule/TwinLeaf.png',
+    posterImage: '/SGfes/TwinLeaf.png',
+    image: '/SGfes/TwinLeaf.png',
     published: true
   },
   {
@@ -282,8 +282,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: 'Double sharpです！音楽家を目指す2人による、クラシックの本気のステージ！それぞれが音大受験に向けて磨き上げている勝負曲を披露します。ピアノの華麗な超絶技巧と、コントラバスの迫力ある重低音をぜひお楽しみください！',
     needsPoster: true,
     posterFile: 'Double sharp.jpg',
-    posterImage: '/images/schedule/Double sharp.jpg',
-    image: '/images/schedule/Double sharp.jpg',
+    posterImage: '/SGfes/Double sharp.jpg',
+    image: '/SGfes/Double sharp.jpg',
     published: true
   },
   {
@@ -308,8 +308,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '聖書研究会ゴスペル部門がお届けする、現代版ワーシップの20分。エレキ、ベース、ピアノ、アコギ、クラッシックギター、ドラムが奏でる音楽とともに、心を揺らすひとときを。1日目12:20〜12:40、２日目12:30〜12:50。レクチャールームにて。',
     needsPoster: true,
     posterFile: 'GOSPELLIVE.png',
-    posterImage: '/images/schedule/GOSPELLIVE.png',
-    image: '/images/schedule/GOSPELLIVE.png',
+    posterImage: '/SGfes/GOSPELLIVE.png',
+    image: '/SGfes/GOSPELLIVE.png',
     published: true
   },
   {
@@ -358,8 +358,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '夏休み前から振り作りを始め、今日のために高1・高2で協力し作り上げてきました。第一体育館で1日目、2日目ともに13時05分からスタートします！ぜひお越しください！',
     needsPoster: true,
     posterFile: 'ダンス部.jpg',
-    posterImage: '/images/schedule/ダンス部.jpg',
-    image: '/images/schedule/ダンス部.jpg',
+    posterImage: '/SGfes/ダンス部.jpg',
+    image: '/SGfes/ダンス部.jpg',
     published: true
   },
   {
@@ -385,8 +385,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '誰もが一度は聞いたことのある曲から、最近話題の曲まで、幅広いジャンルの曲を演奏します！\n思わず体を動かしたくなるようなステージを、音楽の風に乗せてお届けします！',
     needsPoster: true,
     posterFile: '吹奏楽部.jpg',
-    posterImage: '/images/schedule/吹奏楽部.jpg',
-    image: '/images/schedule/吹奏楽部.jpg',
+    posterImage: '/SGfes/吹奏楽部.jpg',
+    image: '/SGfes/吹奏楽部.jpg',
     published: true
   },
   {
@@ -412,8 +412,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '先生クイズ\n先生に関するクイズを出題！清教学園にいる皆様ならわかるはずです！\n\nイントロクイズ\n様々なイントロの曲名を当てていただきます！皆様は正解できますか…？\n\nビンゴ大会\n観客の皆様全員で行う大規模ビンゴ大会！景品はなんと、あの先生方の一押しグッズ！？\n果たしてどんな景品なのか、お楽しみに♪\n\nクラブ\n最近流行った曲を、みんなで歌って踊って、盛り上がろう！',
     needsPoster: true,
     posterFile: 'Seikyo Night Fes.png',
-    posterImage: '/images/schedule/Seikyo Night Fes.png',
-    image: '/images/schedule/Seikyo Night Fes.png',
+    posterImage: '/SGfes/Seikyo Night Fes.png',
+    image: '/SGfes/Seikyo Night Fes.png',
     published: true
   },
   {
@@ -554,8 +554,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '私たちは「声を合わせ、心を一つにして、聞いてくださる方の心に響く歌を歌うこと」を目指して、中高合わせて41人で毎日楽しく活動しています。コンクール曲に加え、みなさんも一度は耳にしたことのあるPOPS曲も歌わせていただきます。ぜひ最後まで楽しんでお聴きください！',
     needsPoster: true,
     posterFile: '合唱部.jpg',
-    posterImage: '/images/schedule/合唱部.jpg',
-    image: '/images/schedule/合唱部.jpg',
+    posterImage: '/SGfes/合唱部.jpg',
+    image: '/SGfes/合唱部.jpg',
     published: true
   },
   {
@@ -580,8 +580,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: 'ハンドベル部です！私たちはトーンチャイムという楽器を使って嵐の有名曲をメドレーで演奏します。11人全員で息を合わせて頑張ります。みなさんぜひお越しください！',
     needsPoster: true,
     posterFile: 'ハンドベル部.jpg',
-    posterImage: '/images/schedule/ハンドベル部.jpg',
-    image: '/images/schedule/ハンドベル部.jpg',
+    posterImage: '/SGfes/ハンドベル部.jpg',
+    image: '/SGfes/ハンドベル部.jpg',
     published: true
   },
   {
@@ -607,8 +607,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '部員一同が一つになって、1 日目は高校生ならではの、恐れず挑戦する気持ちを形にし、2 日目はいつも支えてくださる皆様に感謝の気持ちを伝えます。今日までの成長の証となる、私たちの「挑戦」と「感謝」をぜひ見にきてください！',
     needsPoster: true,
     posterFile: '書道部.jpg',
-    posterImage: '/images/schedule/書道部.jpg',
-    image: '/images/schedule/書道部.jpg',
+    posterImage: '/SGfes/書道部.jpg',
+    image: '/SGfes/書道部.jpg',
     published: true
   },
   {
@@ -634,8 +634,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '文化祭2日目に行う在校生による清教学園ツアーです！\n清教学園ツアーでは、第一体育館・チャペル・リブラリア・ラーニングコモンズなど、清教学園のいろんな場所をまわります！\n入試を考えている人は、学校の雰囲気をリアルに知れ、 OB・OGのみなさんは「ここ懐かしい！」となること間違いなし。\n集合場所は受付を通った場所（第一体育館前）に看板を設置しています。\n参加者には景品もあります！\n気軽に参加してください！',
     needsPoster: true,
     posterFile: '清教学園ツアー.png',
-    posterImage: '/images/schedule/清教学園ツアー.png',
-    image: '/images/schedule/清教学園ツアー.png',
+    posterImage: '/SGfes/清教学園ツアー.png',
+    image: '/SGfes/清教学園ツアー.png',
     published: true
   },
   {
@@ -661,8 +661,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '警察体験では、パトカーの展示、指紋採取体験やモンタージュを作ったり、チャンバラをすることができます。\n消防体験では、防火服、面体、酸素ボンベの展示及び体験着用や消化器の体験をすることができます。\n野球教室では、キャッチボール、簡単なバッティングをすることができます。',
     needsPoster: true,
     posterFile: '警察・消防体験、野球教室.jpeg',
-    posterImage: '/images/schedule/警察・消防体験、野球教室.jpeg',
-    image: '/images/schedule/警察・消防体験、野球教室.jpeg',
+    posterImage: '/SGfes/警察・消防体験、野球教室.jpeg',
+    image: '/SGfes/警察・消防体験、野球教室.jpeg',
     published: true
   },
   {
@@ -687,8 +687,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '高二25人で人気曲を踊ります！第一体育館で1日目は9時50分、2日目は10時10分からスタートです！ぜひお越しください！',
     needsPoster: true,
     posterFile: '^_^☺︎(にこにこスマイル).jpg',
-    posterImage: '/images/schedule/^_^☺︎(にこにこスマイル).jpg',
-    image: '/images/schedule/^_^☺︎(にこにこスマイル).jpg',
+    posterImage: '/SGfes/^_^☺︎(にこにこスマイル).jpg',
+    image: '/SGfes/^_^☺︎(にこにこスマイル).jpg',
     published: true
   },
   {
@@ -713,8 +713,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: 'こんにちは。that’s brass です。私たちはレクチャールームで10:20分からクラリネットとバスクラリネットで2重奏を演奏させていただきます。普段はあまり聞けない編成でのアンサンブルなので是非この機会にお越しください。',
     needsPoster: true,
     posterFile: "That's BRASS.png",
-    posterImage: "/images/schedule/That's BRASS.png",
-    image: "/images/schedule/That's BRASS.png",
+    posterImage: "/SGfes/That's BRASS.png",
+    image: "/SGfes/That's BRASS.png",
     published: true
   },
   {
@@ -739,8 +739,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: 'Brass Sです！レクチャールーム、10:40~10:50で金管5重奏のアンサンブルをします！楽器編成は、トランペット、トロンボーン、ホルン、ユーフォニアム、チューバです。全く雰囲気の違う２曲をお届けいたしますので、金管アンサンブルの様々な可能性を感じていただけます！ぜひお越しください！！',
     needsPoster: true,
     posterFile: 'Brass S.jpg',
-    posterImage: '/images/schedule/Brass S.jpg',
-    image: '/images/schedule/Brass S.jpg',
+    posterImage: '/SGfes/Brass S.jpg',
+    image: '/SGfes/Brass S.jpg',
     published: true
   },
   {
@@ -815,8 +815,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '皆さんこんにちは、ブラックワンです！ 私たちはピアノとボーカルによる音楽ユニットです。本日は皆さんにも聞き馴染みのある人気のポップスを演奏します。優しい歌声と繊細なピアノが織りなす、ブラックワンならではの世界観をぜひお楽しみください！',
     needsPoster: true,
     posterFile: 'ブラックワン.png',
-    posterImage: '/images/schedule/ブラックワン.png',
-    image: '/images/schedule/ブラックワン.png',
+    posterImage: '/SGfes/ブラックワン.png',
+    image: '/SGfes/ブラックワン.png',
     published: true
   },
   {
@@ -842,8 +842,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '文化祭2日目に行う在校生による清教学園ツアーです！\n清教学園ツアーでは、第一体育館・チャペル・リブラリア・ラーニングコモンズなど、清教学園のいろんな場所をまわります！\n入試を考えている人は、学校の雰囲気をリアルに知れ、 OB・OGのみなさんは「ここ懐かしい！」となること間違いなし。\n集合場所は受付を通った場所（第一体育館前）に看板を設置しています。\n参加者には景品もあります！\n気軽に参加してください！',
     needsPoster: true,
     posterFile: '清教学園ツアー.png',
-    posterImage: '/images/schedule/清教学園ツアー.png',
-    image: '/images/schedule/清教学園ツアー.png',
+    posterImage: '/SGfes/清教学園ツアー.png',
+    image: '/SGfes/清教学園ツアー.png',
     published: true
   },
   {
@@ -868,8 +868,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '去年も同じ2人で有志に出させていただいた経験があるので、前回よりももっと良い歌声を届けられると思います。最後の曲ではお互いにハモリのあるパート分けになっているので、注目して聞いてほしいです！',
     needsPoster: true,
     posterFile: 'TwinLeaf.png',
-    posterImage: '/images/schedule/TwinLeaf.png',
-    image: '/images/schedule/TwinLeaf.png',
+    posterImage: '/SGfes/TwinLeaf.png',
+    image: '/SGfes/TwinLeaf.png',
     published: true
   },
   {
@@ -894,8 +894,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '聖書研究会ゴスペル部門がお届けする、現代版ワーシップの20分。エレキ、ベース、ピアノ、アコギ、クラッシックギター、ドラムが奏でる音楽とともに、心を揺らすひとときを。1日目12:20〜12:40、２日目12:30〜12:50。レクチャールームにて。',
     needsPoster: true,
     posterFile: 'GOSPELLIVE.png',
-    posterImage: '/images/schedule/GOSPELLIVE.png',
-    image: '/images/schedule/GOSPELLIVE.png',
+    posterImage: '/SGfes/GOSPELLIVE.png',
+    image: '/SGfes/GOSPELLIVE.png',
     published: true
   },
   {
@@ -944,8 +944,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '夏休み前から振り作りを始め、今日のために高1・高2で協力し作り上げてきました。第一体育館で1日目、2日目ともに13時05分からスタートします！ぜひお越しください！',
     needsPoster: true,
     posterFile: 'ダンス部.jpg',
-    posterImage: '/images/schedule/ダンス部.jpg',
-    image: '/images/schedule/ダンス部.jpg',
+    posterImage: '/SGfes/ダンス部.jpg',
+    image: '/SGfes/ダンス部.jpg',
     published: true
   },
   {
@@ -971,8 +971,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '誰もが一度は聞いたことのある曲から、最近話題の曲まで、幅広いジャンルの曲を演奏します！\n思わず体を動かしたくなるようなステージを、音楽の風に乗せてお届けします！',
     needsPoster: true,
     posterFile: '吹奏楽部.jpg',
-    posterImage: '/images/schedule/吹奏楽部.jpg',
-    image: '/images/schedule/吹奏楽部.jpg',
+    posterImage: '/SGfes/吹奏楽部.jpg',
+    image: '/SGfes/吹奏楽部.jpg',
     published: true
   },
   {
@@ -998,8 +998,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '文化祭2日目に行う在校生による清教学園ツアーです！\n清教学園ツアーでは、第一体育館・チャペル・リブラリア・ラーニングコモンズなど、清教学園のいろんな場所をまわります！\n入試を考えている人は、学校の雰囲気をリアルに知れ、 OB・OGのみなさんは「ここ懐かしい！」となること間違いなし。\n集合場所は受付を通った場所（第一体育館前）に看板を設置しています。\n参加者には景品もあります！\n気軽に参加してください！',
     needsPoster: true,
     posterFile: '清教学園ツアー.png',
-    posterImage: '/images/schedule/清教学園ツアー.png',
-    image: '/images/schedule/清教学園ツアー.png',
+    posterImage: '/SGfes/清教学園ツアー.png',
+    image: '/SGfes/清教学園ツアー.png',
     published: true
   },
   {
@@ -1025,8 +1025,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: 'SGfesスタンプラリーとは校内をまわりながらスタンプを集めると賞品がもらえる企画です！\nタンプラリーの台紙はスタンプの場所に置かれていて5個のスタンプを集めるとラーニングコモンズにくれば景品をプレゼント！\nぜひチャレンジしてみてくださいね！',
     needsPoster: true,
     posterFile: 'SGfesFile.jpeg',
-    posterImage: '/images/schedule/SGfesFile.jpeg',
-    image: '/images/schedule/SGfesFile.jpeg',
+    posterImage: '/SGfes/SGfesFile.jpeg',
+    image: '/SGfes/SGfesFile.jpeg',
     published: true
   },
   {
@@ -1166,8 +1166,8 @@ export const initialSchedules: ScheduleEvent[] = [
     activityContent: '指紋採取　ドラマで見るような指紋採取の体験ができます\n逮捕術　犯人を逮捕する際の術を学ぶことができます\nモンタージュ　犯人の目・鼻・口などの顔のパーツの写真や絵を組み合わせて、一人の顔を作り上げる体験です',
     needsPoster: true,
     posterFile: 'police.jpeg',
-    posterImage: '/images/schedule/police.jpeg',
-    image: '/images/schedule/police.jpeg',
+    posterImage: '/SGfes/警察・消防体験、野球教室.jpeg',
+    image: '/SGfes/警察・消防体験、野球教室.jpeg',
     published: true
   }
 ];

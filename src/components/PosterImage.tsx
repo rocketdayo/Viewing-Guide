@@ -38,22 +38,45 @@ export const getPosterCandidateUrls = (src?: string, posterFile?: string, poster
   if (withoutExt && withoutExt !== fileName) {
     baseNames.push(`${withoutExt}.png`);
     baseNames.push(`${withoutExt}.jpg`);
+    baseNames.push(`${withoutExt}.jpeg`);
+    baseNames.push(`${withoutExt}.webp`);
   }
   if (title && title.trim()) {
-    baseNames.push(`${title.trim()}.png`);
+    const cleanTitle = title.trim();
+    if (!baseNames.includes(cleanTitle)) {
+      baseNames.push(`${cleanTitle}.png`);
+      baseNames.push(`${cleanTitle}.jpg`);
+      baseNames.push(`${cleanTitle}.jpeg`);
+    }
   }
 
   const prefixes = [
+    '/SGfes/',
+    '/images/schedule/',
     '/classposter/',
     '/images/classes/',
     '/images/projects/',
     '/images/alumni/',
-    '/images/'
+    '/images/',
+    '/'
   ];
 
-  for (const name of baseNames) {
-    for (const prefix of prefixes) {
+  if (posterImage && (posterImage.startsWith('/SGfes/') || posterImage.startsWith('/images/schedule/'))) {
+    add(posterImage);
+    try {
+      add(encodeURI(posterImage));
+    } catch {}
+  }
+
+  for (const prefix of prefixes) {
+    for (const name of baseNames) {
       add(`${prefix}${name}`);
+      try {
+        const encodedName = encodeURIComponent(name);
+        if (encodedName !== name) {
+          add(`${prefix}${encodedName}`);
+        }
+      } catch {}
     }
   }
 
@@ -61,7 +84,7 @@ export const getPosterCandidateUrls = (src?: string, posterFile?: string, poster
   add(image);
   add(src);
 
-  return candidates.slice(0, 8);
+  return candidates.slice(0, 32);
 };
 
 export const PosterImage: React.FC<PosterImageProps> = ({
@@ -137,6 +160,20 @@ export const PosterImage: React.FC<PosterImageProps> = ({
   };
 
   if (hasError || !currentUrl) {
+    if (!allowZoom) {
+      return (
+        <div 
+          id="poster-thumb-placeholder"
+          className={`flex flex-col items-center justify-center bg-slate-100 text-slate-400 select-none p-1 ${className}`}
+        >
+          <ImageIcon className="w-5 h-5 text-slate-300 mb-0.5" />
+          <span className="text-[9px] font-bold text-slate-500 text-center line-clamp-1 leading-tight px-0.5">
+            {title || 'ポスター'}
+          </span>
+        </div>
+      );
+    }
+
     return (
       <div 
         id="poster-placeholder-card"
