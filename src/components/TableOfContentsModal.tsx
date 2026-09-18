@@ -20,7 +20,8 @@ import {
   HelpCircle,
   Smartphone,
   Globe,
-  ShieldCheck
+  ShieldCheck,
+  Stamp
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AppDataState } from '../types';
@@ -196,6 +197,13 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
       icon: GraduationCap,
       color: 'text-amber-800 bg-amber-50 border-amber-200',
       action: () => handleJump('home', 'alumni-section'),
+    },
+    {
+      title: language === 'en' ? 'SGfes Stamp Rally (Day 2)' : 'SGfesスタンプラリー（文化祭2日目特別企画）',
+      desc: language === 'en' ? 'Collect 5 stamps across campus to win prizes at Learning Commons' : '校内5箇所のスタンプを集めてラーニングコモンズで特製景品をプレゼント！',
+      icon: Stamp,
+      color: 'text-amber-900 bg-amber-100/70 border-amber-300',
+      action: () => handleJump('home', 'stamprally-section'),
     },
   ];
 

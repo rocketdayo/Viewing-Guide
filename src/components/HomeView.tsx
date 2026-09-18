@@ -27,6 +27,7 @@ import { AlumniSection } from './AlumniSection';
 import { AnnouncementsSection } from './AnnouncementsSection';
 import { StudentInfoSection } from './StudentInfoSection';
 import { CampusTourSection } from './CampusTourSection';
+import { StampRallySection } from './StampRallySection';
 import { useI18n } from '../utils/i18n';
 
 interface HomeViewProps {
@@ -444,6 +445,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <CampusTourSection onNavigate={onNavigate} />
 
       <AlumniSection />
+
+      <StampRallySection onNavigate={onNavigate} />
     </div>
   );
 };
