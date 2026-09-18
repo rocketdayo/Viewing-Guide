@@ -126,13 +126,13 @@ export const INITIAL_APP_DATA: AppDataState = {
         level: 'ticket',
         waitTimeMinutes: 15,
         ticketRequired: true,
-        ticketDistributionTime: 'オンラインにて整理券受付中',
+        ticketDistributionTime: '各教室付近のQRコードより受付',
         lastUpdated: '11:42',
-        statusNote: 'オンライン整理券を発行してご参加ください'
+        statusNote: '教室付近のQRコードをスキャンして整理券を取得'
       },
       rules: ['1グループ2〜4名様推奨', '制限時間内に間違いを報告してください'],
       onlineTicketUrl: '',
-      onlineTicketNote: 'オンライン整理券発行対応クラスです。整理券を発行の上、指定時間にお越しください。'
+      onlineTicketNote: '整理券対象企画です。各クラス（教室）の近くに掲示されているQRコードをスマートフォンのカメラでスキャンして整理券を取得してください。'
     },
     {
       id: 'p-1c',
@@ -177,13 +177,13 @@ export const INITIAL_APP_DATA: AppDataState = {
         level: 'ticket',
         waitTimeMinutes: 10,
         ticketRequired: true,
-        ticketDistributionTime: 'オンラインにて整理券受付中',
+        ticketDistributionTime: '各教室付近のQRコードより受付',
         lastUpdated: '11:35',
-        statusNote: 'オンライン整理券発行対応中'
+        statusNote: '教室付近のQRコードをスキャンして整理券を取得'
       },
       rules: ['釣り竿は周りの人にぶつからないようご注意ください'],
       onlineTicketUrl: '',
-      onlineTicketNote: 'オンライン整理券発行対応クラスです。整理券をお持ちの方を優先してご案内いたします。'
+      onlineTicketNote: '整理券対象企画です。各クラス（教室）の近くに掲示されているQRコードをスマートフォンのカメラでスキャンして整理券を取得してください。'
     },
     {
       id: 'p-1e',
@@ -348,13 +348,13 @@ export const INITIAL_APP_DATA: AppDataState = {
         level: 'ticket',
         waitTimeMinutes: 10,
         ticketRequired: true,
-        ticketDistributionTime: 'オンラインにて整理券受付中',
+        ticketDistributionTime: '各教室付近のQRコードより受付',
         lastUpdated: '11:45',
-        statusNote: 'オンライン整理券発行対応中'
+        statusNote: '教室付近のQRコードをスキャンして整理券を取得'
       },
       rules: ['撮影時は順番をお守りください'],
       onlineTicketUrl: '',
-      onlineTicketNote: 'オンライン整理券発行対応クラスです。整理券を取得のうえお越しください。'
+      onlineTicketNote: '整理券対象企画です。各クラス（教室）の近くに掲示されているQRコードをスマートフォンのカメラでスキャンして整理券を取得してください。'
     },
     {
       id: 'p-2b',
@@ -423,13 +423,13 @@ export const INITIAL_APP_DATA: AppDataState = {
         level: 'ticket',
         waitTimeMinutes: 15,
         ticketRequired: true,
-        ticketDistributionTime: 'オンラインにて整理券受付中',
+        ticketDistributionTime: '各教室付近のQRコードより受付',
         lastUpdated: '11:38',
-        statusNote: 'オンライン整理券発行対応中'
+        statusNote: '教室付近のQRコードをスキャンして整理券を取得'
       },
       rules: ['動きやすい服装・靴でご参加ください'],
       onlineTicketUrl: '',
-      onlineTicketNote: 'オンライン整理券発行対応クラスです。整理券をお持ちの方を優先してご案内いたします。'
+      onlineTicketNote: '整理券対象企画です。各クラス（教室）の近くに掲示されているQRコードをスマートフォンのカメラでスキャンして整理券を取得してください。'
     },
     {
       id: 'p-2e',
@@ -450,13 +450,13 @@ export const INITIAL_APP_DATA: AppDataState = {
         level: 'ticket',
         waitTimeMinutes: 20,
         ticketRequired: true,
-        ticketDistributionTime: 'オンラインにて整理券受付中',
+        ticketDistributionTime: '各教室付近のQRコードより受付',
         lastUpdated: '11:46',
-        statusNote: 'オンライン整理券を発行してご参加ください'
+        statusNote: '教室付近のQRコードをスキャンして整理券を取得'
       },
       rules: ['大声を出さずに耐えられるか挑戦してください'],
       onlineTicketUrl: '',
-      onlineTicketNote: 'オンライン整理券発行対応クラスです。指定の時間枠の整理券を取得してください。'
+      onlineTicketNote: '整理券対象企画です。各クラス（教室）の近くに掲示されているQRコードをスマートフォンのカメラでスキャンして整理券を取得してください。'
     },
     {
       id: 'p-2f',
@@ -573,13 +573,13 @@ export const INITIAL_APP_DATA: AppDataState = {
         level: 'ticket',
         waitTimeMinutes: 15,
         ticketRequired: true,
-        ticketDistributionTime: 'オンラインにて整理券受付中',
+        ticketDistributionTime: '各教室付近のQRコードより受付',
         lastUpdated: '11:42',
-        statusNote: 'オンライン整理券発行対応中'
+        statusNote: '教室付近のQRコードをスキャンして整理券を取得'
       },
       rules: ['現場の証拠品は丁寧に扱ってください'],
       onlineTicketUrl: '',
-      onlineTicketNote: 'オンライン整理券発行対応クラスです。整理券を取得の上、捜査班の集合時間にお越しください。'
+      onlineTicketNote: '整理券対象企画です。各クラス（教室）の近くに掲示されているQRコードをスマートフォンのカメラでスキャンして整理券を取得してください。'
     },
     {
       id: 'p-2k',

@@ -74,18 +74,18 @@ export const FaqMannersView: React.FC<{ onNavigate: (page: string) => void }> = 
       category: 'tickets',
       question: '整理券が必要な企画はどのように見分けますか？',
       questionEn: 'How do I know which projects require tickets?',
-      answer: '本アプリの「クラス企画一覧」または「リアルタイム混雑状況」画面で「🎫 整理券制」のバッジが表示されている企画が対象です。各企画の詳細ページに配布時間やオンライン整理券の取得リンクが掲載されています。',
-      answerEn: 'Projects marked with the "🎫 Ticket Req." badge on the Projects or Live Congestion page require tickets. Check project details for distribution times and online pass links.',
+      answer: '本アプリの「クラス企画一覧」または「リアルタイム混雑状況」画面で「🎫 整理券制」のバッジが表示されている企画が対象です。各クラス（教室）の近くにQRコードが掲示されており、そちらをスキャンして整理券を取得できます。',
+      answerEn: 'Projects marked with the "🎫 Ticket Required" badge on the Projects or Live Congestion page require tickets. A QR code is posted near each classroom—scan it with your phone to obtain your ticket.',
       tag: '整理券対象'
     },
     {
       id: 'faq-tickets-distribution',
       category: 'tickets',
-      question: '整理券はどこで・何時に配られますか？',
-      questionEn: 'Where and when are tickets distributed?',
-      answer: '整理券はオンライン整理券にて配布されます。午前の部と午後の部を分ける対応は行いません。なお、混雑時は一時発券が停止する場合があります。',
-      answerEn: 'Tickets are distributed via online digital tickets. There are no separate morning or afternoon distribution sessions. Please note that ticket issuance may be temporarily suspended during peak congestion.',
-      tag: 'オンライン整理券'
+      question: '整理券はどこで・どのように取得できますか？',
+      questionEn: 'Where and how do I get a numbered ticket?',
+      answer: '整理券対象クラスの近くにQRコードが掲示されています。スマートフォンのカメラでQRコードをスキャンして整理券を取得できます。なお、混雑状況や定員に達した場合は一時発券が停止・終了することがあります。',
+      answerEn: 'Numbered tickets can be obtained by scanning the QR code posted near each classroom with your smartphone camera. Please note that ticket distribution may be temporarily suspended if capacity is reached.',
+      tag: 'QRコード整理券'
     },
     {
       id: 'faq-trash',

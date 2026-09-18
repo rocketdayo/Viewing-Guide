@@ -374,8 +374,8 @@ const translations: Record<Language, I18nTranslations> = {
     detailCopied: 'コピー完了！',
     detailBookmarkAdd: 'マイタイムラインに追加',
     detailBookmarkRemove: 'マイタイムラインから削除',
-    detailOnlineTicketNotice: 'オンライン整理券の配付対象企画です',
-    detailGetOnlineTicket: 'オンライン整理券を取得する',
+    detailOnlineTicketNotice: '整理券制の企画です（各教室付近のQRコードから取得）',
+    detailGetOnlineTicket: '整理券受付リンクを開く',
 
     scheduleTitle: 'ステージタイムテーブル',
     scheduleSubtitle: '第一体育館・レクチャールームの部活動・有志・クラス公演スケジュール',
@@ -605,8 +605,8 @@ const translations: Record<Language, I18nTranslations> = {
     detailCopied: 'Copied to clipboard!',
     detailBookmarkAdd: 'Add to Timeline',
     detailBookmarkRemove: 'Remove from Timeline',
-    detailOnlineTicketNotice: 'This project offers digital tickets',
-    detailGetOnlineTicket: 'Get Digital Ticket',
+    detailOnlineTicketNotice: 'Numbered ticket required (Scan QR code near the classroom)',
+    detailGetOnlineTicket: 'Open Ticket Reservation',
 
     scheduleTitle: 'Stage Timetable',
     scheduleSubtitle: 'Live performances in Gym 1 and Lecture Room (Clubs, Volunteers, Classes)',

@@ -131,8 +131,8 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({
                     </span>
                     {isOnlineTicketClass && (
                       <span className="bg-purple-100 text-purple-900 border border-purple-200 text-xs px-2.5 py-0.5 rounded-md font-bold flex items-center gap-1 shadow-xs">
-                        <Ticket className="w-3.5 h-3.5 text-purple-600" />
-                        {language === 'en' ? 'Digital Ticket' : 'オンライン整理券対象'}
+                        <QrCode className="w-3.5 h-3.5 text-purple-600" />
+                        {language === 'en' ? 'QR Ticket Required' : '整理券制（QR）'}
                       </span>
                     )}
                   </div>
@@ -160,49 +160,59 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({
               <ClassPosterSection project={project} />
 
               {isOnlineTicketClass && (
-                <div className="p-4 rounded-xs bg-purple-50 text-purple-950 border border-purple-200 shadow-xs">
-                  <div className="flex items-start justify-between gap-3">
+                <div className="p-4 rounded-xs bg-purple-50 text-purple-950 border border-purple-200 shadow-xs space-y-3">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center space-x-1.5">
+                      <span className="bg-purple-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1">
+                        <QrCode className="w-3 h-3" /> QR TICKET
+                      </span>
+                      <span className="text-xs font-bold text-purple-800">
+                        {language === 'en' ? 'Numbered Ticket Information' : '整理券の取得方法'}
+                      </span>
+                    </div>
+                    <h4 className="text-sm sm:text-base font-bold text-purple-950 flex items-center gap-1.5">
+                      {language === 'en' ? 'Scan the QR code near the classroom to get a ticket' : '各クラスの近くにあるQRコードをスキャンして整理券を取得できます'}
+                    </h4>
+                    <p className="text-xs sm:text-sm text-purple-900 leading-relaxed">
+                      {project.onlineTicketNote || (language === 'en'
+                        ? 'A QR code is posted near this classroom. Please scan the QR code with your smartphone camera to obtain your numbered ticket.'
+                        : '整理券対象企画です。各クラス（教室）の近くに掲示されているQRコードをスマートフォンのカメラでスキャンして整理券を取得してください。')}
+                    </p>
+                  </div>
+
+                  <div className="p-3 rounded-xs bg-white/95 border border-purple-200 flex items-start gap-2.5 text-xs text-purple-950 shadow-2xs">
+                    <div className="w-7 h-7 rounded-md bg-purple-100 border border-purple-200 flex items-center justify-center shrink-0 mt-0.5">
+                      <QrCode className="w-4 h-4 text-purple-700" />
+                    </div>
                     <div className="space-y-1">
-                      <div className="flex items-center space-x-1.5">
-                        <span className="bg-purple-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1">
-                          <QrCode className="w-3 h-3" /> Online Ticket
-                        </span>
-                        <span className="text-xs font-bold text-purple-800">
-                          {language === 'en' ? 'Digital Queue Ticket' : 'オンライン整理券受付'}
-                        </span>
-                      </div>
-                      <h4 className="text-sm font-bold text-purple-950">
-                        {language === 'en' ? 'Digital tickets available for this project' : 'この企画はオンライン整理券を発行してご参加いただけます'}
-                      </h4>
-                      <p className="text-xs text-purple-900/90 leading-relaxed mt-1">
-                        {project.onlineTicketNote || (language === 'en' ? 'Digital time slots are implemented to reduce wait times.' : '混雑緩和のため、オンライン整理券による時間帯指定入場を実施しています。')}
+                      <p className="font-bold text-purple-950">
+                        {language === 'en' ? 'How to obtain your ticket:' : '整理券の受け取り手順:'}
+                      </p>
+                      <p className="text-[11px] sm:text-xs text-purple-800 leading-relaxed">
+                        {language === 'en'
+                          ? '① Go to the classroom on site ➔ ② Scan the posted QR code with your phone camera ➔ ③ Receive your ticket and visit at your designated time.'
+                          : '① 教室入口付近へ行く ➔ ② 掲示されているQRコードをスマホのカメラでスキャン ➔ ③ 整理券を取得し、指定の時間にお越しください。'}
                       </p>
                     </div>
                   </div>
 
-                  <div className="mt-3.5 pt-3 border-t border-purple-200 flex flex-wrap items-center justify-between gap-2">
-                    <div className="text-[11px] text-purple-800 flex items-center gap-1.5">
-                      <Info className="w-3.5 h-3.5 text-purple-600" />
-                      <span>{language === 'en' ? 'Proceed to ticket reservation to pick a time slot' : '整理券の取得画面へ進んで時間枠をご選択ください'}</span>
-                    </div>
-                    {project.onlineTicketUrl ? (
+                  {project.onlineTicketUrl && (
+                    <div className="pt-2 border-t border-purple-200/80 flex items-center justify-between gap-2">
+                      <span className="text-[11px] text-purple-700 font-medium">
+                        {language === 'en' ? 'Online Ticket Page:' : '整理券受付リンク:'}
+                      </span>
                       <a
                         href={project.onlineTicketUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xs bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+                        className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xs bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
                       >
-                        <Ticket className="w-4 h-4" />
+                        <Ticket className="w-3.5 h-3.5" />
                         <span>{t.detailGetOnlineTicket}</span>
-                        <ExternalLink className="w-3.5 h-3.5 ml-0.5" />
+                        <ExternalLink className="w-3 h-3 ml-0.5" />
                       </a>
-                    ) : (
-                      <div className="inline-flex items-center space-x-1 px-3.5 py-1.5 rounded-xs bg-purple-100 text-purple-800 text-xs font-medium border border-purple-200">
-                        <Ticket className="w-3.5 h-3.5 text-purple-600" />
-                        <span>{language === 'en' ? 'Ticket system coming soon' : '整理券システム準備中（順次受付開始）'}</span>
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               )}
 
