@@ -984,7 +984,7 @@ const basementPlaces = [
  image:"images/2-J.png",
  detail: true,
  description: "文化祭準備中に発生した事件を、教室内にあるヒントを見つけながら容疑者のアリバイを聞き、事件の謎を解き明かしていただきます。ぜひお楽しみください。",
- location: "2階",
+ location: "地下階",
  time: "9:00〜14:30"
 },
 { name: "生徒会室 学園祭準備室",
@@ -1051,7 +1051,7 @@ const path = decodeURIComponent(window.location.pathname);
 let places = [];
 let floorName = "";
 
-if (path.includes("floor地下")) {
+if (path.toLowerCase().includes("floorb") || path.includes("floor地下")) {
     places = basementPlaces;
     floorName = "地下階";
 } else if (path.includes("floor1")) {
